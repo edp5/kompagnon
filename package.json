@@ -16,7 +16,8 @@
   "scripts": {
     "release": "commit-and-tag-version",
     "ci:api": "cd api && npm ci",
-    "ci:all": "run-p --print-label ci:api"
+    "ci:all": "run-p --print-label ci:api",
+    "configure": "sh ./scripts/configure.sh"
   },
   "dependencies": {
     "commit-and-tag-version": "^12.6.0",
