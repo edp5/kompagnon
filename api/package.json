@@ -13,6 +13,21 @@
   "author": "edp5",
   "type": "module",
   "main": "index.js",
+  "scripts": {
+    "test": "npm run test:prepare && NODE_ENV=test vitest run",
+    "test:prepare": "NODE_ENV=test npm run db:prepare",
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "db:new-migration": "npx knex --knexfile ./db/knexfile.js  migrate:make --stub $PWD/db/template.js $migrationname",
+    "db:create": "node ./db/create-database.js",
+    "db:delete": "node ./db/drop-database.js",
+    "db:empty": "node ./db/empty-database.js",
+    "db:migrate": "knex --knexfile ./db/knexfile.js  migrate:latest",
+    "db:rollback:latest": "knex --knexfile ./db/knexfile.js  migrate:down",
+    "db:prepare": "npm run db:delete && npm run db:create && npm run db:migrate",
+    "db:seed": "knex --knexfile ./db/knexfile.js seed:run",
+    "db:reset": "npm run db:prepare && npm run db:seed"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
