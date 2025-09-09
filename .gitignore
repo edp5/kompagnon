@@ -1,0 +1,7 @@
+# Macos
+*.DS_Store
+*node_modules
+*.env
+
+# IDE
+.idea
