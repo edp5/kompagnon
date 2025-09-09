@@ -17,4 +17,6 @@ server.use((req, res, next) => {
   next();
 });
 
-export default server
+server.use(health);
+
+export default server;
