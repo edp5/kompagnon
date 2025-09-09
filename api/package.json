@@ -26,11 +26,15 @@
     "db:rollback:latest": "knex --knexfile ./db/knexfile.js  migrate:down",
     "db:prepare": "npm run db:delete && npm run db:create && npm run db:migrate",
     "db:seed": "knex --knexfile ./db/knexfile.js seed:run",
-    "db:reset": "npm run db:prepare && npm run db:seed"
+    "db:reset": "npm run db:prepare && npm run db:seed",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-vitest-globals": "^1.5.0",
     "express": "^5.1.0",
     "knex": "^3.1.0",
     "lodash": "^4.17.21",
