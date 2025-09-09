@@ -1,0 +1,22 @@
+{
+  "name": "kompagnon",
+  "version": "0.0.0",
+  "description": "moving assistance platform for invalid people",
+  "homepage": "https://github.com/edp5/kompagnon#readme",
+  "bugs": {
+    "url": "https://github.com/edp5/kompagnon/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edp5/kompagnon.git"
+  },
+  "license": "MIT",
+  "author": "edp5",
+  "type": "module",
+  "scripts": {
+    "release": "commit-and-tag-version"
+  },
+  "dependencies": {
+    "commit-and-tag-version": "^12.6.0"
+  }
+}
