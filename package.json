@@ -14,7 +14,9 @@
   "author": "edp5",
   "type": "module",
   "scripts": {
-    "release": "commit-and-tag-version"
+    "release": "commit-and-tag-version",
+    "ci:api": "cd api && npm ci",
+    "ci:all": "run-p --print-label ci:api"
   },
   "dependencies": {
     "commit-and-tag-version": "^12.6.0",
