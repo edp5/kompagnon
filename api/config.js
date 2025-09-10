@@ -49,6 +49,22 @@ const configuration = (function() {
       },
     },
     baseUrl: process.env.BASE_URL,
+    swagger: {
+      definition: {
+        openapi: "3.0.0",
+        info: {
+          title: "Api Kompagnon",
+          version: "0.0.0",
+          description: "The api for Kompagnon platform",
+        },
+        servers: [
+          {
+            url: `http://localhost:${process.env.PORT || 3000}`,
+          },
+        ],
+      },
+      apis: ["./src/**/routes.js"],
+    },
   };
 
   if (config.environment === "test") {
