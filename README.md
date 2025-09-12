@@ -1,4 +1,4 @@
-# Kompagnon
+# Kompagnon api
 
 ## Project Goal
 
@@ -9,7 +9,7 @@ The goal of Kompagnon is to provide a support service for people with disabiliti
 ### Get the sources
 
 ```bash
-git clone git@github.com:edp5/kompagnon.git && cd kompagnon
+git clone git@github.com:edp5/kompagnon-api.git && cd kompagnon-api
 ```
 
 #### Installation
@@ -23,8 +23,7 @@ npm run configure
 On Windows, run the following:
 
 ```bash
-npm ci && npm run ci:all
-cd api
+npm ci
 copy sample.env .env   # if using CMD
 # or: Copy-Item sample.env .env   # if using PowerShell
 docker compose up -d
@@ -32,11 +31,8 @@ npm run db:reset
 ```
 
 ## Launch
-
-For now, only the API is available, so you can start it with:
-
 ```bash
-cd api && npm run dev
+npm run dev
 ```
 
 ### Contribution
@@ -46,18 +42,13 @@ Your code must be clear and logic. Your pull request can be accepted or rejected
 This project is testing and all new implementation must be tested.
 
 #### Linter
-All app of the project have a linter. You can run the linter with:
-```bash
-npm run lint
-```
-on root folder to run the linter of all apps.
-If errors must be fixed with "fix" option, you can goto app error folder and run
+The api is using eslint with the airbnb style guide. Please run the linter before pushing your code:
 ```bash
 npm run lint:fix
 ```
-All fixable errors will be fixed.
 
 ### Commits and pull request
-Your commit must respect conventional commit with "feat" or "fix" or "refactor" the scope and the title of your commit. For exemple:
-"feat(api): add the db configuration".
-Pull requests must respect similare rules.
+Your commit messages must be clear and concise. Please use the following format:
+```
+feat: add new feature
+```
