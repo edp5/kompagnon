@@ -8,8 +8,8 @@ echo "Configuring the environment for the project..."
 echo "Installing dependencies..."
 npm ci || { echo "Error installing npm ci dependencies"; exit 1; }
 
-# Environment variable
-echo "Setting up environment variables..."
+# Root-level environment variable
+echo "Setting up root-level environment variables..."
 cp ./sample.env ./.env || { echo "Error copying environment file"; exit 1; }
 
 # docker
