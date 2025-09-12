@@ -52,6 +52,7 @@ jobs:
         run: npm run configure
 
       - name: wait for db
+        # Increased to 15 seconds to accommodate slow database startup in CI environment.
         run: sleep 15
 
       - name: run tests
