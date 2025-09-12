@@ -2,10 +2,7 @@ version: 2
 updates:
   # Fetch and update latest `npm` packages
   - package-ecosystem: npm
-    directories:
-      - './api'
-      - './'
-      # - './web'
+    directory: '/'
     schedule:
       interval: daily
       time: '00:00'
