@@ -1,3 +1,6 @@
+# Coverage
+**/coverage
+
 # Macos
 *.DS_Store
 *node_modules
