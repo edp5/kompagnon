@@ -63,6 +63,14 @@ jobs:
         run: sleep 5
         working-directory: ./api
 
-      - name: run tests
-        run: npm t
+      - name: run tests with coverage
+        run: npm run test:coverage
         working-directory: ./api
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./api/coverage
+          flags: api
+          name: web-test

@@ -15,6 +15,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test:prepare && NODE_ENV=test vitest run",
+    "test:coverage": "npm t -- --coverage",
     "test:prepare": "NODE_ENV=test npm run db:prepare",
     "dev": "nodemon index.js",
     "start": "node index.js",
@@ -48,6 +49,7 @@
     "vitest": "^3.2.4"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.4",
     "nodemon": "^3.1.10"
   }
 }
