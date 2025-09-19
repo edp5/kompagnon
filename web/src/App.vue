@@ -2,6 +2,7 @@
 import { onBeforeMount, ref } from "vue";
 
 import { apiCheck } from "@/adapters/api-check.js";
+import FooterComponent from "@/components/FooterComponent.vue";
 
 const apiIsOk = ref(false);
 
@@ -21,6 +22,7 @@ onBeforeMount(async () => {
       >vuejs.org</a> to read the
       documentation
     </p>
+    <FooterComponent />
   </div>
 </template>
 
