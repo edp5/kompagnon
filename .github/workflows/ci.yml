@@ -73,7 +73,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./api/coverage
           flags: api
-          name: web-test
+          name: api-test
 
   web-lint:
     runs-on: ubuntu-latest
