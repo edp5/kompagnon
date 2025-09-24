@@ -29,15 +29,18 @@ copy sample.env .env   # if using CMD
 # or: Copy-Item sample.env .env   # if using PowerShell
 docker compose up -d
 npm run db:reset
+cd ../web
+copy sample.env .env   # if using CMD
+# or: Copy-Item sample.env .env   # if using PowerShell
 ```
 
 ## Launch
-
-For now, only the API is available, so you can start it with:
-
+You can parallel run apps with:
 ```bash
-cd api && npm run dev
+npm run dev
 ```
+in root path. You can also goto app and run only the current app.
+
 
 ### Contribution
 Your code must be clear and logic. Your pull request can be accepted or rejected without explication.

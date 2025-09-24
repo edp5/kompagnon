@@ -5,7 +5,7 @@ updates:
     directories:
       - './api'
       - './'
-      # - './web'
+      - './web'
     schedule:
       interval: daily
       time: '00:00'
