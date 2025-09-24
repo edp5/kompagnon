@@ -59,7 +59,7 @@ export const logger = {
 
 /**
  * Creates a child logger for a section.
- * Debug may be enabled for a section using LOG_DEBUG.
+ * Debug may be enabled for a section using DEBUG_ENABLED.
  * @param {string} section
  * @param {pino.Bindings} bindings
  * @param {pino.ChildLoggerOptions} options
