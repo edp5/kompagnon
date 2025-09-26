@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 
 import { logger } from "./logger.js";
+import auth from "./src/shared/auth/routes.js";
 import health from "./src/shared/health/routes.js";
 import swaggerRoute from "./swagger.js";
 
@@ -17,6 +18,7 @@ server.use((req, res, next) => {
   next();
 });
 
+server.use("/api/auth", auth);
 server.use(health);
 
 export default server;
