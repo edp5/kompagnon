@@ -70,6 +70,8 @@ const configuration = (function() {
   if (config.environment === "test") {
     config.port = 0;
     config.logging.enabled = false;
+    config.jwt.tokenSecret = "abcd";
+    config.jwt.expirationTime = "1h";
     config.email.enabled = false;
     config.email.testAccount = false;
     config.baseUrl = "http://localhost/#/";
