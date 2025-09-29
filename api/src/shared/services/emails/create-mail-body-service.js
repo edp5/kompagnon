@@ -41,8 +41,8 @@ async function createMailBodyService(documentName, replaceElements) {
 
     if (replaceElements) {
       for (const [key, value] of Object.entries(replaceElements)) {
-        const placeholder = `{{${escapeRegExp(key)}}}`;
-        mailBody = mailBody.replace(new RegExp(placeholder, "g"), value);
+        const placeholder = `{{${key}}}`;
+        mailBody = mailBody.replace(new RegExp(escapeRegExp(placeholder), "g"), value);
       }
     }
 
