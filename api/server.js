@@ -2,8 +2,8 @@ import cors from "cors";
 import express from "express";
 
 import { logger } from "./logger.js";
-import health from "./src/shared/health/routes.js";
 import identitiesAccessManagement from "./src/identities-access-management/routes.js";
+import health from "./src/shared/health/routes.js";
 import swaggerRoute from "./swagger.js";
 
 const server = express();

@@ -9,7 +9,7 @@ import { logger } from "../../../logger.js";
  */
 async function createTransporter() {
   const { email } = config;
-  
+
   if (!email.enabled) {
     logger.info("Email service is disabled");
     return null;
@@ -46,14 +46,14 @@ async function createTransporter() {
 async function sendActivationEmail(email, activationToken) {
   try {
     const transporter = await createTransporter();
-    
+
     if (!transporter) {
       logger.info("Email service disabled, skipping activation email");
       return;
     }
 
     const activationUrl = `${config.baseUrl}activate?token=${activationToken}`;
-    
+
     const mailOptions = {
       from: config.email.auth.user,
       to: email,

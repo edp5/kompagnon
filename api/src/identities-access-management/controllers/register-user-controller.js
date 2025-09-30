@@ -1,8 +1,8 @@
+import { logger } from "../../../logger.js";
+import { createUser, findUserByEmail } from "../repositories/user-repository.js";
+import { sendActivationEmail } from "../services/email-service.js";
 import { generatePassword } from "../services/password-service.js";
 import { encodedToken } from "../services/token-service.js";
-import { sendActivationEmail } from "../services/email-service.js";
-import { createUser, findUserByEmail } from "../repositories/user-repository.js";
-import { logger } from "../../../logger.js";
 
 /**
  * Validates user registration data
@@ -126,7 +126,7 @@ async function registerUserController(req, res) {
     logger.info(`User registered successfully: ${newUser.email}`, { userId: newUser.id });
   } catch (error) {
     logger.error("User registration failed", error);
-    
+
     if (error.message === "Email already exists") {
       return res.status(409).json({
         success: false,

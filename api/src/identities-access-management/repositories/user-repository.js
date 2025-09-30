@@ -16,7 +16,7 @@ const TABLE_NAME = "users";
 async function createUser(userData) {
   try {
     const { firstname, lastname, email, birthday, password } = userData;
-    
+
     const [user] = await configuredKnex(TABLE_NAME)
       .insert({
         firstname,
@@ -35,12 +35,12 @@ async function createUser(userData) {
     return user;
   } catch (error) {
     logger.error("Failed to create user", error);
-    
+
     // Handle unique constraint violation (duplicate email)
     if (error.code === "23505" && error.constraint === "users_email_unique") {
       throw new Error("Email already exists");
     }
-    
+
     throw new Error("Failed to create user");
   }
 }
