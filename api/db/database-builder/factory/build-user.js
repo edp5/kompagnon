@@ -1,6 +1,9 @@
+import { generatePassword } from "../../../src/identities-access-management/services/password-service.js";
 import { knex } from "../../knex-database-connection.js";
-
-async function buildUser({ firstname = "John", lastname = "Doe", email = "john.doe@example.net", birthday = "01/01/1970", created_at = new Date(), updated_at = new Date(), isActive = true, isChecked = true }) {
+async function buildUser({ firstname = "John", lastname = "Doe", email = "john.doe@example.net", birthday = "01/01/1970", created_at = new Date(), updated_at = new Date(), isActive = true, isChecked = true, hashedPassword = null }) {
+  if (!hashedPassword) {
+    hashedPassword = await generatePassword("password");
+  }
   const [values] = await knex("users").insert({
     firstname,
     lastname,
@@ -10,6 +13,7 @@ async function buildUser({ firstname = "John", lastname = "Doe", email = "john.d
     updated_at,
     isActive,
     isChecked,
+    hashedPassword,
   }).returning("*");
   return values;
 }
