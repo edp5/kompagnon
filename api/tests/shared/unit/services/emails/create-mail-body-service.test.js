@@ -2,7 +2,7 @@ import * as fs from "node:fs/promises";
 
 import { describe, expect, it, vi } from "vitest";
 
-import { createMailBodyService } from "../../../../../../src/shared/services/emails/create-mail-body-service.js";
+import { createMailBodyService } from "../../../../../src/shared/services/emails/create-mail-body-service.js";
 
 vi.mock("node:fs/promises", () => ({
   readFile: vi.fn(),
