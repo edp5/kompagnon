@@ -3,6 +3,7 @@ import express from "express";
 
 import { logger } from "./logger.js";
 import health from "./src/shared/health/routes.js";
+import identitiesAccessManagement from "./src/identities-access-management/routes.js";
 import swaggerRoute from "./swagger.js";
 
 const server = express();
@@ -18,5 +19,6 @@ server.use((req, res, next) => {
 });
 
 server.use(health);
+server.use(identitiesAccessManagement);
 
 export default server;
