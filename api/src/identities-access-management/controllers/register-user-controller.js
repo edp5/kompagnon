@@ -1,8 +1,8 @@
-import { generatePassword } from "../services/password-service.js";
-import { encodedToken } from "../services/token-service.js";
-import { sendMailService } from "../../shared/services/emails/send-mail-service.js";
 import { knex } from "../../../db/knex-database-connection.js";
 import { logger } from "../../../logger.js";
+import { sendMailService } from "../../shared/services/emails/send-mail-service.js";
+import { generatePassword } from "../services/password-service.js";
+import { encodedToken } from "../services/token-service.js";
 
 /**
  * Validates user registration data
@@ -112,7 +112,7 @@ async function registerUserController(req, res) {
     // Send activation email using existing service
     try {
       const activationUrl = `${process.env.BASE_URL || "http://localhost:5173/#/"}activate?token=${activationToken}`;
-      
+
       await sendMailService({
         to: newUser.email,
         subject: "Activate your Kompagnon account",
@@ -146,7 +146,7 @@ async function registerUserController(req, res) {
     logger.info(`User registered successfully: ${newUser.email}`, { userId: newUser.id });
   } catch (error) {
     logger.error("User registration failed", error);
-    
+
     // Handle unique constraint violation (duplicate email)
     if (error.code === "23505" && error.constraint === "users_email_unique") {
       return res.status(409).json({
@@ -154,7 +154,7 @@ async function registerUserController(req, res) {
         message: "User with this email already exists",
       });
     }
-    
+
     res.status(500).json({
       success: false,
       message: "Internal server error during registration",
