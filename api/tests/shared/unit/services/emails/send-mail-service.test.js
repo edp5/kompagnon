@@ -1,8 +1,8 @@
 import nodemailer from "nodemailer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { config } from "../../../../../../config.js";
-import { sendMailService } from "../../../../../../src/shared/services/emails/send-mail-service.js";
+import { config } from "../../../../../config.js";
+import { sendMailService } from "../../../../../src/shared/services/emails/send-mail-service.js";
 
 const { email } = config;
 
