@@ -16,15 +16,22 @@
   "scripts": {
     "release": "commit-and-tag-version",
     "ci:api": "cd api && npm ci",
+    "ci:admin": "cd admin && npm ci",
     "ci:web": "cd web && npm ci",
-    "ci:all": "run-p --print-label ci:api ci:web",
+    "ci:all": "run-p --print-label ci:api ci:web ci:admin",
     "configure": "sh ./scripts/configure.sh",
     "dev:api": "cd api && npm run dev",
     "dev:web": "cd web && npm run dev",
-    "dev": "run-p --print-label dev:api dev:web",
+    "dev:admin": "cd admin && npm run dev",
+    "dev": "run-p --print-label dev:api dev:web dev:admin",
     "lint:api": "cd api && npm run lint",
     "lint:web": "cd web && npm run lint",
-    "lint": "run-p --print-label lint:api lint:web"
+    "lint:admin": "cd admin && npm run lint",
+    "lint": "run-p --print-label lint:api lint:web lint:admin",
+    "test:api": "cd api && npm test",
+    "test:web": "cd web && npm test",
+    "test:admin": "cd admin && npm test",
+    "test": "run-p --print-label test:api test:web test:admin"
   },
   "dependencies": {
     "commit-and-tag-version": "^12.6.0",

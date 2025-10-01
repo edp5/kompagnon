@@ -27,5 +27,10 @@ cd ./api && npm run db:reset || { echo "Error resetting the database"; exit 1; }
 echo "Setting up web environment variables..."
 cp ./web/sample.env ./web/.env || { echo "Error copying web environment file"; exit 1; }
 
+# admin app
+# copy the sample env to env
+# echo "Setting up admin app environment variables..."
+# cp ./admin-app/sample.env ./admin-app/.env || { echo "Error copying admin app environment file"; exit 1; }
+
 # end
 echo "Configuration complete."
