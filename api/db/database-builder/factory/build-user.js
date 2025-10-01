@@ -1,6 +1,7 @@
 import { generatePassword } from "../../../src/identities-access-management/services/password-service.js";
+import { DEFAULT_USER_TYPE } from "../../../src/shared/constants.js";
 import { knex } from "../../knex-database-connection.js";
-async function buildUser({ firstname = "John", lastname = "Doe", email = "john.doe@example.net", birthday = "01/01/1970", created_at = new Date(), updated_at = new Date(), isActive = true, isChecked = true, hashedPassword = null }) {
+async function buildUser({ firstname = "John", lastname = "Doe", email = "john.doe@example.net", birthday = "01/01/1970", created_at = new Date(), updated_at = new Date(), isActive = true, isChecked = true, hashedPassword = null, userType = DEFAULT_USER_TYPE }) {
   if (!hashedPassword) {
     hashedPassword = await generatePassword("password");
   }
@@ -14,6 +15,7 @@ async function buildUser({ firstname = "John", lastname = "Doe", email = "john.d
     isActive,
     isChecked,
     hashedPassword,
+    userType,
   }).returning("*");
   return values;
 }
