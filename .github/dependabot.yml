@@ -6,6 +6,7 @@ updates:
       - './api'
       - './'
       - './web'
+      - './admin'
     schedule:
       interval: daily
       time: '00:00'
