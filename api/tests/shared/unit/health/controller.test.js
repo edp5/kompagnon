@@ -1,9 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import controller from "../../../../src/shared/health/controller.js";
-import { res } from "../../../helpers.js";
 
 describe("Unit | Shared | Health | Controller", () => {
+  let res;
+  beforeEach(() => {
+    res = {
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn().mockReturnValue(),
+      send: vi.fn().mockReturnValue(),
+      text: vi.fn().mockReturnValue(),
+    };
+  });
   it("should call res.status and res.send", async () => {
     // given
     const req = {};
