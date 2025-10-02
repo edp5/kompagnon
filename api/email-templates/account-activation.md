@@ -1,6 +1,6 @@
 # Activation de votre compte Kompagnon
 
-Bonjour {{firstName}} {{lastname}},
+Bonjour {{firstname}} {{lastname}},
 
 Bienvenue sur Kompagnon ! Nous sommes ravis de vous compter parmi nous.
 
