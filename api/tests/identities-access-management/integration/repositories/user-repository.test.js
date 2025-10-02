@@ -74,4 +74,26 @@ describe("UserRepository Integration Tests", () => {
       await expect(userRepository.activateUserById(999)).rejects.toThrow("User with ID 999 not found");
     });
   });
+
+  describe("#findUserByEmail", () => {
+    it("should return user information", async () => {
+      // given
+      const userCreated = await databaseBuilder.factory.buildUser();
+
+      // when
+      const user = await userRepository.findUserByEmail(userCreated.email);
+
+      // then
+      expect(user).toBeDefined();
+      expect(userCreated).toEqual(user);
+    });
+
+    it("should return null if user does not found", async () => {
+      // when
+      const user = await userRepository.findUserByEmail("test@example.net");
+
+      // then
+      expect(user).toBeNull();
+    });
+  });
 });

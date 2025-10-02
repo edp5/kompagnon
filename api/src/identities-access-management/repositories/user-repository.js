@@ -63,4 +63,16 @@ async function activateUserById(userId) {
   }
 }
 
-export { activateUserById, createNewUser };
+/**
+ * Finds a user by their email address
+ * @param {string} email - The email address of the user to find
+ * @returns {Promise<awaited Knex.QueryBuilder<TRecord, DeferredKeySelection.AddUnionMember<UnwrapArrayMember<TResult>, undefined>>>}
+ */
+async function findUserByEmail(email) {
+  const user = await knex("users")
+    .where({ email })
+    .first();
+  return user || null;
+}
+
+export { activateUserById, createNewUser, findUserByEmail };
