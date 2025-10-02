@@ -32,6 +32,9 @@ npm run db:reset
 cd ../web
 copy sample.env .env   # if using CMD
 # or: Copy-Item sample.env .env   # if using PowerShell
+cd ../admin
+copy sample.env .env   # if using CMD
+# or: Copy-Item sample.env .env   # if using PowerShell
 ```
 
 ## Launch
