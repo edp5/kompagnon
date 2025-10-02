@@ -63,7 +63,7 @@ const configuration = (function() {
           },
         ],
       },
-      apis: ["./src/**/routes.js"],
+      apis: ["./src/**/*routes*.js"],
     },
   };
 
