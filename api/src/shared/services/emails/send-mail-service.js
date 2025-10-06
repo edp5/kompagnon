@@ -7,8 +7,12 @@ const { email } = config;
 
 /**
  * Send an email using nodemailer
- * @param req: { to: string, subject?: string, text?: string, html?: string }
- * @returns {Promise<*|{info: string, data: {from: string, to: *, subject}}>}
+ * @param {object} req - Email request object
+ * @param {string} req.to - Recipient email address
+ * @param {string} [req.subject] - Email subject
+ * @param {string} [req.text] - Plain text email content
+ * @param {string} [req.html] - HTML email content
+ * @returns {Promise<object>} The email send result
  */
 async function sendMailService(req) {
   if (!req.to) {

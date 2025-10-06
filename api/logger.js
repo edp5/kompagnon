@@ -60,12 +60,13 @@ export const logger = {
 /**
  * Creates a child logger for a section.
  * Debug may be enabled for a section using DEBUG_ENABLED.
- * @param {string} section
- * @param {pino.Bindings} bindings
- * @param {pino.ChildLoggerOptions} options
+ * @param {string} section - The section name for the logger
+ * @param {pino.Bindings} bindings - Logger bindings
+ * @param {pino.ChildLoggerOptions} options - Logger options
+ * @returns {pino.Logger} The child logger instance
  */
 export function child(section, bindings, options) {
-  /** @type{Partial<pino.ChildLoggerOptions>} */
+  /** @type {Partial<pino.ChildLoggerOptions>} */
   const optionsOverride = {};
   if (logging.debug) {
     optionsOverride.level = "debug";

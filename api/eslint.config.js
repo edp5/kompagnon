@@ -54,7 +54,7 @@ export default defineConfig([
       "jsdoc/check-alignment": "warn",
       "jsdoc/check-param-names": "warn",
       "jsdoc/check-property-names": "warn",
-      "jsdoc/check-tag-names": "warn",
+      "jsdoc/check-tag-names": ["warn", { definedTags: ["swagger"] }],
       "jsdoc/check-types": "warn",
       "jsdoc/empty-tags": "warn",
       "jsdoc/require-param": "warn",

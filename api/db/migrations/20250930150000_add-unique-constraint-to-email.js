@@ -2,7 +2,7 @@ const TABLE_NAME = "users";
 const COLUMN_NAME = "email";
 
 /**
- * @param { import("knex").Knex } knex
+ * @param { import("knex").Knex } knex - The Knex instance
  * @returns { Promise<void> }
  */
 async function up(knex) {
@@ -12,7 +12,7 @@ async function up(knex) {
 }
 
 /**
- * @param { import("knex").Knex } knex
+ * @param { import("knex").Knex } knex - The Knex instance
  * @returns { Promise<void> }
  */
 async function down(knex) {

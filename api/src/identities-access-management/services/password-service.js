@@ -6,9 +6,9 @@ import { logger } from "../../../logger.js";
 const { passwordHash } = config.users;
 
 /**
- *
- * @param {} password
- * @returns {Promise<void|*>}
+ * Generates a hashed password using bcrypt
+ * @param {string} password - The plain text password to hash
+ * @returns {Promise<string>} The hashed password
  */
 async function generatePassword(password) {
   try {
@@ -20,10 +20,10 @@ async function generatePassword(password) {
 }
 
 /**
- *
- * @param input
- * @param hashedPassword
- * @returns {Promise<void|*>}
+ * Compares a plain text password with a hashed password
+ * @param {string} input - The plain text password to check
+ * @param {string} hashedPassword - The hashed password to compare against
+ * @returns {Promise<boolean>} True if passwords match, false otherwise
  */
 async function checkPassword(input, hashedPassword) {
   try {
