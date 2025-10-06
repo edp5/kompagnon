@@ -10,8 +10,8 @@ describe("UserRepository Integration Tests", () => {
     it("should create a new user with default user type", async () => {
       // given
       const userData = {
-        firstName: "John",
-        lastName: "Doe",
+        firstname: "John",
+        lastname: "Doe",
         email: "john.doe@example.com",
         birthday: "1990-01-01",
         hashedPassword: "hashedPassword123",
@@ -43,8 +43,8 @@ describe("UserRepository Integration Tests", () => {
       await databaseBuilder.factory.buildUser({ email: "duplicate@example.com" });
 
       const userData = {
-        firstName: "John",
-        lastName: "Doe",
+        firstname: "John",
+        lastname: "Doe",
         email: "duplicate@example.com",
         birthday: "1990-01-01",
         hashedPassword: "hashedPassword123",
