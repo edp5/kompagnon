@@ -4,8 +4,8 @@ import { logger } from "../../../logger.js";
 /**
  * Creates a new user in the database
  * @param {object} params - User creation parameters
- * @param {string} params.firstName - User's first name
- * @param {string} params.lastName - User's last name
+ * @param {string} params.firstname - User's first name
+ * @param {string} params.lastname - User's last name
  * @param {string} params.email - User's email address
  * @param {string} params.birthday - User's birthday (YYYY-MM-DD format)
  * @param {string} params.hashedPassword - User's hashed password
@@ -13,12 +13,12 @@ import { logger } from "../../../logger.js";
  * @returns {Promise<number>} The ID of the created user
  * @throws {Error} If user creation fails
  */
-async function createNewUser({ firstName, lastName, email, birthday, hashedPassword, userType }) {
+async function createNewUser({ firstname, lastname, email, birthday, hashedPassword, userType }) {
   try {
     const [newUser] = await knex("users")
       .insert({
-        firstname: firstName.trim(),
-        lastname: lastName.trim(),
+        firstname: firstname.trim(),
+        lastname: lastname.trim(),
         email: email.trim().toLowerCase(),
         birthday,
         hashedPassword,
