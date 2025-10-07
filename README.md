@@ -63,6 +63,23 @@ npm run lint:fix
 ```
 All fixable errors will be fixed.
 
+##### JSDoc Documentation (API)
+The API includes JSDoc linting to ensure proper documentation standards. The linter checks for:
+- Proper parameter documentation with types and descriptions
+- Return value documentation
+- Valid JSDoc syntax and tag names
+
+When writing functions in the API, follow this format:
+```javascript
+/**
+ * @param {string} paramName - Description of the parameter
+ * @returns {boolean} Description of the return value
+ */
+function exampleFunction(paramName) {
+  // function implementation
+}
+```
+
 ### Commits and pull request
 Your commit must respect conventional commit with "feat" or "fix" or "refactor" the scope and the title of your commit. For exemple:
 "feat(api): add the db configuration".

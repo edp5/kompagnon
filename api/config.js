@@ -1,7 +1,9 @@
 import "dotenv/config";
 /**
- * @param {string} numberAsString
- * @param {number} defaultIntNumber
+ * Parses a string to a number with a default fallback
+ * @param {string} numberAsString - The string to parse as a number
+ * @param {number} defaultIntNumber - The default value if parsing fails
+ * @returns {number} The parsed number or the default value
  */
 function _getNumber(numberAsString, defaultIntNumber) {
   const number = parseInt(numberAsString, 10);

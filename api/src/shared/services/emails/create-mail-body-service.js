@@ -14,8 +14,8 @@ const FOOTER_FILE_NAME = "footer.md";
 
 /**
  * Escapes special characters in a string to be used in a regular expression.
- * @param string
- * @returns {*}
+ * @param {string} string - The string to escape
+ * @returns {string} The escaped string
  */
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -23,9 +23,9 @@ function escapeRegExp(string) {
 
 /**
  * Creates the mail body by reading a markdown file and replacing placeholders with provided values.
- * @param documentName: Name of the markdown file (without extension) to read from the email-templates folder.
- * @param replaceElements: An object containing key-value pairs where keys are placeholders in the markdown file (enclosed in {{}}) and values are the strings to replace them with.
- * @returns {Promise<string>}
+ * @param {string} documentName - Name of the markdown file (without extension) to read from the email-templates folder
+ * @param {object} replaceElements - An object containing key-value pairs where keys are placeholders in the markdown file (enclosed in {{}}) and values are the strings to replace them with
+ * @returns {Promise<string>} The processed markdown converted to HTML
  */
 async function createMailBodyService(documentName, replaceElements) {
   try {

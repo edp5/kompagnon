@@ -3,7 +3,7 @@ import { logger } from "../../../logger.js";
 
 /**
  * Creates a new user in the database
- * @param {Object} params - User creation parameters
+ * @param {object} params - User creation parameters
  * @param {string} params.firstName - User's first name
  * @param {string} params.lastName - User's last name
  * @param {string} params.email - User's email address
