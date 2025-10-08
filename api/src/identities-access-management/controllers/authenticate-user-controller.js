@@ -34,11 +34,10 @@ async function authenticateUserController(
   try {
     const { email, password } = req.body;
     const foundUser = await findUserRepository(email);
-    if (!foundUser.isActive) {
-      return res.status(404).send();
-    }
     if (!foundUser) {
       return res.status(401).json({ message: ERRORS.AUTHENTICATION.INVALID_CREDENTIALS });
+    } else if (!foundUser.isActive) {
+      return res.status(404).send();
     }
     if (!await checkPasswordsService(password, foundUser.hashedPassword)) {
       return res.status(401).json({ message: ERRORS.AUTHENTICATION.INVALID_CREDENTIALS });
