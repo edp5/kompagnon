@@ -28,7 +28,7 @@ describe("Unit | Identities Access Management | Controller | Authenticate user c
         password: "password123",
       },
     };
-    findUserRepository.mockResolvedValue({ id: 123, hashedPassword: "hashedPassword", userType: "user" });
+    findUserRepository.mockResolvedValue({ id: 123, hashedPassword: "hashedPassword", userType: "user", isActive: true });
     encodedTokenService.mockReturnValue("token123");
     checkPasswordService.mockResolvedValue(true);
 
@@ -117,7 +117,7 @@ describe("Unit | Identities Access Management | Controller | Authenticate user c
           password: "password123",
         },
       };
-      findUserRepository.mockResolvedValue({ id: 123, hashedPassword: "hashedPassword", userType: "user" });
+      findUserRepository.mockResolvedValue({ id: 123, hashedPassword: "hashedPassword", userType: "user", isActive: true });
       checkPasswordService.mockResolvedValue(false);
 
       // when
