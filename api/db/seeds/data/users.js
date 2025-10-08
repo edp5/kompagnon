@@ -10,6 +10,7 @@ async function users(databaseBuilder) {
     birthday: "01/01/1970",
     hashedPassword: password,
     userType: DEFAULT_USER_TYPE,
+    lastLoggedAt: new Date("2025-10-08"),
   };
 
   // call database builder with data
