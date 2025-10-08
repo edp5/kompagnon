@@ -63,4 +63,13 @@ async function activateUserById(userId) {
   }
 }
 
-export { activateUserById, createNewUser };
+async function updateLastLoggedAt(userId) {
+  return await knex("users")
+    .where({ id: userId })
+    .update({
+      lastLoggedAt: knex.fn.now(),
+      updated_at: knex.fn.now(),
+    });
+}
+
+export { activateUserById, createNewUser, updateLastLoggedAt };

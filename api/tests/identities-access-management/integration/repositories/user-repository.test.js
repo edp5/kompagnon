@@ -74,4 +74,62 @@ describe("UserRepository Integration Tests", () => {
       await expect(userRepository.activateUserById(999)).rejects.toThrow("User with ID 999 not found");
     });
   });
+
+  describe("#updateLastLoggedAt", () => {
+    it("should update lastLoggedAt timestamp when user has no previous login", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({ lastLoggedAt: null });
+
+      // when
+      const result = await userRepository.updateLastLoggedAt(user.id);
+
+      // then
+      expect(result).toBe(1);
+      const updatedUser = await knex("users").where({ id: user.id }).first();
+      expect(updatedUser.lastLoggedAt).toBeTruthy();
+      expect(new Date(updatedUser.lastLoggedAt).getTime()).toBeLessThanOrEqual(Date.now());
+    });
+
+    it("should update lastLoggedAt timestamp when user has previous login", async () => {
+      // given
+      const previousLoginTime = new Date("2024-01-01T10:00:00Z");
+      const user = await databaseBuilder.factory.buildUser({ lastLoggedAt: previousLoginTime });
+
+      // when
+      const result = await userRepository.updateLastLoggedAt(user.id);
+
+      // then
+      expect(result).toBe(1);
+      const updatedUser = await knex("users").where({ id: user.id }).first();
+      expect(updatedUser.lastLoggedAt).toBeTruthy();
+      expect(new Date(updatedUser.lastLoggedAt).getTime()).toBeGreaterThan(
+        previousLoginTime.getTime(),
+      );
+      expect(new Date(updatedUser.lastLoggedAt).getTime()).toBeLessThanOrEqual(Date.now());
+    });
+
+    it("should update updated_at timestamp", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser();
+      const originalUpdatedAt = user.updated_at;
+
+      // when
+      const result = await userRepository.updateLastLoggedAt(user.id);
+
+      // then
+      expect(result).toBe(1);
+      const updatedUser = await knex("users").where({ id: user.id }).first();
+      expect(new Date(updatedUser.updated_at).getTime()).toBeGreaterThan(
+        new Date(originalUpdatedAt).getTime(),
+      );
+    });
+
+    it("should return 0 when user not found", async () => {
+      // when
+      const result = await userRepository.updateLastLoggedAt(999);
+
+      // then
+      expect(result).toBe(0);
+    });
+  });
 });
