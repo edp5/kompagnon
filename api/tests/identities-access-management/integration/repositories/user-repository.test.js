@@ -56,6 +56,35 @@ describe("UserRepository Integration Tests", () => {
     });
   });
 
+  describe("#findUserById", () => {
+    it("should find user by ID", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({
+        firstname: "Jane",
+        lastname: "Smith",
+        email: "jane.smith@example.com",
+      });
+
+      // when
+      const foundUser = await userRepository.findUserById(user.id);
+
+      // then
+      expect(foundUser).toBeDefined();
+      expect(foundUser.id).toBe(user.id);
+      expect(foundUser.firstname).toBe("Jane");
+      expect(foundUser.lastname).toBe("Smith");
+      expect(foundUser.email).toBe("jane.smith@example.com");
+    });
+
+    it("should return null if user not found", async () => {
+      // when
+      const foundUser = await userRepository.findUserById(999);
+
+      // then
+      expect(foundUser).toBeNull();
+    });
+  });
+
   describe("#activateUserById", () => {
     it("should activate user successfully", async () => {
       // given

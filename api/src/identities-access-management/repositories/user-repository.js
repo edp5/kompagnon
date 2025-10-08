@@ -38,6 +38,19 @@ async function createNewUser({ firstname, lastname, email, birthday, hashedPassw
 }
 
 /**
+ * Finds a user by their ID
+ * @param {number} userId - The ID of the user to find
+ * @returns {Promise<object | null>} The user object or null if not found
+ */
+async function findUserById(userId) {
+  const user = await knex("users")
+    .where({ id: userId })
+    .first();
+
+  return user || null;
+}
+
+/**
  * Activates a user by setting isActive to true
  * @param {number} userId - The ID of the user to activate
  * @returns {Promise<void>}
@@ -63,4 +76,4 @@ async function activateUserById(userId) {
   }
 }
 
-export { activateUserById, createNewUser };
+export { activateUserById, createNewUser, findUserById };
