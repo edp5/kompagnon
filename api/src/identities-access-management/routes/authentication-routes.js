@@ -1,5 +1,6 @@
 import express from "express";
 
+import { activateUserController } from "../controllers/activate-user-controller.js";
 import { authenticateUserController, authenticateUserSchema } from "../controllers/authenticate-user-controller.js";
 import { registerUserController, registerUserSchema } from "../controllers/register-user-controller.js";
 
@@ -92,5 +93,62 @@ authenticationRoutes.post("/api/authentication/register", registerUserSchema, re
  *         description: Internal server error
  */
 authenticationRoutes.post("/api/authentication/authenticate", authenticateUserSchema, authenticateUserController);
+
+/**
+ * @swagger
+ * /api/authentication/activate:
+ *   get:
+ *     summary: Activate a user account
+ *     description: Activates a user account using the token sent by email
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Activation token sent by email
+ *     responses:
+ *       201:
+ *         description: User activated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User activated successfully
+ *       400:
+ *         description: Invalid or missing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid or expired token
+ *       401:
+ *         description: User not found or already active
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: User not found or already active
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal server error
+ */
+authenticationRoutes.get("/api/authentication/activate", activateUserController);
 
 export default authenticationRoutes;
