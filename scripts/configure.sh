@@ -20,7 +20,7 @@ docker compose up -d || { echo "Error starting Docker"; exit 1; }
 
 # database
 echo "Creating database..."
-cd ./api && npm run db:reset || { echo "Error resetting the database"; exit 1; }
+cd ./api && npm run db:reset && cd ../ || { echo "Error resetting the database"; exit 1; }
 
 # web
 # copy the sample env to env
@@ -29,7 +29,7 @@ cp ./web/sample.env ./web/.env || { echo "Error copying web environment file"; e
 
 # admin app
 # copy the sample env to env
-# echo "Setting up admin app environment variables..."
+echo "Setting up admin app environment variables..."
 # cp ./admin-app/sample.env ./admin-app/.env || { echo "Error copying admin app environment file"; exit 1; }
 
 # end

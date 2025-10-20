@@ -13,7 +13,20 @@ git clone git@github.com:edp5/kompagnon.git && cd kompagnon
 ```
 
 #### Installation
+You must have:
+- nvm: (node version manager) you can install with homebrew on macos and on nvm website on windows,
+- docker,
+- an IDE
 
+Before starting installation, you must go to the root project folder and run:
+```bash
+nvm use
+```
+If it's necessary run:
+```bash
+nvm install
+```
+to install and use the version specified in the .nvmrc file.
 On macOS, use the setup script:
 
 ```bash
@@ -43,6 +56,9 @@ You can parallel run apps with:
 npm run dev
 ```
 in root path. You can also goto app and run only the current app.
+
+### WARNING
+When you open a new terminal session, you must run `nvm use` to use the correct node version.
 
 
 ### Contribution
