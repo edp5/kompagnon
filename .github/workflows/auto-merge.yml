@@ -19,4 +19,4 @@ jobs:
       - name: Call auto merge
         uses: edp5/edp5-actions/auto-merge@main
         with:
-            token: ${{ secrets.SERVICE_TOKEN }}
+            token: ${{ secrets.GITHUB_TOKEN }}
