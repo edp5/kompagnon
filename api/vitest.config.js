@@ -12,6 +12,7 @@ export default defineConfig({
         singleFork: true,
       },
     },
+    fileParallelism: false,
     reporters: process.env.GITHUB_ACTIONS ? ["dot", "github-actions"] : ["dot"],
   },
 });
