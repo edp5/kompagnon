@@ -7,6 +7,12 @@ export default defineConfig({
     },
     setupFiles: ["tests/setup.js"],
     pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
+    fileParallelism: false,
     reporters: process.env.GITHUB_ACTIONS ? ["dot", "github-actions"] : ["dot"],
   },
 });
