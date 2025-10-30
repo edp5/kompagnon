@@ -9,7 +9,7 @@ export default defineConfig({
     pool: "forks",
     poolOptions: {
       forks: {
-        singleFork: true,
+        isolate: false,
       },
     },
     reporters: process.env.GITHUB_ACTIONS ? ["dot", "github-actions"] : ["dot"],
