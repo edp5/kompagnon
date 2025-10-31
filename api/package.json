@@ -16,6 +16,7 @@
   "scripts": {
     "test": "npm run test:prepare && NODE_ENV=test vitest run",
     "test:coverage": "npm t -- --coverage",
+    "test:ui": "npm run test:prepare && NODE_ENV=test vitest --ui",
     "test:prepare": "NODE_ENV=test npm run db:prepare",
     "dev": "nodemon index.js",
     "start": "node index.js",
@@ -52,8 +53,9 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "eslint-plugin-jsdoc": "^61.1.11",
     "@vitest/coverage-v8": "^4.0.4",
+    "@vitest/ui": "^4.0.4",
+    "eslint-plugin-jsdoc": "^61.1.11",
     "nodemon": "^3.1.10",
     "supertest": "^7.1.4",
     "vitest": "^4.0.4"
