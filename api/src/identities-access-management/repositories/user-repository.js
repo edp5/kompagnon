@@ -72,4 +72,14 @@ async function updateLastLoggedAt(userId) {
     });
 }
 
-export { activateUserById, createNewUser, updateLastLoggedAt };
+/**
+ * Find a user by email
+ * @param {string} email - The email of the user to find
+ * @returns {Promise<object|null>} The user object if found, otherwise null
+ */
+async function findUserByEmail(email) {
+  const foundUser = await knex("users").where({ email }).first();
+  return foundUser || null;
+}
+
+export { activateUserById, createNewUser, findUserByEmail, updateLastLoggedAt };
