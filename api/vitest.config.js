@@ -3,15 +3,53 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     coverage: {
-      include: "src",
+      include: ["src"],
     },
-    setupFiles: ["tests/setup.js"],
-    pool: "forks",
-    poolOptions: {
-      forks: {
-        singleFork: true,
+    projects: [
+      {
+        test: {
+          name: "Unit tests",
+          setupFiles: ["./tests/setup.js"],
+          isolate: true,
+          include: ["tests/**/unit/**/*.test.js"],
+        },
       },
-    },
-    reporters: process.env.GITHUB_ACTIONS ? ["dot", "github-actions"] : ["dot"],
+      {
+        test: {
+          name: "Integration tests",
+          setupFiles: ["./tests/setup.js"],
+          include: ["tests/**/integration/**/*.test.js"],
+          poolOptions: {
+            forks: {
+              execArgv: ["--expose-gc"],
+              isolate: true,
+              singleFork: true,
+            },
+            threads: {
+              memoryLimit: 300,
+            },
+          },
+          maxWorkers: 1,
+        },
+      },
+      {
+        test: {
+          name: "Acceptance tests",
+          setupFiles: ["./tests/setup.js"],
+          include: ["tests/**/acceptance/**/*.test.js"],
+          poolOptions: {
+            forks: {
+              execArgv: ["--expose-gc"],
+              isolate: true,
+              singleFork: true,
+            },
+          },
+        },
+      },
+    ],
+    fileParallelism: false,
+    reporters: process.env.GITHUB_ACTIONS
+      ? ["dot", "github-actions"]
+      : ["dot"],
   },
 });
