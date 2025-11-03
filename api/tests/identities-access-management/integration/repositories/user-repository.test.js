@@ -5,7 +5,7 @@ import { knex } from "../../../../db/knex-database-connection.js";
 import * as userRepository from "../../../../src/identities-access-management/repositories/user-repository.js";
 import { USER_TYPES } from "../../../../src/shared/constants.js";
 
-describe("UserRepository Integration Tests", () => {
+describe("Integration | Identities Access Management | Repositories | User repository", () => {
   describe("#createNewUser", () => {
     it("should create a new user with default user type", async () => {
       // given
@@ -130,6 +130,31 @@ describe("UserRepository Integration Tests", () => {
 
       // then
       expect(result).toBe(0);
+    });
+  });
+
+  describe("#findUserByEmail", () => {
+    it("should return user information", async () => {
+      // given
+      const createdUser = await databaseBuilder.factory.buildUser({ email: "found@example.net" });
+
+      // when
+      const foundUser = await userRepository.findUserByEmail("found@example.net");
+
+      // then
+      expect(foundUser).toBeDefined();
+      expect(foundUser).toEqual(createdUser);
+    });
+
+    it("should return null if user not found", async () => {
+      // given
+      const email = "toto@example.net";
+
+      // when
+      const foundUser = await userRepository.findUserByEmail(email);
+
+      // then
+      expect(foundUser).toBeNull();
     });
   });
 });
