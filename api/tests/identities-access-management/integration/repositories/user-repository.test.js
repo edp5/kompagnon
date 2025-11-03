@@ -56,6 +56,31 @@ describe("Integration | Identities Access Management | Repositories | User repos
     });
   });
 
+  describe("#findUserById", () => {
+    it("should find user by ID", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser();
+
+      // when
+      const foundUser = await userRepository.findUserById(user.id);
+
+      // then
+      expect(foundUser).toBeDefined();
+      expect(foundUser.id).toBe(user.id);
+      expect(foundUser.firstname).toBe(user.firstname);
+      expect(foundUser.lastname).toBe(user.lastname);
+      expect(foundUser.email).toBe(user.email);
+    });
+
+    it("should return null if user not found", async () => {
+      // when
+      const foundUser = await userRepository.findUserById(999);
+
+      // then
+      expect(foundUser).toBeNull();
+    });
+  });
+
   describe("#activateUserById", () => {
     it("should activate user successfully", async () => {
       // given
