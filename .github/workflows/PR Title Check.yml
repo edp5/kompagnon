@@ -5,6 +5,7 @@ on:
     types: [opened, reopened, edited, synchronize]
     branches:
       - main
+  merge_group:
 
 jobs:
   check-title:
@@ -16,6 +17,11 @@ jobs:
 
       - name: Validate PR title
         run: |
+          # exit with 0 if is merge queue
+            if [[ "${{ github.event_name }}" == "merge_group" ]]; then
+                echo "Merge group event detected. Skipping PR title check."
+                exit 0
+            fi
           if [[ ! "$(echo '${{ github.event.pull_request.title }}' | grep -E '^(fix|feat|tech|docs|bump|style|refactor|chore|perf|test|revert|breaking)(\([^)]+\))?:')" ]]; then
             echo "Error: Pull request title must start with one of the following keywords: fix, feat, tech, docs, bump, style, refactor, chore, perf, test, breaking or revert. Optionally, it can include a scope in parentheses followed by a colon (e.g., 'feat(scope):')."
             exit 1

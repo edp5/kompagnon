@@ -2,10 +2,13 @@ name: commits check
 
 on:
   pull_request:
+  merge_group:
 
 jobs:
   block-autosquash-commits:
     runs-on: ubuntu-latest
+    # Run only if not merge queue
+    if: github.event_name != 'merge_group'
     permissions:
       pull-requests: read
     steps:
