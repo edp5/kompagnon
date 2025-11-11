@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.4",
-    "@vitest/ui": "^4.0.4",
+    "@vitest/ui": "^4.0.8",
     "eslint-plugin-jsdoc": "^61.1.12",
     "nodemon": "^3.1.10",
     "supertest": "^7.1.4",
