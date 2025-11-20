@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { registerNewUser } from "@/adaptors/authentication.js";
+import { registerNewUser } from "@/adapters/authentication.js";
 
 const payload = {
   firstname: "John",
@@ -10,7 +10,7 @@ const payload = {
   birthday: "2000-01-01",
 };
 
-describe("Unit | Adaptors | Authentication", () => {
+describe("Unit | Adapters | Authentication", () => {
   it("should call the registration endpoint with provided payload", async () => {
     // given
     const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({ ok: true });

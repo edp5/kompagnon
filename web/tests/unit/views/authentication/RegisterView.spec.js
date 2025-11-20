@@ -1,10 +1,10 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { registerNewUser } from "@/adaptors/authentication.js";
+import { registerNewUser } from "@/adapters/authentication.js";
 import RegisterView from "@/views/authentication/RegisterView.vue";
 
-vi.mock("@/adaptors/authentication.js", () => ({
+vi.mock("@/adapters/authentication.js", () => ({
   registerNewUser: vi.fn(),
 }));
 

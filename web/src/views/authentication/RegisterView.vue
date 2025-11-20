@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, ref } from "vue";
 
-import { registerNewUser } from "@/adaptors/authentication.js";
+import { registerNewUser } from "@/adapters/authentication.js";
 
 function initialFormState() {
   return {
