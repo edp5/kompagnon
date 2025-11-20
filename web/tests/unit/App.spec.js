@@ -1,6 +1,6 @@
 import { mount } from "@vue/test-utils";
-import { createMemoryHistory, createRouter } from "vue-router";
 import { describe, expect, it, vi } from "vitest";
+import { createMemoryHistory, createRouter } from "vue-router";
 
 import { apiCheck } from "@/adapters/api-check.js";
 import App from "@/App.vue";

@@ -3,13 +3,15 @@ import { reactive, ref } from "vue";
 
 import { registerNewUser } from "@/adaptors/authentication.js";
 
-const initialFormState = () => ({
-  firstname: "",
-  lastname: "",
-  email: "",
-  password: "",
-  birthday: "",
-});
+function initialFormState() {
+  return {
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: "",
+    birthday: "",
+  };
+}
 
 const form = reactive(initialFormState());
 const isSubmitting = ref(false);
@@ -46,7 +48,10 @@ async function handleSubmit() {
   <section class="register-view">
     <h1>Create your account</h1>
 
-    <form class="register-form" @submit.prevent="handleSubmit">
+    <form
+      class="register-form"
+      @submit.prevent="handleSubmit"
+    >
       <label>
         First name
         <input
@@ -101,7 +106,10 @@ async function handleSubmit() {
         >
       </label>
 
-      <button type="submit" :disabled="isSubmitting">
+      <button
+        type="submit"
+        :disabled="isSubmitting"
+      >
         {{ isSubmitting ? "Creating account..." : "Create account" }}
       </button>
     </form>

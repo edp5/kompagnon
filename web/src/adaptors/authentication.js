@@ -26,7 +26,7 @@ async function registerNewUser({ firstname, lastname, email, password, birthday,
     }
 
     return { success: true };
-  } catch (error) {
+  } catch {
     return {
       success: false,
       message: "Unable to reach the server. Please try again later.",

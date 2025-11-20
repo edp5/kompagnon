@@ -1,20 +1,20 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import RegisterView from "@/views/authentication/RegisterView.vue";
 import { registerNewUser } from "@/adaptors/authentication.js";
+import RegisterView from "@/views/authentication/RegisterView.vue";
 
 vi.mock("@/adaptors/authentication.js", () => ({
   registerNewUser: vi.fn(),
 }));
 
-const fillForm = async (wrapper) => {
-  await wrapper.get('input[name="firstname"]').setValue("John");
-  await wrapper.get('input[name="lastname"]').setValue("Doe");
-  await wrapper.get('input[name="email"]').setValue("john.doe@example.com");
-  await wrapper.get('input[name="password"]').setValue("password123");
-  await wrapper.get('input[name="birthday"]').setValue("2000-01-01");
-};
+async function fillForm(wrapper) {
+  await wrapper.get("input[name=\"firstname\"]").setValue("John");
+  await wrapper.get("input[name=\"lastname\"]").setValue("Doe");
+  await wrapper.get("input[name=\"email\"]").setValue("john.doe@example.com");
+  await wrapper.get("input[name=\"password\"]").setValue("password123");
+  await wrapper.get("input[name=\"birthday\"]").setValue("2000-01-01");
+}
 
 describe("Unit | Views | Authentication | RegisterView", () => {
   beforeEach(() => {
