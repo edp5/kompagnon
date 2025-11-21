@@ -15,10 +15,14 @@ describe("Unit | Router", () => {
     expect(router.options.history.base).toBeDefined();
   });
 
-  it("should have empty routes array initially", () => {
+  it("should register the signup route", () => {
+    // when
+    const routes = router.getRoutes();
+    const registerRoute = routes.find((route) => route.name === "register");
+
     // then
-    expect(router.options.routes).toEqual([]);
-    expect(router.getRoutes()).toHaveLength(0);
+    expect(registerRoute).toBeDefined();
+    expect(registerRoute?.path).toBe("/register");
   });
 
   it("should have correct router methods", () => {
@@ -32,6 +36,7 @@ describe("Unit | Router", () => {
 
   it("should be able to add routes dynamically", () => {
     // given
+    const initialRouteCount = router.getRoutes().length;
     const testRoute = {
       path: "/test",
       name: "test",
@@ -43,7 +48,7 @@ describe("Unit | Router", () => {
 
     // then
     expect(router.hasRoute("test")).toBe(true);
-    expect(router.getRoutes()).toHaveLength(1);
+    expect(router.getRoutes()).toHaveLength(initialRouteCount + 1);
 
     // cleanup
     router.removeRoute("test");
