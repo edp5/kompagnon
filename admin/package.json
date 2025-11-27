@@ -27,7 +27,7 @@
     "eslint-plugin-i18n-json": "^4.0.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-vitest-globals": "^1.5.0",
-    "eslint-plugin-vue": "~10.6.0",
+    "eslint-plugin-vue": "~10.6.1",
     "globals": "^16.5.0",
     "jsdom": "^27.2.0",
     "vite": "^7.2.4",
