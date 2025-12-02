@@ -3,6 +3,27 @@ import { describe, expect, it } from "vitest";
 import router from "@/router/index.js";
 
 describe("Unit | Router", () => {
+  describe("routes configuration", () => {
+    it("should register the root redirect route", () => {
+      // when
+      const rootRoute = router.getRoutes().find((route) => route.path === "/");
+
+      // then
+      expect(rootRoute).toBeDefined();
+      // TODO: update redirect to login route once it exists.
+      expect(rootRoute?.redirect).toEqual({ name: "register" });
+    });
+
+    it("should register the signup route", () => {
+      // when
+      const registerRoute = router.getRoutes().find((route) => route.name === "register");
+
+      // then
+      expect(registerRoute).toBeDefined();
+      expect(registerRoute?.path).toBe("/register");
+    });
+  });
+
   it("should create a router instance", () => {
     // then
     expect(router).toBeDefined();
@@ -13,12 +34,6 @@ describe("Unit | Router", () => {
     // then
     expect(router.options.history).toBeDefined();
     expect(router.options.history.base).toBeDefined();
-  });
-
-  it("should have empty routes array initially", () => {
-    // then
-    expect(router.options.routes).toEqual([]);
-    expect(router.getRoutes()).toHaveLength(0);
   });
 
   it("should have correct router methods", () => {
@@ -32,6 +47,7 @@ describe("Unit | Router", () => {
 
   it("should be able to add routes dynamically", () => {
     // given
+    const initialRouteCount = router.getRoutes().length;
     const testRoute = {
       path: "/test",
       name: "test",
@@ -43,7 +59,7 @@ describe("Unit | Router", () => {
 
     // then
     expect(router.hasRoute("test")).toBe(true);
-    expect(router.getRoutes()).toHaveLength(1);
+    expect(router.getRoutes()).toHaveLength(initialRouteCount + 1);
 
     // cleanup
     router.removeRoute("test");
