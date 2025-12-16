@@ -2,48 +2,80 @@
 import { computed, ref } from "vue";
 
 defineProps({
+  id: {
+    type: String,
+    description: "Unique identifier for the input field",
+    required: true,
+  },
   label: {
     type: String,
-    default: "mot de passe",
+    description: "Label for the password input field",
+    required: true,
   },
   modelValue: {
     type: String,
+    description: "The current value of the password input",
     default: "",
+  },
+  name: {
+    type: String,
+    description: "Name attribute for the input field",
+    default: "",
+  },
+  required: {
+    type: Boolean,
+    description: "Whether the input field is required",
+    default: false,
+  },
+  disabled: {
+    type: Boolean,
+    description: "Whether the input field is disabled",
+    default: false,
   },
 });
 
 const emit = defineEmits(["update:modelValue"]);
 
-const showPassword = ref(false);
-const inputType = computed(() => (showPassword.value ? "text" : "password"));
+const isPasswordVisible = ref(false);
+const inputType = computed(() => (isPasswordVisible.value ? "text" : "password"));
 
-function togglePasswordVisibility() {
-  showPassword.value = !showPassword.value;
+function toggleVisibility() {
+  isPasswordVisible.value = !isPasswordVisible.value;
 }
 
-function updateValue(event) {
+function onInput(event) {
   emit("update:modelValue", event.target.value);
 }
 </script>
 
 <template>
   <div class="password-component">
-    <label :for="`password-${label}`">{{ label }}</label>
-    <div class="password-input-wrapper">
+    <label
+      class="password-component__label"
+      :for="id"
+    >
+      {{ label }}
+    </label>
+
+    <div class="password-component__input-wrapper">
       <input
-        :id="`password-${label}`"
+        :id="id"
+        :name="name || id"
         :type="inputType"
         :value="modelValue"
-        @input="updateValue"
-        class="password-input"
-      />
+        :required="required"
+        class="password-component__input"
+        :disabled="disabled"
+        @input="onInput"
+      >
+
       <button
         type="button"
-        @click="togglePasswordVisibility"
-        class="toggle-button"
-        :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+        class="password-component__toggle"
+        :aria-pressed="isPasswordVisible.toString()"
+        @click="toggleVisibility"
       >
-        {{ showPassword ? "👁️" : "👁️‍🗨️" }}
+        {{ isPasswordVisible ? "Masquer" : "Afficher" }}
       </button>
     </div>
   </div>
@@ -53,44 +85,29 @@ function updateValue(event) {
 .password-component {
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
+  gap: 0.25rem;
 }
 
-.password-input-wrapper {
-  position: relative;
+.password-component__input-wrapper {
   display: flex;
-  align-items: center;
+  align-items: stretch;
+  gap: 0.5rem;
 }
 
-.password-input {
-  width: 100%;
-  padding: 0.5em;
-  padding-right: 2.5em;
-  border: 1px solid #ccc;
+.password-component__label {
+  font-weight: 600;
+}
+
+.password-component__input {
+  flex: 1;
+}
+
+.password-component__toggle {
+  border: 1px solid #d3d3d3;
   border-radius: 4px;
-  font-size: 1em;
-}
-
-.toggle-button {
-  position: absolute;
-  right: 0.5em;
-  background: none;
-  border: none;
+  background-color: transparent;
+  padding: 0.5rem 0.75rem;
   cursor: pointer;
-  padding: 0.25em;
-  font-size: 1.2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.toggle-button:hover {
-  opacity: 0.7;
-}
-
-label {
-  font-weight: 500;
-  color: #333;
 }
 </style>
 
