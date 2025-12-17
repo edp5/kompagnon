@@ -1,4 +1,4 @@
-import { errors } from "celebrate";
+import { errors, isCelebrateError } from "celebrate";
 import cors from "cors";
 import express from "express";
 
@@ -23,6 +23,29 @@ server.use(health);
 server.use(authenticationRoutes);
 
 // do not write routes under this line
-server.use(errors);
+server.use((err, req, res, next) => {
+  if (isCelebrateError(err)) {
+    const details = [];
+    for (const [segment, joiError] of err.details.entries()) {
+      const errors = joiError.details.map(d => ({
+        message: d.message,
+        path: d.path.join("."),
+        type: d.type,
+      }));
+      details.push({ in: segment, errors });
+    }
+    logger.error({
+      event: "Error validation",
+      message: "Validation failed",
+      details: details,
+    });
+    return res.status(400).json({
+      status: "error",
+      message: "Validation failed",
+      details,
+    });
+  }
+  return errors(err, req, res, next);
+});
 
 export default server;

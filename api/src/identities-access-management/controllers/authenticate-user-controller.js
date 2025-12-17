@@ -1,4 +1,4 @@
-import { celebrate, Joi } from "celebrate";
+import { celebrate, Joi, Segments } from "celebrate";
 
 import { logger } from "../../../logger.js";
 import ERRORS from "../errors.js";
@@ -7,7 +7,7 @@ import { checkPassword } from "../services/password-service.js";
 import { encodedToken } from "../services/token-service.js";
 
 const authenticateUserSchema = celebrate({
-  body: Joi.object({
+  [Segments.BODY]: Joi.object({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
