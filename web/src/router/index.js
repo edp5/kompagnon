@@ -21,6 +21,11 @@ const router = createRouter({
       name: "register",
       component: RegisterView,
     },
+    {
+      path: "/authentication/activate",
+      name: "activate-account",
+      component: ActivateAccountView,
+    },
   ],
 });
 
