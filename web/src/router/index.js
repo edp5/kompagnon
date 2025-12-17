@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+import LoginView from "@/views/authentication/LoginView.vue";
 import RegisterView from "@/views/authentication/RegisterView.vue";
 
 const router = createRouter({
@@ -7,8 +8,12 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      // TODO: update redirect to login route once it exists.
-      redirect: { name: "register" },
+      redirect: { name: "login" },
+    },
+    {
+      path: "/login",
+      name: "login",
+      component: LoginView,
     },
     {
       path: "/register",

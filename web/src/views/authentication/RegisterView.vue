@@ -152,6 +152,12 @@ async function handleSubmit() {
     >
       {{ errorMessage }}
     </p>
+
+    <p class="login-link">
+      Déjà un compte ? <router-link :to="{ name: 'login' }">
+        Se connecter
+      </router-link>
+    </p>
   </section>
 </template>
 
@@ -215,5 +221,10 @@ button:disabled {
 .feedback.error {
   background-color: #fee2e2;
   color: #991b1b;
+}
+
+.login-link {
+  margin-top: 1.5rem;
+  text-align: center;
 }
 </style>
