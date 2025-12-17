@@ -68,5 +68,41 @@ async function loginUser({ email, password }) {
   }
 }
 
-export { loginUser, registerNewUser };
+async function activateAccount({ token }) {
+  try {
+    const response = await fetch(`${AUTHENTICATION_URL}activate?token=${encodeURIComponent(token)}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
+    if (!response.ok) {
+      if (response.status === 400) {
+        return {
+          success: false,
+          message: "Token invalide ou expiré.",
+        };
+      }
+      if (response.status === 401) {
+        return {
+          success: false,
+          message: "Utilisateur non trouvé ou déjà actif.",
+        };
+      }
+      return {
+        success: false,
+        message: "Échec de l'activation. Veuillez réessayer.",
+      };
+    }
+
+    return { success: true, message: "Compte activé avec succès !" };
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de joindre le serveur. Veuillez réessayer plus tard.",
+    };
+  }
+}
+
+export { loginUser, registerNewUser, activateAccount };
