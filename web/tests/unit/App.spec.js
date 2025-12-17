@@ -20,6 +20,11 @@ function createTestRouter() {
         path: "/",
         component: RegisterView,
       },
+      {
+        path: "/login",
+        name: "login",
+        component: { template: "<div>Login</div>" },
+      },
     ],
   });
 }

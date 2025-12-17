@@ -11,7 +11,7 @@ describe("Unit | Router", () => {
       // then
       expect(rootRoute).toBeDefined();
       // TODO: update redirect to login route once it exists.
-      expect(rootRoute?.redirect).toEqual({ name: "register" });
+      expect(rootRoute?.redirect).toEqual({ name: "login" });
     });
 
     it("should register the signup route", () => {
