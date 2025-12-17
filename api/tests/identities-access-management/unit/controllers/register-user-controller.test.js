@@ -29,7 +29,6 @@ describe("Unit | Identities Access Management | Controller | Register new user",
         lastname: "Doe",
         email: "john.doe@example.net",
         password: "Password",
-        userType: "admin",
       },
     };
     createUserRepository.mockResolvedValue(123);
@@ -46,7 +45,6 @@ describe("Unit | Identities Access Management | Controller | Register new user",
       lastname: req.body.lastname,
       email: req.body.email,
       hashedPassword: "hashedPassword",
-      userType: req.body.userType,
     });
     expect(sendMailActivationService).toHaveBeenCalledWith({ firstname: req.body.firstname, lastname: req.body.lastname, token: "token", email: req.body.email });
     expect(res.status).toHaveBeenCalledWith(201);
@@ -62,7 +60,6 @@ describe("Unit | Identities Access Management | Controller | Register new user",
           lastname: "Doe",
           email: "john.doe@example.net",
           password: "Password",
-          userType: "admin",
         },
       };
       const error = new Error("Database connection failed");

@@ -1,7 +1,6 @@
 import { celebrate, Joi } from "celebrate";
 
 import { logger } from "../../../logger.js";
-import { USER_TYPES } from "../../shared/constants.js";
 import ERRORS from "../errors.js";
 import { createNewUser } from "../repositories/user-repository.js";
 import { generatePassword } from "../services/password-service.js";
@@ -15,7 +14,6 @@ const registerUserSchema = celebrate({
     lastname: Joi.string().required(),
     password: Joi.string().required(),
     birthday: Joi.string().required(),
-    userType: Joi.string().required().valid(...Object.values(USER_TYPES)),
   }),
 });
 
@@ -40,9 +38,9 @@ async function registerUserController(
   encodedTokenService = encodedToken,
 ) {
   try {
-    const { firstname, lastname, email, password, birthday, userType } = req.body;
+    const { firstname, lastname, email, password, birthday } = req.body;
     const hashedPassword = await generatePasswordService(password);
-    const userId = await createUserRepository({ firstname, lastname, email, birthday, hashedPassword, userType });
+    const userId = await createUserRepository({ firstname, lastname, email, birthday, hashedPassword });
     await sendMailActivationService({ firstname, lastname, token: encodedTokenService({ userId }), email });
     return res.status(201).send();
   } catch (error) {

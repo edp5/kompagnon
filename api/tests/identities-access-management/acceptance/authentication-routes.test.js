@@ -5,7 +5,6 @@ import databaseBuilder from "../../../db/database-builder/index.js";
 import { knex } from "../../../db/knex-database-connection.js";
 import server from "../../../server.js";
 import { encodedToken } from "../../../src/identities-access-management/services/token-service.js";
-import { DEFAULT_USER_TYPE } from "../../../src/shared/constants.js";
 
 describe("Acceptance | Identities Access Management | Routes | Authentication routes", () => {
   describe("POST /api/authentication/register", () => {
@@ -16,7 +15,6 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
         lastname: "Doe",
         email: "john.doe@example.net",
         password: "password",
-        userType: DEFAULT_USER_TYPE,
         birthday: "01/01/2001",
       };
 
@@ -47,8 +45,6 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
         lastname: "Doe",
         email: "john.doe@example.net",
         password: "password",
-        userType: "useeeeer",
-        birthday: "01/01/2001",
       };
 
       // when
