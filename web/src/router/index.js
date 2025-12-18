@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+import ActivateAccountView from "@/views/authentication/AuthenticationView.vue";
 import LoginView from "@/views/authentication/LoginView.vue";
 import RegisterView from "@/views/authentication/RegisterView.vue";
-import ActivateAccountView from "@/views/authentication/ActivateAccountView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

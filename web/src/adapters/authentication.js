@@ -105,4 +105,4 @@ async function activateAccount({ token }) {
   }
 }
 
-export { loginUser, registerNewUser, activateAccount };
+export { activateAccount, loginUser, registerNewUser };
