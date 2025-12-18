@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { loginUser, registerNewUser } from "@/adapters/authentication.js";
+import { activateAccount, loginUser, registerNewUser } from "@/adapters/authentication.js";
 
 describe("Unit | Adapters | Authentication", () => {
   describe("#registerNewUser", () => {
@@ -127,6 +127,92 @@ describe("Unit | Adapters | Authentication", () => {
 
       // when
       const result = await loginUser(payload);
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de joindre le serveur. Veuillez réessayer plus tard.");
+    });
+  });
+
+  describe("#activateAccount", () => {
+    it("should call the activation endpoint with the provided token", async () => {
+      // given
+      const token = "test-activation-token";
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({ status: 201 });
+
+      // when
+      const result = await activateAccount({ token });
+
+      // then
+      expect(result).toEqual({ success: true, message: "Compte activé avec succès !" });
+      expect(fetchSpy).toHaveBeenCalledWith("/api/authentication/activate?token=test-activation-token", {
+        method: "GET",
+      });
+    });
+
+    it("should encode the token in the URL", async () => {
+      // given
+      const token = "token with spaces & special=chars";
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({ status: 201 });
+
+      // when
+      await activateAccount({ token });
+
+      // then
+      expect(fetchSpy).toHaveBeenCalledWith(
+        `/api/authentication/activate?token=${encodeURIComponent(token)}`,
+        expect.any(Object),
+      );
+    });
+
+    it("should return a specific failure message if response status is 400 (invalid token)", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({
+        status: 400,
+      });
+
+      // when
+      const result = await activateAccount({ token: "invalid-token" });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Token invalide ou expiré.");
+    });
+
+    it("should return a specific failure message if response status is 401 (user not found or already active)", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({
+        status: 401,
+      });
+
+      // when
+      const result = await activateAccount({ token: "some-token" });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Utilisateur non trouvé ou déjà actif.");
+    });
+
+    it("should return a general failure message if response is not ok and status is not 400 or 401", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({
+        status: 500,
+      });
+
+      // when
+      const result = await activateAccount({ token: "some-token" });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Échec de l'activation. Veuillez réessayer.");
+    });
+
+    it("should handle network errors gracefully", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockRejectedValue(new Error("Network error"));
+
+      // when
+      const result = await activateAccount({ token: "some-token" });
 
       // then
       expect(result.success).toBe(false);

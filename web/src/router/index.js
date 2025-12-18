@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+import ActivateAccountView from "@/views/authentication/ActivateAccountView.vue";
 import LoginView from "@/views/authentication/LoginView.vue";
 import RegisterView from "@/views/authentication/RegisterView.vue";
 
