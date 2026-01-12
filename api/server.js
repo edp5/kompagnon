@@ -1,4 +1,4 @@
-import { errors, isCelebrateError } from "celebrate";
+import { isCelebrateError } from "celebrate";
 import cors from "cors";
 import express from "express";
 
@@ -23,7 +23,7 @@ server.use(health);
 server.use(authenticationRoutes);
 
 // do not write routes under this line
-server.use((err, req, res, next) => {
+server.use((err, req, res) => {
   if (isCelebrateError(err)) {
     const details = [];
     for (const [segment, joiError] of err.details.entries()) {
@@ -45,7 +45,17 @@ server.use((err, req, res, next) => {
       details,
     });
   }
-  return errors(err, req, res, next);
+
+  // Generic error handler for non-celebrate errors
+  logger.error({
+    event: "Unhandled error",
+    message: err.message || "Internal server error",
+    stack: err.stack,
+  });
+  return res.status(500).json({
+    status: "error",
+    message: "Internal server error",
+  });
 });
 
 export default server;
