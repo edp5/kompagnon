@@ -23,7 +23,8 @@ server.use(health);
 server.use(authenticationRoutes);
 
 // do not write routes under this line
-server.use((err, req, res) => {
+// eslint-disable-next-line no-unused-vars
+server.use((err, req, res, next) => {
   if (isCelebrateError(err)) {
     const details = [];
     for (const [segment, joiError] of err.details.entries()) {
