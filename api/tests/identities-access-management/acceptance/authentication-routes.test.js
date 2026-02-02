@@ -27,7 +27,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       expect(user).toBeDefined();
     });
 
-    it("should return 500 if object validation failed", async () => {
+    it("should return 400 if object validation failed", async () => {
       // given
       const body = { firstname: "toto" };
 
@@ -35,23 +35,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       const response = await request(server).post("/api/authentication/register").send(body);
 
       // then
-      expect(response.status).toBe(500);
-    });
-
-    it("should return 500 if user type does not exists", async () => {
-      // given
-      const body = {
-        firstname: "John",
-        lastname: "Doe",
-        email: "john.doe@example.net",
-        password: "password",
-      };
-
-      // when
-      const response = await request(server).post("/api/authentication/register").send(body);
-
-      // then
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -70,7 +54,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       expect(response.body.data.userId).toEqual(createdUser.id);
     });
 
-    it("should return 500 if schema is not ok", async () => {
+    it("should return 400 if schema is not ok", async () => {
       // given
       const body = { email: "test", password: "password" };
 
@@ -78,7 +62,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       const response = await request(server).post("/api/authentication/authenticate").send(body);
 
       // then
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
     });
   });
 

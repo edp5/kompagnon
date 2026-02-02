@@ -1,4 +1,4 @@
-import { celebrate, Joi } from "celebrate";
+import { celebrate, Joi, Segments } from "celebrate";
 
 import { logger } from "../../../logger.js";
 import ERRORS from "../errors.js";
@@ -8,7 +8,7 @@ import { sendMailToActivateUserService } from "../services/send-mail-to-activate
 import { encodedToken } from "../services/token-service.js";
 
 const registerUserSchema = celebrate({
-  body: Joi.object({
+  [Segments.BODY]: Joi.object({
     email: Joi.string().email().required(),
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
