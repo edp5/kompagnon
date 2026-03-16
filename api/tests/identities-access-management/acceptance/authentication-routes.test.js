@@ -8,23 +8,44 @@ import { encodedToken } from "../../../src/identities-access-management/services
 
 describe("Acceptance | Identities Access Management | Routes | Authentication routes", () => {
   describe("POST /api/authentication/register", () => {
-    it("should return 201 http code status and create user", async () => {
-      // given
-      const body = {
-        firstname: "John",
-        lastname: "Doe",
-        email: "john.doe@example.net",
-        password: "password",
-        birthday: "01/01/2001",
-      };
+    describe("201 http status", () => {
+      it("should return 201 http code status and create user with simple date", async () => {
+        // given
+        const body = {
+          firstname: "John",
+          lastname: "Doe",
+          email: "john.doe@example.net",
+          password: "password",
+          birthday: "01/01/2001",
+        };
 
-      // when
-      const response = await request(server).post("/api/authentication/register").send(body);
+        // when
+        const response = await request(server).post("/api/authentication/register").send(body);
 
-      // then
-      expect(response.status).toBe(201);
-      const user = await knex("users").where({ email: body.email }).first();
-      expect(user).toBeDefined();
+        // then
+        expect(response.status).toBe(201);
+        const user = await knex("users").where({ email: body.email }).first();
+        expect(user).toBeDefined();
+      });
+
+      it("should return 201 http code status and create user with complex date", async () => {
+        // given
+        const body = {
+          firstname: "John",
+          lastname: "Doe",
+          email: "john.doe@example.net",
+          password: "password",
+          birthday: "14/02/2003",
+        };
+
+        // when
+        const response = await request(server).post("/api/authentication/register").send(body);
+
+        // then
+        expect(response.status).toBe(201);
+        const user = await knex("users").where({ email: body.email }).first();
+        expect(user).toBeDefined();
+      });
     });
 
     it("should return 400 if object validation failed", async () => {

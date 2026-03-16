@@ -13,9 +13,53 @@ const registerUserSchema = celebrate({
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
     password: Joi.string().required(),
-    birthday: Joi.string().required(),
+    birthday: Joi.alternatives()
+      .try(
+        Joi.string().pattern(/^\d{2}\/\d{2}\/\d{4}$/), // DD/MM/YYYY
+        Joi.string().isoDate(), // ISO 8601 (e.g., YYYY-MM-DD)
+      )
+      .required(),
   }),
 });
+
+/**
+ * Normalize birthday into YYYY-MM-DD and validate that it is a real date.
+ * Accepts either DD/MM/YYYY or YYYY-MM-DD (ISO) formats.
+ * @param {string} birthday
+ * @returns {string} Normalized birthday in YYYY-MM-DD format
+ * @throws {Error} with statusCode 400 for invalid formats or dates
+ */
+function normalizeBirthday(birthday) {
+  // Accept ISO format as-is if it matches YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(birthday)) {
+    return birthday;
+  }
+
+  // Accept DD/MM/YYYY and convert to YYYY-MM-DD
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(birthday);
+  if (!match) {
+    const error = new Error("Invalid birthday format");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const [, day, month, year] = match;
+  const date = new Date(`${year}-${month}-${day}T00:00:00Z`);
+
+  const isInvalidDate =
+    Number.isNaN(date.getTime()) ||
+    date.getUTCFullYear().toString() !== year ||
+    String(date.getUTCMonth() + 1).padStart(2, "0") !== month ||
+    String(date.getUTCDate()).padStart(2, "0") !== day;
+
+  if (isInvalidDate) {
+    const error = new Error("Invalid birthday date");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return `${year}-${month}-${day}`;
+}
 
 /**
  * Register User Controller
@@ -40,10 +84,26 @@ async function registerUserController(
   try {
     const { firstname, lastname, email, password, birthday } = req.body;
     const hashedPassword = await generatePasswordService(password);
-    const userId = await createUserRepository({ firstname, lastname, email, birthday, hashedPassword });
-    await sendMailActivationService({ firstname, lastname, token: encodedTokenService({ userId }), email });
+    const normalizedBirthday = normalizeBirthday(birthday);
+    const userId = await createUserRepository({
+      firstname,
+      lastname,
+      email,
+      hashedPassword,
+      birthday: normalizedBirthday,
+    });
+    await sendMailActivationService({
+      firstname,
+      lastname,
+      token: encodedTokenService({ userId }),
+      email,
+    });
     return res.status(201).send();
   } catch (error) {
+    if (error.statusCode && error.statusCode >= 400 && error.statusCode < 500) {
+      logger.warn(`User registration rejected: ${error.message}`);
+      return res.status(error.statusCode).json({ message: error.message });
+    }
     logger.error(`User registration failed: ${error}`);
     return res.status(500).json({ message: ERRORS.INTERNAL_SERVER_ERROR });
   }
