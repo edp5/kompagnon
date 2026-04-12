@@ -44,7 +44,7 @@ async function handleSubmit() {
 
 <template>
   <section class="login-view">
-    <h1>Se connecter</h1>
+    <h1>Administration — Se connecter</h1>
 
     <form
       class="login-form"
@@ -85,12 +85,6 @@ async function handleSubmit() {
       aria-live="assertive"
     >
       {{ errorMessage }}
-    </p>
-
-    <p class="register-link">
-      Pas encore de compte ? <router-link :to="{ name: 'register' }">
-        S'inscrire
-      </router-link>
     </p>
   </section>
 </template>
@@ -150,10 +144,5 @@ button:disabled {
 .feedback.error {
   background-color: #fee2e2;
   color: #991b1b;
-}
-
-.register-link {
-  margin-top: 1.5rem;
-  text-align: center;
 }
 </style>

@@ -59,7 +59,7 @@ async function loginUser({ email, password }) {
     }
 
     const data = await response.json();
-    return { success: true, user: data.user }; // Assuming the API returns user data on success
+    return { success: true, token: data.data.token, userId: data.data.userId };
   } catch {
     return {
       success: false,
