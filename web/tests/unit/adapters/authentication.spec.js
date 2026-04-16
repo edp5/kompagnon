@@ -69,19 +69,18 @@ describe("Unit | Adapters | Authentication", () => {
       vi.restoreAllMocks();
     });
 
-    it("should call the login endpoint with provided payload and return user on success", async () => {
+    it("should call the login endpoint with provided payload and return token and userId on success", async () => {
       // given
-      const mockUser = { id: 1, email: "john.doe@example.com" };
       const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
         ok: true,
-        json: async () => ({ user: mockUser }),
+        json: async () => ({ data: { token: "jwt-token", userId: 1 } }),
       });
 
       // when
       const result = await loginUser(payload);
 
       // then
-      expect(result).toEqual({ success: true, user: mockUser });
+      expect(result).toEqual({ success: true, token: "jwt-token", userId: 1 });
       expect(fetchSpy).toHaveBeenCalledWith("/api/authentication/authenticate", {
         method: "POST",
         headers: {

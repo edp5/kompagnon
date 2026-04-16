@@ -15,14 +15,11 @@ vi.mock("vue-router", () => ({
   useRouter: () => ({
     push: mockPush,
   }),
-  RouterLink: {
-    template: "<a><slot /></a>",
-  },
 }));
 
 async function fillForm(wrapper) {
-  await wrapper.get("input[name=\"email\"]").setValue("john.doe@example.com");
-  await wrapper.get("input[name=\"password\"]").setValue("password123");
+  await wrapper.get("input[name=\"email\"]").setValue("admin@example.com");
+  await wrapper.get("input.password-input").setValue("password123");
 }
 
 describe("Unit | Views | Authentication | LoginView", () => {
@@ -44,7 +41,7 @@ describe("Unit | Views | Authentication | LoginView", () => {
 
     // then
     expect(loginUser).toHaveBeenCalledWith({
-      email: "john.doe@example.com",
+      email: "admin@example.com",
       password: "password123",
     });
     expect(authStore.token).toBe("jwt-token");
@@ -84,15 +81,5 @@ describe("Unit | Views | Authentication | LoginView", () => {
 
     // then
     expect(wrapper.text()).toContain("Une erreur est survenue lors de la connexion.");
-  });
-
-  it("should render registration link", async () => {
-    // when
-    const wrapper = mount(LoginView);
-
-    // then
-    const link = wrapper.find("p.register-link");
-    expect(link.exists()).toBe(true);
-    expect(link.text()).toContain("Pas encore de compte ?  S'inscrire");
   });
 });
