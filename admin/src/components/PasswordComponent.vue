@@ -34,14 +34,14 @@ function updateValue(event) {
         :id="`password-${label}`"
         :type="inputType"
         :value="modelValue"
-        @input="updateValue"
         class="password-input"
-      />
+        @input="updateValue"
+      >
       <button
         type="button"
-        @click="togglePasswordVisibility"
         class="toggle-button"
         :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+        @click="togglePasswordVisibility"
       >
         {{ showPassword ? "👁️" : "👁️‍🗨️" }}
       </button>
