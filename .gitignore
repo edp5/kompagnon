@@ -8,3 +8,6 @@
 
 # IDE
 .idea
+
+# dists in api
+**/dists/**
