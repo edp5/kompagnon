@@ -3,6 +3,7 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import ActivateAccountView from "@/views/authentication/ActivateAccountView.vue";
 import LoginView from "@/views/authentication/LoginView.vue";
 import RegisterView from "@/views/authentication/RegisterView.vue";
+import HomeView from "@/views/HomeView.vue";
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -10,6 +11,11 @@ const router = createRouter({
     {
       path: "/",
       redirect: { name: "login" },
+    },
+    {
+      path: "/home",
+      name: "home",
+      component: HomeView,
     },
     {
       path: "/login",

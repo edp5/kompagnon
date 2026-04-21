@@ -15,10 +15,11 @@ describe("Unit | Router", () => {
     expect(router.options.history.base).toBeDefined();
   });
 
-  it("should have empty routes array initially", () => {
+  it("should have the expected routes", () => {
     // then
-    expect(router.options.routes).toEqual([]);
-    expect(router.getRoutes()).toHaveLength(0);
+    expect(router.options.routes).toHaveLength(3);
+    expect(router.hasRoute("home")).toBe(true);
+    expect(router.hasRoute("login")).toBe(true);
   });
 
   it("should have correct router methods", () => {
@@ -32,6 +33,7 @@ describe("Unit | Router", () => {
 
   it("should be able to add routes dynamically", () => {
     // given
+    const initialLength = router.getRoutes().length;
     const testRoute = {
       path: "/test",
       name: "test",
@@ -43,7 +45,7 @@ describe("Unit | Router", () => {
 
     // then
     expect(router.hasRoute("test")).toBe(true);
-    expect(router.getRoutes()).toHaveLength(1);
+    expect(router.getRoutes()).toHaveLength(initialLength + 1);
 
     // cleanup
     router.removeRoute("test");
