@@ -16,3 +16,20 @@ export const USER_TYPES = {
  * Default user type for new registrations
  */
 export const DEFAULT_USER_TYPE = USER_TYPES.USER;
+/**
+ * Journey status constants
+ * @readonly
+ * @enum {string}
+ */
+export const JOURNEY_STATUS = {
+  /** Waiting for confirmation */
+  WAITING: "waiting",
+  /** Journey accepted by both parties */
+  ACCEPTED: "accepted",
+  /** Journey rejected */
+  REJECTED: "rejected",
+  /** Journey cancelled */
+  CANCELLED: "cancelled",
+  /** Journey successfully completed */
+  COMPLETED: "completed",
+};
