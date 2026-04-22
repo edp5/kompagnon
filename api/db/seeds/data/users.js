@@ -1,20 +1,30 @@
 import { generatePassword } from "../../../src/identities-access-management/services/password-service.js";
-import { DEFAULT_USER_TYPE } from "../../../src/shared/constants.js";
-
-const password = await generatePassword("kompagnon123");
+import { USER_DISABILITIES, USER_ROLE } from "../../../src/shared/constants.js";
 async function users(databaseBuilder) {
-  const simpleUser = {
-    firstname: "simple",
-    lastname: "user",
-    email: "simple.user@example.net",
-    birthday: "01/01/1970",
-    hashedPassword: password,
-    userType: DEFAULT_USER_TYPE,
-    lastLoggedAt: new Date("2025-10-08"),
-  };
+  const hashedPassword = await generatePassword("kompagnon123");
+  const users = [
+    // User valid, compagnon
+    {
+      firstname: "Albert",
+      lastname: "Berlat",
+      email: "albert.berlat@example.net",
+      role: USER_ROLE.VALID,
+      hashedPassword,
+    },
+    // Invalid user with blind disability
+    {
+      firstname: "Andrea",
+      lastname: "Marceti",
+      email: "a.marceti@examle.net",
+      role: USER_ROLE.INVALID,
+      disabilities: USER_DISABILITIES.BLIND,
+      hashedPassword,
+    },
+    // Add other users here
+  ];
 
   // call database builder with data
-  await databaseBuilder.factory.buildUser(simpleUser);
+  await Promise.all(users.map((user) => databaseBuilder.factory.buildUser(user)));
 }
 
 export { users };
