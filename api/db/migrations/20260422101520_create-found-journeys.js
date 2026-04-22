@@ -18,8 +18,8 @@ async function up(knex) {
       .inTable("passenger_journeys")
       .onDelete("CASCADE");
     table.string("status").notNullable().defaultTo("waiting");
-    table.timestamp("createdAt").defaultTo(knex.fn.now());
-    table.timestamp("updatedAt").defaultTo(knex.fn.now());
+    table.timestamp("created-at").defaultTo(knex.fn.now());
+    table.timestamp("updated-at").defaultTo(knex.fn.now());
   });
 }
 

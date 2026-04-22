@@ -39,8 +39,8 @@ async function up(knex) {
       .comment(
         "arrival latitude is a parameter for the algorythm to find the closest passenger",
       );
-    table.timestamp("createdAt").defaultTo(knex.fn.now());
-    table.timestamp("updatedAt").defaultTo(knex.fn.now());
+    table.timestamp("created_at").defaultTo(knex.fn.now());
+    table.timestamp("updated_at").defaultTo(knex.fn.now());
   });
 }
 
