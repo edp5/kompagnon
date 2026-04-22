@@ -46,6 +46,20 @@ export default defineConfig({
           },
         },
       },
+      {
+        test: {
+          name: "Migration tests",
+          include: ["tests/db/migrations/**/*.test.js"],
+          poolOptions: {
+            forks: {
+              execArgv: ["--expose-gc"],
+              isolate: true,
+              singleFork: true,
+            },
+          },
+          maxWorkers: 1,
+        },
+      },
     ],
     fileParallelism: false,
     reporters: process.env.GITHUB_ACTIONS
