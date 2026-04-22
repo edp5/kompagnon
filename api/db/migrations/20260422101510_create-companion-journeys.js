@@ -11,36 +11,36 @@ async function up(knex) {
       .references("id")
       .inTable("users")
       .onDelete("CASCADE");
-    table.timestamp("departure_time").notNullable().comment("departure time");
-    table.timestamp("arrival_time").notNullable().comment("arrival time");
-    table.text("departure_address").notNullable();
-    table.text("arrival_address").notNullable();
+    table.timestamp("departureTime").notNullable().comment("departure time");
+    table.timestamp("arrivalTime").notNullable().comment("arrival time");
+    table.text("departureAddress").notNullable();
+    table.text("arrivalAddress").notNullable();
     table
-      .decimal("departure_lon", 11, 8)
+      .decimal("departureLon", 11, 8)
       .notNullable()
       .comment(
         "departure longitude is a parameter for the algorythm to find the closest passenger",
       );
     table
-      .decimal("departure_lat", 10, 8)
+      .decimal("departureLat", 10, 8)
       .notNullable()
       .comment(
         "departure latitude is a parameter for the algorythm to find the closest passenger",
       );
     table
-      .decimal("arrival_lon", 11, 8)
+      .decimal("arrivalLon", 11, 8)
       .notNullable()
       .comment(
         "arrival longitude is a parameter for the algorythm to find the closest passenger",
       );
     table
-      .decimal("arrival_lat", 10, 8)
+      .decimal("arrivalLat", 10, 8)
       .notNullable()
       .comment(
         "arrival latitude is a parameter for the algorythm to find the closest passenger",
       );
-    table.timestamp("created_at").defaultTo(knex.fn.now());
-    table.timestamp("updated_at").defaultTo(knex.fn.now());
+    table.timestamp("createdAt").defaultTo(knex.fn.now());
+    table.timestamp("updatedAt").defaultTo(knex.fn.now());
   });
 }
 
