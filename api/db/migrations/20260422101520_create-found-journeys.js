@@ -1,3 +1,5 @@
+import { JOURNEY_STATUS } from "../../src/shared/constants.js";
+
 /**
  * @param { import("knex").Knex } knex - The Knex instance
  * @returns { Promise<void> }
@@ -17,9 +19,9 @@ async function up(knex) {
       .references("id")
       .inTable("passenger_journeys")
       .onDelete("CASCADE");
-    table.string("status").notNullable().defaultTo("waiting");
-    table.timestamp("created-at").defaultTo(knex.fn.now());
-    table.timestamp("updated-at").defaultTo(knex.fn.now());
+    table.string("status").notNullable().defaultTo(JOURNEY_STATUS.WAITING);
+    table.timestamp("created_at").defaultTo(knex.fn.now());
+    table.timestamp("updated_at").defaultTo(knex.fn.now());
   });
 }
 
