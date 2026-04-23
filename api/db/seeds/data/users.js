@@ -17,7 +17,7 @@ async function users(databaseBuilder) {
       lastname: "Marceti",
       email: "a.marceti@examle.net",
       role: USER_ROLE.INVALID,
-      disabilities: USER_DISABILITIES.BLIND,
+      disabilities: [USER_DISABILITIES.BLIND],
       hashedPassword,
     },
     // Add other users here
