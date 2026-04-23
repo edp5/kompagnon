@@ -4,6 +4,7 @@ import express from "express";
 
 import { logger } from "./logger.js";
 import authenticationRoutes from "./src/identities-access-management/routes/authentication-routes.js";
+import usersRoutes from "./src/identities-access-management/routes/users-routes.js";
 import fronts from "./src/shared/fronts/fronts-routes.js";
 import health from "./src/shared/health/routes.js";
 import swaggerRoute from "./swagger.js";
@@ -26,6 +27,7 @@ server.use((req, res, next) => {
 server.use(fronts);
 server.use(health);
 server.use(authenticationRoutes);
+server.use(usersRoutes);
 
 // do not write routes under this line
 // eslint-disable-next-line no-unused-vars
