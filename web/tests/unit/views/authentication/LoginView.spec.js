@@ -11,10 +11,15 @@ vi.mock("@/adapters/authentication.js", () => ({
 }));
 
 const mockPush = vi.fn();
+const mockRoute = {
+  query: {},
+};
+
 vi.mock("vue-router", () => ({
   useRouter: () => ({
     push: mockPush,
   }),
+  useRoute: () => mockRoute,
   RouterLink: {
     template: "<a><slot /></a>",
   },
@@ -25,18 +30,31 @@ async function fillForm(wrapper) {
   await wrapper.get("input[name=\"password\"]").setValue("password123");
 }
 
+function mountLoginView() {
+  return mount(LoginView, {
+    global: {
+      stubs: {
+        RouterLink: {
+          template: "<a><slot /></a>",
+        },
+      },
+    },
+  });
+}
+
 describe("Unit | Views | Authentication | LoginView", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
+    mockRoute.query = {};
   });
 
-  it("should store the token and redirect to home after a successful login", async () => {
+  it("should redirect to home page after a successful login", async () => {
     // given
     loginUser.mockResolvedValue({ success: true, token: "jwt-token", userId: 1 });
 
     // when
-    const wrapper = mount(LoginView);
+    const wrapper = mountLoginView();
     const authStore = useAuthStore();
     await fillForm(wrapper);
     await wrapper.find("form").trigger("submit");
@@ -60,7 +78,7 @@ describe("Unit | Views | Authentication | LoginView", () => {
     });
 
     // when
-    const wrapper = mount(LoginView);
+    const wrapper = mountLoginView();
     await fillForm(wrapper);
     await wrapper.find("form").trigger("submit");
     await flushPromises();
@@ -70,6 +88,21 @@ describe("Unit | Views | Authentication | LoginView", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
+  it("should redirect to the requested protected route after a successful login", async () => {
+    // given
+    mockRoute.query = { redirect: "/profile" };
+    loginUser.mockResolvedValue({ success: true, token: "jwt-token", userId: 1 });
+
+    // when
+    const wrapper = mountLoginView();
+    await fillForm(wrapper);
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+
+    // then
+    expect(mockPush).toHaveBeenCalledWith("/profile");
+  });
+
   it("should show fallback error message when login fails without message", async () => {
     // given
     loginUser.mockResolvedValue({
@@ -77,7 +110,7 @@ describe("Unit | Views | Authentication | LoginView", () => {
     });
 
     // when
-    const wrapper = mount(LoginView);
+    const wrapper = mountLoginView();
     await fillForm(wrapper);
     await wrapper.find("form").trigger("submit");
     await flushPromises();
@@ -88,7 +121,7 @@ describe("Unit | Views | Authentication | LoginView", () => {
 
   it("should render registration link", async () => {
     // when
-    const wrapper = mount(LoginView);
+    const wrapper = mountLoginView();
 
     // then
     const link = wrapper.find("p.register-link");

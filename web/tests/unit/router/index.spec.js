@@ -1,8 +1,16 @@
-import { describe, expect, it } from "vitest";
+import { createPinia, setActivePinia } from "pinia";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import router from "@/router/index.js";
+import { useAuthStore } from "@/stores/auth.js";
 
 describe("Unit | Router", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    setActivePinia(createPinia());
+    await router.push({ name: "login" });
+  });
+
   describe("routes configuration", () => {
     it("should register the root redirect route", () => {
       // when
@@ -10,7 +18,6 @@ describe("Unit | Router", () => {
 
       // then
       expect(rootRoute).toBeDefined();
-      // TODO: update redirect to login route once it exists.
       expect(rootRoute?.redirect).toEqual({ name: "login" });
     });
 
@@ -21,6 +28,26 @@ describe("Unit | Router", () => {
       // then
       expect(registerRoute).toBeDefined();
       expect(registerRoute?.path).toBe("/register");
+    });
+
+    it("should register the profile route", () => {
+      // when
+      const profileRoute = router.getRoutes().find((route) => route.name === "profile");
+
+      // then
+      expect(profileRoute).toBeDefined();
+      expect(profileRoute?.path).toBe("/profile");
+      expect(profileRoute?.meta.requiresAuth).toBe(true);
+    });
+
+    it("should require authentication for the home route", () => {
+      // when
+      const homeRoute = router.getRoutes().find((route) => route.name === "home");
+
+      // then
+      expect(homeRoute).toBeDefined();
+      expect(homeRoute?.path).toBe("/home");
+      expect(homeRoute?.meta.requiresAuth).toBe(true);
     });
   });
 
@@ -84,5 +111,26 @@ describe("Unit | Router", () => {
 
     // cleanup
     router.removeRoute("testWithParam");
+  });
+
+  it("should redirect unauthenticated users from protected routes to login", async () => {
+    // when
+    await router.push({ name: "profile" });
+
+    // then
+    expect(router.currentRoute.value.name).toBe("login");
+    expect(router.currentRoute.value.query.redirect).toBe("/profile");
+  });
+
+  it("should allow authenticated users to access protected routes", async () => {
+    // given
+    const authStore = useAuthStore();
+    authStore.setAuth("jwt-token", 1);
+
+    // when
+    await router.push({ name: "profile" });
+
+    // then
+    expect(router.currentRoute.value.name).toBe("profile");
   });
 });

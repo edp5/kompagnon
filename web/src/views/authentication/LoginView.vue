@@ -1,12 +1,13 @@
 <script setup>
 import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 import { loginUser } from "@/adapters/authentication.js";
 import PasswordComponent from "@/components/PasswordComponent.vue";
 import { useAuthStore } from "@/stores/auth.js";
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 
 function initialFormState() {
@@ -32,7 +33,11 @@ async function handleSubmit() {
 
   if (result.success) {
     authStore.setAuth(result.token, result.userId);
-    router.push({ name: "home" });
+    const redirectTarget = typeof route.query.redirect === "string"
+      ? route.query.redirect
+      : { name: "home" };
+
+    router.push(redirectTarget);
   } else {
     errorMessage.value =
       result.message ?? "Une erreur est survenue lors de la connexion.";
