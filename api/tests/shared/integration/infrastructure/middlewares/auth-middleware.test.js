@@ -149,9 +149,7 @@ describe("Integration | Shared | Infrastructure | Middlewares | Auth Middleware"
       expect(next).toHaveBeenCalledTimes(1);
       expect(req.auth).toBeDefined();
       expect(req.auth.userId).toBe(user.id);
-      expect(req.auth.firstname).toBe("John");
-      expect(req.auth.lastname).toBe("Doe");
-      expect(req.auth.email).toBe("john@example.com");
+      expect(req.auth.userType).toBe(user.userType);
     });
   });
 });
