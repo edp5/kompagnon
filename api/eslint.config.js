@@ -81,6 +81,6 @@ export default defineConfig([
     },
   },
   {
-    ignores: ["./dist/*"],
+    ignores: ["./dists/*"],
   },
 ]);
