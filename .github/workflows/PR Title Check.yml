@@ -2,13 +2,14 @@ name: PR Title Check
 
 on:
   pull_request:
-    types: [opened, reopened, edited, synchronize]
+    types: [opened, reopened, edited, synchronize, ready_for_review]
     branches:
       - main
   merge_group:
 
 jobs:
   check-title:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
 
     steps:
