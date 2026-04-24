@@ -25,7 +25,7 @@ const registerUserSchema = celebrate({
 /**
  * Normalize birthday into YYYY-MM-DD and validate that it is a real date.
  * Accepts either DD/MM/YYYY or YYYY-MM-DD (ISO) formats.
- * @param {string} birthday - Birthday string in either DD/MM/YYYY or YYYY-MM-DD format
+ * @param {string} birthday - Birthday value provided by the client in DD/MM/YYYY or YYYY-MM-DD format.
  * @returns {string} Normalized birthday in YYYY-MM-DD format
  * @throws {Error} with statusCode 400 for invalid formats or dates
  */
