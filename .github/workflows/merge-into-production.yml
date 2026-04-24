@@ -3,7 +3,7 @@ name: merge into production
 on:
   release:
     types:
-      - released
+      - published
 
 permissions:
   contents: write
