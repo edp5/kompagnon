@@ -48,9 +48,6 @@ export async function authMiddleware(req, res, next) {
     // Attach user information to request
     req.auth = {
       userId: user.id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
       userType: user.userType,
     };
 
