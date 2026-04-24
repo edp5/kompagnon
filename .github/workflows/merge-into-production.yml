@@ -1,0 +1,31 @@
+name: merge into production
+
+on:
+  release:
+    types:
+      - released
+
+permissions:
+  contents: write
+
+jobs:
+  merge-main-into-production:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.SERVICE_TOKEN }}
+          fetch-depth: 0
+
+      - name: Merge main into production
+        run: |
+          git checkout production
+          git merge origin/main --no-edit
+
+      - name: Push changes
+        run: |
+          git push origin production
+        env:
+          GITHUB_TOKEN: ${{ secrets.SERVICE_TOKEN }}
