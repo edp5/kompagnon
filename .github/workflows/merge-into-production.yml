@@ -19,10 +19,16 @@ jobs:
           token: ${{ secrets.SERVICE_TOKEN }}
           fetch-depth: 0
 
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Merge main into production
         run: |
-          git checkout production
-          git merge origin/main --no-edit
+          git fetch origin main production
+          git checkout -B production origin/production
+          git merge --no-edit origin/main
 
       - name: Push changes
         run: |
