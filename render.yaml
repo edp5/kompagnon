@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: kompagnon
+    env: node
+    plan: free
+    buildCommand: bash scripts/deploy.sh
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: development
+      - key: BASE_URL
+        value: https://kompagnon.onrender.com
