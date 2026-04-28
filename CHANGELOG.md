@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/edp5/kompagnon/compare/v1.0.0...v1.0.1) (2026-04-28)
+
+### 🐛 Bug Fixes
+
+* Fix the empty database script and deployment script ([#516](https://github.com/edp5/kompagnon/issues/516)) ([21a60c5](https://github.com/edp5/kompagnon/commit/21a60c5d59c5ffaac013acc1b7c2a51205a20f7a))
+
 ## 1.0.0 (2026-04-28)
 
 ### 🚀 New features
