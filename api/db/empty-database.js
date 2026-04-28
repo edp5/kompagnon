@@ -1,7 +1,7 @@
 import process from "node:process";
 
 import { logger } from "../logger.js";
-import { disconnect, emptyAllTablesOfDatabase } from "./knex-database-connections.js";
+import { disconnect, emptyAllTablesOfDatabase } from "./knex-database-connection.js";
 
 async function main() {
   logger.info("Emptying all tables...");
