@@ -59,7 +59,6 @@ async function emptyAllTablesOfDatabase() {
     tableNames,
     "knex_migrations",
     "knex_migrations_lock",
-    "view-active-organization-learners",
   );
 
   const tables = _.map(tablesToDelete, (tableToDelete) => `"${tableToDelete}"`).join();
