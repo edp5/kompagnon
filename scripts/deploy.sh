@@ -13,5 +13,8 @@ npm --prefix api ci
 echo "Running migrations..."
 npm --prefix api run db:migrate
 
+# Empty the database before seeding
+npm --prefix api run db:empty
+
 # seed database for testing
 npm --prefix api run db:seed
