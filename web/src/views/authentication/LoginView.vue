@@ -3,6 +3,9 @@ import { reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { loginUser } from "@/adapters/authentication.js";
+import AuthLayout from "@/components/AuthLayout.vue";
+import BaseButton from "@/components/BaseButton.vue";
+import BaseInput from "@/components/BaseInput.vue";
 import PasswordComponent from "@/components/PasswordComponent.vue";
 import { useAuthStore } from "@/stores/auth.js";
 
@@ -48,117 +51,98 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <section class="login-view">
-    <h1>Se connecter</h1>
-
+  <AuthLayout
+    title="Bon retour sur Kompagnon"
+    description="Connectez-vous pour accéder à votre espace et retrouver vos volontaires."
+  >
     <form
-      class="login-form"
+      class="form-grid"
       @submit.prevent="handleSubmit"
     >
-      <div class="form-control">
-        <label for="email">Adresse e‑mail</label>
-        <input
-          id="email"
-          v-model="form.email"
-          type="email"
-          name="email"
-          autocomplete="email"
-          required
-        >
-      </div>
+      <BaseInput
+        id="email"
+        v-model="form.email"
+        type="email"
+        name="email"
+        label="Adresse e‑mail"
+        autocomplete="email"
+        placeholder="vous@exemple.fr"
+        :required="true"
+      />
 
       <PasswordComponent
         id="password"
         v-model="form.password"
         name="password"
         label="Mot de passe"
+        autocomplete="current-password"
         :required="true"
       />
 
-      <button
+      <BaseButton
         type="submit"
         :disabled="isSubmitting"
+        :full-width="true"
       >
         {{ isSubmitting ? "Connexion en cours..." : "Se connecter" }}
-      </button>
+      </BaseButton>
     </form>
 
     <p
       v-if="errorMessage"
-      class="feedback error"
+      class="feedback error feedback--error"
       role="alert"
       aria-live="assertive"
     >
       {{ errorMessage }}
     </p>
 
-    <p class="register-link">
-      Pas encore de compte ? <router-link :to="{ name: 'register' }">
-        S'inscrire
-      </router-link>
-    </p>
-  </section>
+    <template #footer>
+      <p class="register-link">
+        Pas encore de compte ? <router-link
+          :to="{ name: 'register' }"
+          class="text-link"
+        >
+          S'inscrire
+        </router-link>
+      </p>
+    </template>
+  </AuthLayout>
 </template>
 
 <style scoped>
-.login-view {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.form-control {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.form-control label {
-  display: flex;
-  font-weight: 600;
-}
-
-:deep(input) {
-  padding: 0.5rem;
-  border: 1px solid #d3d3d3;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-button {
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 4px;
-  background-color: #1e40af;
-  color: white;
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+.form-grid {
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .feedback {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  border-radius: 4px;
-}
-
-.feedback.error {
-  background-color: #fee2e2;
-  color: #991b1b;
+  animation: slideInDown 0.4s ease-out;
 }
 
 .register-link {
-  margin-top: 1.5rem;
   text-align: center;
+  animation: fadeInUp 0.8s ease-out 0.2s backwards;
 }
 </style>

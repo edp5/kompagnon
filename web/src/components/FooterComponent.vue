@@ -3,20 +3,12 @@ import packageInfo from "../../../package.json";
 </script>
 
 <template>
-  <footer>
-    <p>© {{ new Date().getFullYear() }} {{ packageInfo.author }}</p>
-    <p>Version: {{ packageInfo.version }}</p>
+  <footer class="footer-component">
+    <div class="footer-component__inner">
+      <p>© {{ new Date().getFullYear() }} {{ packageInfo.author }}</p>
+      <p>Version: {{ packageInfo.version }}</p>
+    </div>
   </footer>
 </template>
 
-<style scoped>
-footer {
-  text-align: center;
-  padding: 1em;
-  background-color: #f8f9fa;
-  border-top: 1px solid #e7e7e7;
-  font-size: 0.9em;
-  color: #6c757d;
-}
-
-</style>
+<style scoped></style>

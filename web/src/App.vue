@@ -3,7 +3,8 @@ import { onBeforeMount, ref } from "vue";
 import { RouterView } from "vue-router";
 
 import { apiCheck } from "@/adapters/api-check.js";
-import FooterComponent from "@/components/FooterComponent.vue";
+import AccessibilityPanel from "@/components/AccessibilityPanel.vue";
+import AppShell from "@/components/AppShell.vue";
 
 const apiIsOk = ref(false);
 
@@ -13,10 +14,10 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div v-if="apiIsOk">
+  <AppShell v-if="apiIsOk">
     <RouterView />
-    <FooterComponent />
-  </div>
+    <AccessibilityPanel />
+  </AppShell>
 </template>
 
 <style scoped></style>
