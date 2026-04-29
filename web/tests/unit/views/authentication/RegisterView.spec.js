@@ -8,6 +8,12 @@ vi.mock("@/adapters/authentication.js", () => ({
   registerNewUser: vi.fn(),
 }));
 
+vi.mock("vue-router", () => ({
+  RouterLink: {
+    template: "<a><slot /></a>",
+  },
+}));
+
 async function fillForm(wrapper) {
   await wrapper.get("input[name=\"firstname\"]").setValue("John");
   await wrapper.get("input[name=\"lastname\"]").setValue("Doe");

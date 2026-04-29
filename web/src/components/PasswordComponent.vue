@@ -32,6 +32,11 @@ defineProps({
     description: "Whether the input field is disabled",
     default: false,
   },
+  autocomplete: {
+    type: String,
+    description: "Autocomplete attribute for the input field",
+    default: undefined,
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -51,7 +56,7 @@ function onInput(event) {
 <template>
   <div class="password-component">
     <label
-      class="password-component__label"
+      class="base-label password-component__label"
       :for="id"
     >
       {{ label }}
@@ -64,6 +69,7 @@ function onInput(event) {
         :type="inputType"
         :value="modelValue"
         :required="required"
+        :autocomplete="autocomplete"
         class="password-component__input"
         :disabled="disabled"
         @input="onInput"
@@ -83,9 +89,7 @@ function onInput(event) {
 
 <style scoped>
 .password-component {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  width: 100%;
 }
 
 .password-component__input-wrapper {
@@ -94,20 +98,15 @@ function onInput(event) {
   gap: 0.5rem;
 }
 
-.password-component__label {
-  font-weight: 600;
-}
-
 .password-component__input {
   flex: 1;
 }
 
 .password-component__toggle {
-  border: 1px solid #d3d3d3;
-  border-radius: 4px;
-  background-color: transparent;
-  padding: 0.5rem 0.75rem;
+  width: auto;
+  padding: 0.75rem 1rem;
   cursor: pointer;
+  font-weight: 600;
 }
 </style>
 

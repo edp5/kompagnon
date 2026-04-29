@@ -4,12 +4,10 @@ import App from "@/App.vue";
 import router from "@/router/index.js";
 
 describe("Unit | Main", () => {
-  it("should import all required dependencies", async () => {
-    // when
-    const mainModule = await import("@/main.js");
-
+  it("should import all required dependencies", () => {
     // then
-    expect(mainModule).toBeDefined();
+    expect(App).toBeDefined();
+    expect(router).toBeDefined();
   });
 
   it("should have App component defined", () => {

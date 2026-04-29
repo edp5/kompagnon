@@ -1,11 +1,38 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
+import AppLayout from "@/components/AppLayout.vue";
 import { useAuthStore } from "@/stores/auth.js";
 import ActivateAccountView from "@/views/authentication/ActivateAccountView.vue";
 import LoginView from "@/views/authentication/LoginView.vue";
 import RegisterView from "@/views/authentication/RegisterView.vue";
+import ConnectView from "@/views/ConnectView.vue";
 import HomeView from "@/views/HomeView.vue";
+import MapView from "@/views/MapView.vue";
+import NotificationsView from "@/views/NotificationsView.vue";
+import PrivacyView from "@/views/PrivacyView.vue";
 import ProfileView from "@/views/ProfileView.vue";
+import SettingsView from "@/views/SettingsView.vue";
+import SupportView from "@/views/SupportView.vue";
+
+function withAppLayout(path, name, component) {
+  return {
+    path,
+    component: AppLayout,
+    meta: {
+      requiresAuth: true,
+    },
+    children: [
+      {
+        path: "",
+        name,
+        component,
+        meta: {
+          requiresAuth: true,
+        },
+      },
+    ],
+  };
+}
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -13,14 +40,6 @@ const router = createRouter({
     {
       path: "/",
       redirect: { name: "login" },
-    },
-    {
-      path: "/home",
-      name: "home",
-      component: HomeView,
-      meta: {
-        requiresAuth: true,
-      },
     },
     {
       path: "/login",
@@ -38,12 +57,28 @@ const router = createRouter({
       component: ActivateAccountView,
     },
     {
-      path: "/profile",
-      name: "profile",
-      component: ProfileView,
-      meta: {
-        requiresAuth: true,
-      },
+      ...withAppLayout("/home", "home", HomeView),
+    },
+    {
+      ...withAppLayout("/map", "map", MapView),
+    },
+    {
+      ...withAppLayout("/connect", "connect", ConnectView),
+    },
+    {
+      ...withAppLayout("/profile", "profile", ProfileView),
+    },
+    {
+      ...withAppLayout("/notifications", "notifications", NotificationsView),
+    },
+    {
+      ...withAppLayout("/settings", "settings", SettingsView),
+    },
+    {
+      ...withAppLayout("/support", "support", SupportView),
+    },
+    {
+      ...withAppLayout("/privacy", "privacy", PrivacyView),
     },
   ],
 });
