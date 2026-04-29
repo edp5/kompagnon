@@ -34,7 +34,7 @@ describe("Unit | Views | HomeView", () => {
     // given
     const authStore = useAuthStore();
     authStore.setAuth("jwt-token", 1);
-    const wrapper = mount(HomeView, {
+    mount(HomeView, {
       global: {
         stubs: {
           AppShell: true,

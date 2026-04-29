@@ -1,5 +1,5 @@
-import { afterEach, vi } from "vitest";
 import { config } from "@vue/test-utils";
+import { afterEach, vi } from "vitest";
 
 import localStorage from "./localStorage.js";
 

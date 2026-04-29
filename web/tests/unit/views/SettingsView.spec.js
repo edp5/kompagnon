@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
-import { createRouter, createMemoryHistory } from "vue-router";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createMemoryHistory, createRouter } from "vue-router";
 
 import SettingsView from "@/views/SettingsView.vue";
 
@@ -11,7 +11,7 @@ describe("Unit | Views | SettingsView", () => {
     setActivePinia(createPinia());
   });
 
-  const createWrapper = () => {
+  function createWrapper() {
     const router = createRouter({
       history: createMemoryHistory(),
       routes: [

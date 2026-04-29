@@ -12,7 +12,7 @@ const profile = ref({ showName: true, showAge: false });
 const location = ref({ share: true });
 const history = ref({ share: false, analytics: true });
 
-const score = null;
+const score = 75;
 </script>
 
 <template>

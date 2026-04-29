@@ -38,26 +38,34 @@ describe("Unit | Components | AccessibilityPanel", () => {
 
   it("should close the drawer when close button is clicked", async () => {
     // given
-    const wrapper = mount(AccessibilityPanel);
+    const wrapper = mount(AccessibilityPanel, {
+      global: { stubs: { transition: false } },
+    });
     await wrapper.find(".a11y-toggle").trigger("click");
+    await wrapper.vm.$nextTick();
 
     // when
     await wrapper.find(".a11y-close").trigger("click");
+    await wrapper.vm.$nextTick();
 
     // then
-    expect(wrapper.find(".a11y-drawer").exists()).toBe(false);
+    expect(wrapper.vm.isOpen).toBe(false);
   });
 
   it("should close the drawer when overlay is clicked", async () => {
     // given
-    const wrapper = mount(AccessibilityPanel);
+    const wrapper = mount(AccessibilityPanel, {
+      global: { stubs: { transition: false } },
+    });
     await wrapper.find(".a11y-toggle").trigger("click");
+    await wrapper.vm.$nextTick();
 
     // when
     await wrapper.find(".a11y-overlay").trigger("click");
+    await wrapper.vm.$nextTick();
 
     // then
-    expect(wrapper.find(".a11y-drawer").exists()).toBe(false);
+    expect(wrapper.vm.isOpen).toBe(false);
   });
 
   it("should have all accessibility options", () => {

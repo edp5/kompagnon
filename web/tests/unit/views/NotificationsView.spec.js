@@ -1,6 +1,6 @@
 import { mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createRouter, createMemoryHistory } from "vue-router";
+import { createMemoryHistory, createRouter } from "vue-router";
 
 import NotificationsView from "@/views/NotificationsView.vue";
 
@@ -11,7 +11,7 @@ describe("Unit | Views | NotificationsView", () => {
     vi.clearAllMocks();
   });
 
-  const createWrapper = () => {
+  function createWrapper() {
     const router = createRouter({
       history: createMemoryHistory(),
       routes: [{ path: "/notifications", component: NotificationsView }],
