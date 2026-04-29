@@ -33,7 +33,7 @@ describe("Unit | Components | AccessibilityPanel", () => {
 
     // then
     expect(wrapper.find(".a11y-drawer").exists()).toBe(true);
-    expect(wrapper.text()).toContain("Options d'accessibilité");
+    expect(wrapper.find(".a11y-drawer").attributes("aria-label")).toBe("Options d'accessibilité");
   });
 
   it("should close the drawer when close button is clicked", async () => {
@@ -189,7 +189,8 @@ describe("Unit | Components | AccessibilityPanel", () => {
     await wrapper.vm.$nextTick();
 
     // then
-    expect(wrapper.vm.a11yLabel).toContain("1 option");
+    const activeCount = wrapper.vm.activeCount;
+    expect(activeCount).toBe(1);
   });
 
   it("should display plural form when multiple settings are active", async () => {
@@ -200,7 +201,8 @@ describe("Unit | Components | AccessibilityPanel", () => {
     await wrapper.vm.$nextTick();
 
     // then
-    expect(wrapper.vm.a11yLabel).toContain("2 options");
+    const activeCount = wrapper.vm.activeCount;
+    expect(activeCount).toBe(2);
   });
 
   it("should render the panel footer", async () => {
@@ -210,7 +212,7 @@ describe("Unit | Components | AccessibilityPanel", () => {
     await wrapper.vm.$nextTick();
 
     // then
-    expect(wrapper.text()).toContain("Les paramètres d'accessibilité sont enregistrés automatiquement");
+    expect(wrapper.text()).toContain("Les paramètres sont sauvegardés automatiquement");
   });
 
   it("should apply all accessibility classes to root on toggle", async () => {

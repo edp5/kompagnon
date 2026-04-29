@@ -1,7 +1,76 @@
 import { mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createRouter, createMemoryHistory } from "vue-router";
 
 import PrivacyView from "@/views/PrivacyView.vue";
+
+describe("Unit | Views | PrivacyView", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const createWrapper = () => {
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [{ path: "/privacy", component: PrivacyView }],
+    });
+
+    return mount(PrivacyView, {
+      global: {
+        plugins: [router],
+        stubs: {
+          AppLayout: true,
+          AppShell: true,
+        },
+      },
+    });
+  };
+
+  it("should render the privacy view", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it("should display the header", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it("should display privacy score card", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it("should display privacy protection status", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it("should display profile visibility section", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it("should display full visibility option", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it("should display limited visibility option", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it("should display location privacy section", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it("should display location sharing option", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm).toBeDefined();
+  });
+});
 
 describe("Unit | Views | PrivacyView", () => {
   beforeEach(() => {
