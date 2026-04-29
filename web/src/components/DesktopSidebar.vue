@@ -115,40 +115,11 @@ function isActive(routeName) {
 
     <div
       v-if="!collapsed"
-      class="sidebar__role-switcher"
+      class="sidebar__role-display"
     >
-      <button
-        class="sidebar__role-btn"
-        :class="{
-          'sidebar__role-btn--active': userRole === 'valid',
-          'sidebar__role-btn--disabled': !canEditRoles,
-        }"
-        :disabled="!canEditRoles"
-        :aria-label="canEditRoles ? 'Passer en mode volontaire' : 'Mode volontaire (lecture seule)'"
-        :title="canEditRoles ? 'Vous êtes volontaire' : 'Vous êtes volontaire (non modifiable)'"
-      >
-        <span
-          v-if="userRole === 'valid'"
-          class="sidebar__role-btn-check"
-        >✓</span>
-        💚 Volont.
-      </button>
-      <button
-        class="sidebar__role-btn"
-        :class="{
-          'sidebar__role-btn--active': userRole === 'invalid',
-          'sidebar__role-btn--disabled': !canEditRoles,
-        }"
-        :disabled="!canEditRoles"
-        :aria-label="canEditRoles ? 'Passer en mode bénéficiaire' : 'Mode bénéficiaire (lecture seule)'"
-        :title="canEditRoles ? 'Vous êtes bénéficiaire' : 'Vous êtes bénéficiaire (non modifiable)'"
-      >
-        <span
-          v-if="userRole === 'invalid'"
-          class="sidebar__role-btn-check"
-        >✓</span>
-        🤝 Bénéf.
-      </button>
+      <p class="sidebar__role-label">
+        {{ userRole === "valid" ? "💚 Volontaire" : "🤝 Bénéficiaire" }}
+      </p>
     </div>
 
     <nav class="sidebar__nav">
@@ -337,20 +308,28 @@ function isActive(routeName) {
   border-bottom: 1px solid var(--c-border);
 }
 
-.sidebar__role-switcher {
-  display: flex;
-  gap: 4px;
+.sidebar__role-display {
   margin: 0.875rem 0.875rem 0.25rem;
+  padding: 0.75rem 1rem;
   background: var(--c-beige);
   border-radius: 12px;
-  padding: 4px;
   border: 1px solid var(--c-border);
 }
 
+.sidebar__role-label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--c-text);
+  text-align: center;
+}
+
+.sidebar__role-switcher {
+  display: none;
+}
+
 .sidebar__role-btn {
-  flex: 1;
-  padding: 8px 6px;
-  border-radius: 9px;
+  display: none;
   border: 1.5px solid transparent;
   cursor: pointer;
   font-family: var(--font-body);

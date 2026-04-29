@@ -12,6 +12,7 @@ const mountTarget = document.querySelector("#app");
 app.use(createPinia());
 app.use(router);
 
-if (mountTarget) {
-  app.mount(mountTarget);
+if (!mountTarget) {
+  throw new Error("Missing #app element in index.html");
 }
+app.mount(mountTarget);

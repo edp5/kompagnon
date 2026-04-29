@@ -1,31 +1,44 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import KIcon from "@/components/KIcon.vue";
 
 const isOpen = ref(false);
 
+const STORAGE_KEYS = {
+  highContrast: "a11y-high-contrast",
+  largeText: "a11y-large-text",
+  reducedMotion: "a11y-reduced-motion",
+  darkMode: "a11y-dark-mode",
+};
+
+function getStorageValue(key) {
+  if (typeof localStorage === "undefined") return false;
+  return localStorage.getItem(STORAGE_KEYS[key]) === "true";
+}
+
 const settings = ref({
-  highContrast: localStorage.getItem("a11y-contrast") === "true",
-  largeText: localStorage.getItem("a11y-largeText") === "true",
-  reducedMotion: localStorage.getItem("a11y-reducedMotion") === "true",
-  darkMode: localStorage.getItem("a11y-darkMode") === "true",
-  screenReaderMode: localStorage.getItem("a11y-screenReader") === "true",
+  highContrast: getStorageValue("highContrast"),
+  largeText: getStorageValue("largeText"),
+  reducedMotion: getStorageValue("reducedMotion"),
+  darkMode: getStorageValue("darkMode"),
 });
 
 function toggleSetting(key) {
   settings.value[key] = !settings.value[key];
-  localStorage.setItem(`a11y-${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`, settings.value[key]);
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem(STORAGE_KEYS[key], settings.value[key]);
+  }
   applySettings();
 }
 
 function applySettings() {
+  if (typeof document === "undefined") return;
   const root = document.documentElement;
   root.classList.toggle("a11y-contrast", settings.value.highContrast);
   root.classList.toggle("a11y-large-text", settings.value.largeText);
   root.classList.toggle("a11y-reduced-motion", settings.value.reducedMotion);
   root.classList.toggle("a11y-dark-mode", settings.value.darkMode);
-  root.classList.toggle("a11y-screen-reader", settings.value.screenReaderMode);
 }
 
 function resetSettings() {
@@ -34,13 +47,12 @@ function resetSettings() {
     largeText: false,
     reducedMotion: false,
     darkMode: false,
-    screenReaderMode: false,
   };
-  localStorage.removeItem("a11y-contrast");
-  localStorage.removeItem("a11y-largeText");
-  localStorage.removeItem("a11y-reducedMotion");
-  localStorage.removeItem("a11y-darkMode");
-  localStorage.removeItem("a11y-screenReader");
+  if (typeof localStorage !== "undefined") {
+    Object.values(STORAGE_KEYS).forEach(key => {
+      localStorage.removeItem(key);
+    });
+  }
   applySettings();
 }
 
@@ -51,11 +63,11 @@ const options = [
   { key: "largeText", label: "Texte agrandi", desc: "Augmente la taille de police de 125%", icon: "accessibility" },
   { key: "reducedMotion", label: "Réduire les animations", desc: "Limite les animations et transitions", icon: "settings" },
   { key: "darkMode", label: "Mode sombre", desc: "Interface avec fond sombre", icon: "moon" },
-  { key: "screenReaderMode", label: "Lecteur d'écran", desc: "Optimisé pour VoiceOver, NVDA", icon: "volume" },
 ];
 
-// Initialize on mount
-applySettings();
+onMounted(() => {
+  applySettings();
+});
 </script>
 
 <template>

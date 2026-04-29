@@ -35,10 +35,6 @@
         <div class="splash__bar" />
       </div>
     </div>
-
-    <p class="splash__version">
-      v1.0
-    </p>
   </section>
 </template>
 

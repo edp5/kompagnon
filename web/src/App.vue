@@ -14,17 +14,14 @@ function retryLoading() {
 }
 
 onBeforeMount(async () => {
-  // Affiche le loader pendant au minimum 6 secondes
   const startTime = Date.now();
-  const minLoadingDuration = 6000; // 6 secondes
+  const minLoadingDuration = 3000;
 
   const apiReady = await apiCheck() ? "ready" : "unavailable";
 
-  // Calcule le temps restant à afficher le loader
   const elapsedTime = Date.now() - startTime;
   const remainingTime = Math.max(0, minLoadingDuration - elapsedTime);
 
-  // Attend le temps restant avant de passer à l'état suivant
   await new Promise(resolve => setTimeout(resolve, remainingTime));
 
   apiState.value = apiReady;
