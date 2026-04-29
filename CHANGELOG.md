@@ -1,3 +1,14 @@
+## [1.1.0](https://github.com/edp5/kompagnon/compare/v1.0.1...v1.1.0) (2026-04-29)
+
+### 🚀 New features
+
+* **web:** apply consistent UI/UX design system across all views ([#512](https://github.com/edp5/kompagnon/issues/512)) ([2bf4024](https://github.com/edp5/kompagnon/commit/2bf40242c6b62e9d03396b75eaedff0296f08c49)), closes [#app](https://github.com/edp5/kompagnon/issues/app)
+
+### 🐛 Bug Fixes
+
+* **api:** revert the pull request 448 ([#518](https://github.com/edp5/kompagnon/issues/518)) ([c9a3b3d](https://github.com/edp5/kompagnon/commit/c9a3b3d87872e4151f7fb415109c6c4c92de69e7))
+* Fix the service to send mails ([#519](https://github.com/edp5/kompagnon/issues/519)) ([c6b246f](https://github.com/edp5/kompagnon/commit/c6b246f5fc05fea03a6f39fcb7e910d2115a018a))
+
 ## [1.0.1](https://github.com/edp5/kompagnon/compare/v1.0.0...v1.0.1) (2026-04-28)
 
 ### 🐛 Bug Fixes
