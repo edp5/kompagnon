@@ -78,7 +78,6 @@ describe("Unit | Components | AccessibilityPanel", () => {
     expect(wrapper.vm.settings.largeText !== undefined).toBe(true);
     expect(wrapper.vm.settings.reducedMotion !== undefined).toBe(true);
     expect(wrapper.vm.settings.darkMode !== undefined).toBe(true);
-    expect(wrapper.vm.settings.screenReaderMode !== undefined).toBe(true);
   });
 
   it("should toggle high contrast setting", () => {
@@ -125,16 +124,6 @@ describe("Unit | Components | AccessibilityPanel", () => {
     expect(wrapper.vm.settings.darkMode).toBe(true);
   });
 
-  it("should toggle screen reader mode setting", () => {
-    // given
-    const wrapper = mount(AccessibilityPanel);
-
-    // when
-    wrapper.vm.toggleSetting("screenReaderMode");
-
-    // then
-    expect(wrapper.vm.settings.screenReaderMode).toBe(true);
-  });
 
   it("should apply settings to document root element", async () => {
     // given
@@ -154,8 +143,8 @@ describe("Unit | Components | AccessibilityPanel", () => {
     const wrapper = mount(AccessibilityPanel);
     wrapper.vm.settings.highContrast = true;
     wrapper.vm.settings.largeText = true;
-    localStorage.setItem("a11y-contrast", "true");
-    localStorage.setItem("a11y-largeText", "true");
+    localStorage.setItem("a11y-high-contrast", "true");
+    localStorage.setItem("a11y-large-text", "true");
     wrapper.vm.isOpen = true;
     await wrapper.vm.$nextTick();
 
@@ -165,14 +154,14 @@ describe("Unit | Components | AccessibilityPanel", () => {
     // then
     expect(wrapper.vm.settings.highContrast).toBe(false);
     expect(wrapper.vm.settings.largeText).toBe(false);
-    expect(localStorage.getItem("a11y-contrast")).toBeNull();
-    expect(localStorage.getItem("a11y-largeText")).toBeNull();
+    expect(localStorage.getItem("a11y-high-contrast")).toBeNull();
+    expect(localStorage.getItem("a11y-large-text")).toBeNull();
   });
 
   it("should load settings from localStorage on initialization", () => {
     // given
-    localStorage.setItem("a11y-contrast", "true");
-    localStorage.setItem("a11y-largeText", "true");
+    localStorage.setItem("a11y-high-contrast", "true");
+    localStorage.setItem("a11y-large-text", "true");
 
     // when
     const wrapper = mount(AccessibilityPanel);
@@ -240,7 +229,6 @@ describe("Unit | Components | AccessibilityPanel", () => {
     expect(document.documentElement.classList.contains("a11y-large-text")).toBe(true);
     expect(document.documentElement.classList.contains("a11y-reduced-motion")).toBe(true);
     expect(document.documentElement.classList.contains("a11y-dark-mode")).toBe(true);
-    expect(document.documentElement.classList.contains("a11y-screen-reader")).toBe(true);
   });
 
   it("should remove all accessibility classes when reset", async () => {

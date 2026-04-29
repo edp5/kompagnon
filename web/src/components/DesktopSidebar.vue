@@ -48,8 +48,6 @@ const displayName = computed(() => {
 
 const userRole = computed(() => profile.value?.role ?? "beneficiaire");
 
-const canEditRoles = computed(() => isAdmin.value);
-
 onMounted(async () => {
   const token = authStore.token;
   if (!token) return;
