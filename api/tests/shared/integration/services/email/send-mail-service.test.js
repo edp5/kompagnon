@@ -65,7 +65,7 @@ describe("Integration | Shared | Services | Email | Send Mail", () => {
     beforeEach(() => {
       config.email.enabled = true;
       config.email.testAccount = false;
-      config.email.service = "gmail";
+      config.email.host = "smtp.gmail.com";
       config.email.port = 587;
       config.email.secure = false;
       config.email.auth = {
@@ -91,7 +91,7 @@ describe("Integration | Shared | Services | Email | Send Mail", () => {
 
       // then
       expect(nodemailer.createTransport).toHaveBeenCalledWith({
-        service: "gmail",
+        host: "smtp.gmail.com",
         port: 587,
         secure: false,
         auth: {

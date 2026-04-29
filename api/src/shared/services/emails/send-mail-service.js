@@ -55,7 +55,7 @@ async function sendMailService(req) {
     });
   } else {
     transporter = nodemailer.createTransport({
-      service: email.service,
+      host: email.host,
       port: email.port,
       secure: email.secure,
       auth: email.auth,
