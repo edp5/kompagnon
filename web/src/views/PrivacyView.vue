@@ -12,26 +12,26 @@ const profile = ref({ showName: true, showAge: false });
 const location = ref({ share: true });
 const history = ref({ share: false, analytics: true });
 
-const score = 75;
+const score = null;
 </script>
 
 <template>
-  <div class="privacy-view">
-    <header class="privacy-header">
-      <div class="privacy-header__left">
-        <span class="privacy-header__eyebrow">Données personnelles</span>
-        <h1 class="privacy-header__title">
+  <div class="privacy-view app-page">
+    <header class="privacy-header app-page__header">
+      <div class="privacy-header__left app-page__header-main">
+        <span class="privacy-header__eyebrow app-page__eyebrow">Données personnelles</span>
+        <h1 class="privacy-header__title app-page__title">
           Confidentialité
         </h1>
-        <p class="privacy-header__sub">
+        <p class="privacy-header__sub app-page__subtitle">
           Contrôlez vos données et votre visibilité dans le réseau
         </p>
       </div>
     </header>
 
-    <div class="privacy-content">
+    <div class="privacy-content app-page__content app-page__content--stack">
       <!-- Score card -->
-      <div class="privacy-score-card privacy-card privacy-card--score">
+      <div class="privacy-score-card privacy-card privacy-card--score glass-panel">
         <div class="privacy-score-card__icon">
           <ShieldCheck
             :size="22"
@@ -64,7 +64,7 @@ const score = 75;
       </div>
 
       <!-- Sections -->
-      <section class="privacy-section privacy-card">
+      <section class="privacy-section privacy-card glass-panel">
         <div class="privacy-section__head">
           <Lock
             :size="16"
@@ -137,7 +137,7 @@ const score = 75;
         </div>
       </section>
 
-      <section class="privacy-section privacy-card">
+      <section class="privacy-section privacy-card glass-panel">
         <div class="privacy-section__head">
           <Lock
             :size="16"
@@ -182,7 +182,7 @@ const score = 75;
         </div>
       </section>
 
-      <section class="privacy-section privacy-card">
+      <section class="privacy-section privacy-card glass-panel">
         <div class="privacy-section__head">
           <Lock
             :size="16"
@@ -238,7 +238,7 @@ const score = 75;
   background: transparent;
 }
 
-/* ── Header ── */
+/* -- Header -- */
 .privacy-header {
   display: flex;
   align-items: flex-end;
@@ -283,16 +283,34 @@ const score = 75;
   margin: 0;
 }
 
-/* ── Content ── */
+/* -- Content -- */
 .privacy-content {
   padding: 0 1.5rem 1.5rem;
+  width: min(100%, 1180px);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 900px;
+  max-width: none;
 }
 
-/* ── Base card ── */
+@media (min-width: 1180px) {
+  .privacy-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .privacy-score-card {
+    grid-column: 1 / -1;
+  }
+
+  .privacy-section:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* -- Base card -- */
 .privacy-card {
   border-radius: 1.5rem;
   border: 1px solid rgba(15, 23, 42, 0.06);
@@ -302,7 +320,7 @@ const score = 75;
   animation: spring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* ── Score card ── */
+/* -- Score card -- */
 .privacy-score-card {
   display: flex;
   align-items: center;
@@ -370,7 +388,7 @@ const score = 75;
   letter-spacing: -0.04em;
 }
 
-/* ── Sections ── */
+/* -- Sections -- */
 .privacy-section {
   padding: 1.25rem;
   display: flex;
@@ -409,7 +427,7 @@ const score = 75;
   margin: 0 0 0.375rem;
 }
 
-/* ── Rows ── */
+/* -- Rows -- */
 .privacy-rows {
   display: flex;
   flex-direction: column;
@@ -470,7 +488,7 @@ const score = 75;
   line-height: 1.45;
 }
 
-/* ── Dropdown ── */
+/* -- Dropdown -- */
 .privacy-dropdown {
   position: relative;
   flex-shrink: 0;
@@ -527,6 +545,16 @@ const score = 75;
 
 .privacy-dropdown__item:hover {
   background: rgba(72, 175, 196, 0.06);
+}
+
+@media (max-width: 1023px) and (min-width: 769px) {
+  .privacy-header { padding: 1.25rem 1.25rem 0.875rem; }
+  .privacy-content { padding: 0 1.25rem 1.25rem; }
+}
+
+@media (max-width: 768px) {
+  .privacy-header { padding: 1.125rem 1.125rem 0.75rem; }
+  .privacy-content { padding: 0 1.125rem 1.125rem; }
 }
 
 @media (max-width: 640px) {

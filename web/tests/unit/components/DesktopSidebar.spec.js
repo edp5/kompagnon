@@ -46,8 +46,8 @@ describe("Unit | Components | DesktopSidebar", () => {
 
     // then
     expect(wrapper.find(".sidebar__brand-logo").exists()).toBe(true);
-    expect(wrapper.text()).toContain("Kompagnon");
-    expect(wrapper.text()).toContain("Accompagnement solidaire");
+    expect(wrapper.find(".sidebar__brand-name").text()).toContain("Kompagnon");
+    expect(wrapper.find(".sidebar__brand-tagline").text()).toBe("Accompagnement solidaire");
   });
 
   it("should render navigation section label", () => {

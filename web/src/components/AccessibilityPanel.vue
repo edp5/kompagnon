@@ -1,6 +1,7 @@
 <script setup>
-import { X } from "lucide-vue-next";
 import { computed, ref } from "vue";
+
+import KIcon from "@/components/KIcon.vue";
 
 const isOpen = ref(false);
 
@@ -43,10 +44,15 @@ function resetSettings() {
   applySettings();
 }
 
-const a11yLabel = computed(() => {
-  const active = Object.values(settings.value).filter(Boolean).length;
-  return active > 0 ? `${active} option${active > 1 ? "s" : ""} activée${active > 1 ? "s" : ""}` : "Accessibilité";
-});
+const activeCount = computed(() => Object.values(settings.value).filter(Boolean).length);
+
+const options = [
+  { key: "highContrast", label: "Contraste élevé", desc: "Améliore la visibilité des textes", icon: "eye" },
+  { key: "largeText", label: "Texte agrandi", desc: "Augmente la taille de police de 125%", icon: "accessibility" },
+  { key: "reducedMotion", label: "Réduire les animations", desc: "Limite les animations et transitions", icon: "settings" },
+  { key: "darkMode", label: "Mode sombre", desc: "Interface avec fond sombre", icon: "moon" },
+  { key: "screenReaderMode", label: "Lecteur d'écran", desc: "Optimisé pour VoiceOver, NVDA", icon: "volume" },
+];
 
 // Initialize on mount
 applySettings();
@@ -54,118 +60,97 @@ applySettings();
 
 <template>
   <div class="a11y-panel">
-    <!-- Toggle Button -->
+    <!-- Bouton flottant -->
     <button
       v-if="!isOpen"
       class="a11y-toggle"
-      :aria-label="`Ouvrir le panneau d'accessibilité - ${a11yLabel}`"
-      :title="`Accessibilité options - ${a11yLabel}`"
+      :aria-label="`Ouvrir le panneau d'accessibilité${activeCount > 0 ? ` — ${activeCount} option${activeCount > 1 ? 's' : ''} active${activeCount > 1 ? 's' : ''}` : ''}`"
       @click="isOpen = true"
     >
-      <span class="a11y-toggle__icon">♿</span>
+      <KIcon
+        name="accessibility"
+        :size="18"
+        aria-hidden="true"
+      />
       <span class="a11y-toggle__text">Accessibilité</span>
+      <span
+        v-if="activeCount > 0"
+        class="a11y-toggle__badge"
+        aria-hidden="true"
+      >{{ activeCount }}</span>
     </button>
 
-    <!-- Panel -->
-    <transition name="slide-in">
+    <!-- Drawer -->
+    <transition name="slide-up">
       <div
         v-if="isOpen"
         class="a11y-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Options d'accessibilité"
       >
         <div class="a11y-drawer__header">
+          <div class="a11y-drawer__title-wrap">
+            <KIcon
+              name="accessibility"
+              :size="18"
+              color="var(--c-teal)"
+              aria-hidden="true"
+            />
+            <h2 class="a11y-drawer__title">
+              Accessibilité
+            </h2>
+          </div>
           <button
             class="a11y-close"
             aria-label="Fermer le panneau d'accessibilité"
             @click="isOpen = false"
           >
-            <X
-              :size="20"
-              :stroke-width="2"
+            <KIcon
+              name="close"
+              :size="16"
+              aria-hidden="true"
             />
           </button>
-          <h2 class="a11y-drawer__title">
-            Options d'accessibilité
-          </h2>
         </div>
 
         <div class="a11y-drawer__content">
-          <div class="a11y-group">
-            <label class="a11y-option">
-              <input
-                aria-label="Activer le mode contraste élevé"
-                type="checkbox"
-                :checked="settings.highContrast"
-                @change="toggleSetting('highContrast')"
-              >
-              <span class="a11y-option__label">
-                <strong>Contraste élevé</strong>
-                <span class="a11y-option__desc">Améliore la visibilité des textes et des éléments</span>
-              </span>
-            </label>
+          <label
+            v-for="opt in options"
+            :key="opt.key"
+            class="a11y-option"
+            :class="{ 'a11y-option--active': settings[opt.key] }"
+          >
+            <div class="a11y-option__icon">
+              <KIcon
+                :name="opt.icon"
+                :size="16"
+                :color="settings[opt.key] ? 'white' : 'var(--c-teal)'"
+                aria-hidden="true"
+              />
+            </div>
+            <span class="a11y-option__label">
+              <strong>{{ opt.label }}</strong>
+              <span class="a11y-option__desc">{{ opt.desc }}</span>
+            </span>
+            <input
+              type="checkbox"
+              class="a11y-option__checkbox"
+              :aria-label="`Activer ${opt.label}`"
+              :checked="settings[opt.key]"
+              @change="toggleSetting(opt.key)"
+            >
+          </label>
+        </div>
 
-            <label class="a11y-option">
-              <input
-                aria-label="Activer la taille de texte augmentée"
-                type="checkbox"
-                :checked="settings.largeText"
-                @change="toggleSetting('largeText')"
-              >
-              <span class="a11y-option__label">
-                <strong>Texte agrandi</strong>
-                <span class="a11y-option__desc">Augmente la taille de police de 125%</span>
-              </span>
-            </label>
-
-            <label class="a11y-option">
-              <input
-                aria-label="Activer la réduction des mouvements"
-                type="checkbox"
-                :checked="settings.reducedMotion"
-                @change="toggleSetting('reducedMotion')"
-              >
-              <span class="a11y-option__label">
-                <strong>Réduire les animations</strong>
-                <span class="a11y-option__desc">Limite les animations et transitions</span>
-              </span>
-            </label>
-
-            <label class="a11y-option">
-              <input
-                aria-label="Activer le mode sombre"
-                type="checkbox"
-                :checked="settings.darkMode"
-                @change="toggleSetting('darkMode')"
-              >
-              <span class="a11y-option__label">
-                <strong>Mode sombre</strong>
-                <span class="a11y-option__desc">Interface avec couleurs sombres</span>
-              </span>
-            </label>
-
-            <label class="a11y-option">
-              <input
-                aria-label="Activer le mode lecteur d'écran"
-                type="checkbox"
-                :checked="settings.screenReaderMode"
-                @change="toggleSetting('screenReaderMode')"
-              >
-              <span class="a11y-option__label">
-                <strong>Mode lecteur d'écran</strong>
-                <span class="a11y-option__desc">Optimise pour les lecteurs d'écran (VoiceOver, NVDA)</span>
-              </span>
-            </label>
-          </div>
-
+        <div class="a11y-drawer__footer">
           <button
             class="a11y-reset"
             @click="resetSettings"
           >
-            Réinitialiser les options
+            Réinitialiser
           </button>
-        </div>
-
-        <div class="a11y-drawer__footer">
-          <p>Les paramètres d'accessibilité sont enregistrés automatiquement sur votre appareil.</p>
+          <p>Les paramètres sont sauvegardés automatiquement.</p>
         </div>
       </div>
     </transition>
@@ -175,6 +160,7 @@ applySettings();
       <div
         v-if="isOpen"
         class="a11y-overlay"
+        aria-hidden="true"
         @click="isOpen = false"
       />
     </transition>
@@ -187,51 +173,41 @@ applySettings();
   bottom: 1.5rem;
   right: 1.5rem;
   z-index: 9999;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
 }
 
+/* ── Toggle button ── */
 .a11y-toggle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 0.5rem;
   height: 44px;
   padding: 0 1.125rem;
-  border-radius: 0.875rem;
-  border: 1.5px solid rgba(72, 175, 196, 0.4);
-  background: white;
-  color: #1e2c38;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   cursor: pointer;
-  letter-spacing: 0.01em;
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    0 0 0 0 rgba(72, 175, 196, 0);
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
   white-space: nowrap;
+  min-height: 44px;
 }
 
 .a11y-toggle:hover {
-  background: #f0f9ff;
-  border-color: #48AFC4;
-  box-shadow:
-    0 4px 16px rgba(72, 175, 196, 0.2),
-    0 0 0 3px rgba(72, 175, 196, 0.08);
+  background: var(--c-teal-light);
+  border-color: var(--c-teal);
+  color: var(--c-teal-dark);
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
 
-.a11y-toggle:active {
-  transform: translateY(1px) scale(0.97);
-}
-
-.a11y-toggle__icon {
-  font-size: 1rem;
-  line-height: 1;
+.a11y-toggle:focus-visible {
+  outline: 3px solid var(--c-teal);
+  outline-offset: 2px;
 }
 
 .a11y-toggle__text {
@@ -244,181 +220,219 @@ applySettings();
   }
 }
 
+.a11y-toggle__badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--c-teal);
+  color: white;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Overlay ── */
 .a11y-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  animation: fade 0.2s ease;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9998;
 }
 
+/* ── Drawer ── */
 .a11y-drawer {
   position: fixed;
   bottom: 0;
   right: 0;
-  width: min(100%, 360px);
-  max-height: 90vh;
-  background: white;
+  width: min(100%, 380px);
+  max-height: 88vh;
+  background: var(--c-surface);
   border-radius: 1.5rem 1.5rem 0 0;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--c-border);
+  border-bottom: none;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.16);
   display: flex;
   flex-direction: column;
-  animation: slide-in 0.3s ease;
-  z-index: 10000;
+  z-index: 9999;
 }
 
 .a11y-drawer__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #f0f0f0;
-  gap: 1rem;
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.a11y-drawer__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
 }
 
 .a11y-drawer__title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1E2C38;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--c-navy);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .a11y-close {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  border: 1px solid #e5e7eb;
-  background: white;
-  color: #6b7280;
+  border-radius: 0.75rem;
+  border: 1.5px solid var(--c-border);
+  background: var(--c-beige);
+  color: var(--c-text-medium);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  transition: all 0.15s ease;
+  min-height: auto;
 }
 
 .a11y-close:hover {
-  background: #f3f4f6;
-  color: #1E2C38;
+  background: var(--c-teal-light);
+  color: var(--c-teal-dark);
+  border-color: var(--c-teal);
 }
 
+/* ── Options ── */
 .a11y-drawer__content {
   flex: 1;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-}
-
-.a11y-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .a11y-option {
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--c-border);
+  background: var(--c-beige);
   cursor: pointer;
-  padding: 0.75rem;
-  border-radius: 0.875rem;
-  transition: background 0.2s ease;
+  transition: all 0.18s ease;
 }
 
 .a11y-option:hover {
-  background: #f9fafb;
+  border-color: var(--c-teal);
+  background: var(--c-teal-light);
 }
 
-.a11y-option input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: #48AFC4;
-  cursor: pointer;
-  margin-top: 2px;
+.a11y-option--active {
+  background: var(--c-teal);
+  border-color: var(--c-teal-dark);
+}
+
+.a11y-option__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 0.625rem;
+  background: rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
+.a11y-option:not(.a11y-option--active) .a11y-option__icon {
+  background: rgba(72, 175, 196, 0.1);
+}
+
 .a11y-option__label {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
+  min-width: 0;
 }
 
 .a11y-option__label strong {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #1E2C38;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--c-navy);
+  line-height: 1.2;
+}
+
+.a11y-option--active .a11y-option__label strong {
+  color: white;
 }
 
 .a11y-option__desc {
-  font-size: 0.8125rem;
-  color: #6b7280;
+  font-size: 0.75rem;
+  color: var(--c-text-medium);
   line-height: 1.4;
 }
 
+.a11y-option--active .a11y-option__desc {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.a11y-option__checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: white;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── Footer ── */
+.a11y-drawer__footer {
+  padding: 1rem 1.25rem 1.5rem;
+  border-top: 1px solid var(--c-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .a11y-reset {
-  background: white;
-  border: 1.5px solid #e5e7eb;
-  color: #1E2C38;
-  border-radius: 0.875rem;
-  padding: 0.75rem 1rem;
-  font-size: 0.9rem;
+  width: 100%;
+  background: var(--c-beige);
+  border: 1.5px solid var(--c-border);
+  color: var(--c-text-medium);
+  border-radius: var(--radius-full);
+  padding: 0.625rem 1rem;
+  font-family: var(--font-body), sans-serif;
+  font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 44px;
+  transition: all 0.15s ease;
+  min-height: 40px;
 }
 
 .a11y-reset:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-}
-
-.a11y-drawer__footer {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #f0f0f0;
-  background: #f9fafb;
-  border-radius: 0 0 0 0;
+  background: var(--c-teal-light);
+  border-color: var(--c-teal);
+  color: var(--c-teal-dark);
 }
 
 .a11y-drawer__footer p {
   margin: 0;
-  font-size: 0.8125rem;
-  color: #6b7280;
+  font-size: 0.75rem;
+  color: var(--c-text-light);
   line-height: 1.5;
+  text-align: center;
 }
 
-@keyframes slide-in {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+/* ── Animations ── */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
 }
 
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Transition classes for Vue (slide + fade) */
-.slide-in-enter-active,
-.slide-in-leave-active {
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
-}
-
-.slide-in-enter-from,
-.slide-in-leave-to {
+.slide-up-enter-from,
+.slide-up-leave-to {
   transform: translateY(100%);
   opacity: 0;
 }
@@ -433,7 +447,6 @@ applySettings();
   opacity: 0;
 }
 
-
 @media (max-width: 600px) {
   .a11y-panel {
     bottom: 1rem;
@@ -442,9 +455,6 @@ applySettings();
 
   .a11y-drawer {
     width: 100%;
-    border-radius: 1.5rem 1.5rem 0 0;
   }
 }
 </style>
-
-

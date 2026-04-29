@@ -1,8 +1,17 @@
 <script setup>
-import { ChevronRight, Shield, User } from "lucide-vue-next";
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
+import { getUserProfile } from "@/adapters/users.js";
 import BaseToggle from "@/components/BaseToggle.vue";
+import KIcon from "@/components/KIcon.vue";
+import { useAuthStore } from "@/stores/auth.js";
+
+const router = useRouter();
+const authStore = useAuthStore();
+const profile = ref(null);
+const errorMessage = ref("");
+const isLoading = ref(true);
 
 const settings = ref({
   notifPush: true,
@@ -14,40 +23,75 @@ const settings = ref({
   privVisible: true,
   privMessages: true,
 });
+
+const displayName = computed(() => {
+  const firstname = profile.value?.firstname;
+  const lastname = profile.value?.lastname;
+
+  if (!firstname || !lastname) {
+    return "-";
+  }
+
+  return `${firstname} ${lastname}`.trim();
+});
+
+const displayEmail = computed(() => profile.value?.email ?? "-");
+
+onMounted(async () => {
+  const token = authStore.token;
+
+  if (!token) {
+    router.push({ name: "login" });
+    return;
+  }
+
+  const result = await getUserProfile({ token });
+  if (result.success) {
+    profile.value = result.profile;
+  } else {
+    errorMessage.value = result.message ?? "Impossible de charger le profil.";
+    if (result.errorCode === "SESSION_EXPIRED") {
+      authStore.logout();
+      router.push({ name: "login" });
+    }
+  }
+
+  isLoading.value = false;
+});
 </script>
 
 <template>
-  <div class="settings-view">
-    <header class="settings-header">
-      <div class="settings-header__left">
-        <span class="settings-header__eyebrow">Votre espace</span>
-        <h1 class="settings-header__title">
+  <div class="settings-view app-page">
+    <header class="settings-header app-page__header">
+      <div class="settings-header__left app-page__header-main">
+        <span class="settings-header__eyebrow app-page__eyebrow">Votre espace</span>
+        <h1 class="settings-header__title app-page__title">
           Paramètres
         </h1>
-        <p class="settings-header__sub">
+        <p class="settings-header__sub app-page__subtitle">
           Personnalisez votre expérience Kompagnon
         </p>
       </div>
     </header>
 
-    <div class="settings-content">
+    <div class="settings-content app-page__content app-page__content--stack">
       <!-- User card -->
-      <div class="settings-user-card settings-card">
+      <div class="settings-user-card settings-card glass-panel">
         <div class="settings-user-card__avatar">
-          <User
+          <KIcon
+            name="user"
             :size="22"
             color="#6b7280"
-            :stroke-width="1.75"
             aria-hidden="true"
           />
         </div>
         <div class="settings-user-card__info">
-          <strong>Marie Dupont</strong>
-          <span>marie.dupont@email.com</span>
+          <strong>{{ displayName }}</strong>
+          <span>{{ displayEmail }}</span>
           <span class="settings-user-card__badge">
-            <Shield
+            <KIcon
+              name="shield"
               :size="11"
-              :stroke-width="2"
               aria-hidden="true"
             />
             Profil vérifié
@@ -56,11 +100,10 @@ const settings = ref({
         <button
           class="settings-user-card__arrow"
           aria-label="Voir plus d'options pour votre profil"
-          title="Accédez à d'autres paramètres de profil"
         >
-          <ChevronRight
+          <KIcon
+            name="chevronRight"
             :size="18"
-            :stroke-width="1.75"
             aria-hidden="true"
           />
         </button>
@@ -69,12 +112,17 @@ const settings = ref({
       <!-- Settings grid -->
       <div class="settings-grid">
         <!-- Notifications -->
-        <div class="settings-section settings-card">
+        <div class="settings-section settings-card glass-panel">
           <div class="settings-section__head">
             <span
               class="settings-section__icon"
               aria-hidden="true"
-            >🔔</span>
+            >
+              <KIcon
+                name="notifications"
+                :size="20"
+              />
+            </span>
             <h3 class="settings-section__title">
               Notifications
             </h3>
@@ -134,12 +182,17 @@ const settings = ref({
         </div>
 
         <!-- Privacy -->
-        <div class="settings-section settings-card">
+        <div class="settings-section settings-card glass-panel">
           <div class="settings-section__head">
             <span
               class="settings-section__icon"
               aria-hidden="true"
-            >🔒</span>
+            >
+              <KIcon
+                name="lock"
+                :size="20"
+              />
+            </span>
             <h3 class="settings-section__title">
               Confidentialité et sécurité
             </h3>
@@ -180,23 +233,28 @@ const settings = ref({
       </div>
 
       <!-- Accessibilité -->
-      <div class="settings-section settings-card settings-section--a11y">
+      <div class="settings-section settings-card settings-section--a11y glass-panel">
         <div class="settings-section__head">
           <span
             class="settings-section__icon"
             aria-hidden="true"
-          >♿</span>
+          >
+            <KIcon
+              name="accessibility"
+              :size="20"
+            />
+          </span>
           <h3 class="settings-section__title">
             Accessibilité
           </h3>
         </div>
         <p class="settings-section__desc">
-          Contraste élevé, texte agrandi, réduction des animations, mode sombre, lecteur d'écran — utilisez le bouton <strong>Accessibilité</strong> en bas à droite de l'écran pour configurer ces options.
+          Contraste élevé, texte agrandi, réduction des animations, mode sombre, lecteur d'écran - utilisez le bouton <strong>Accessibilité</strong> en bas à droite de l'écran pour configurer ces options.
         </p>
       </div>
 
       <!-- About -->
-      <div class="settings-section settings-card">
+      <div class="settings-section settings-card glass-panel">
         <h3 class="settings-section__title">
           À propos de l'application
         </h3>
@@ -234,7 +292,7 @@ const settings = ref({
       </div>
 
       <!-- Danger zone -->
-      <div class="settings-danger settings-card">
+      <div class="settings-danger settings-card glass-panel">
         <h3 class="settings-danger__title">
           Zone de danger
         </h3>
@@ -276,7 +334,7 @@ const settings = ref({
   background: transparent;
 }
 
-/* ── Header ── */
+/* -- Header -- */
 .settings-header {
   display: flex;
   align-items: flex-end;
@@ -322,16 +380,18 @@ const settings = ref({
   margin: 0;
 }
 
-/* ── Content ── */
+/* -- Content -- */
 .settings-content {
   padding: 0 1.5rem 1.5rem;
+  width: min(100%, 1320px);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 1100px;
+  max-width: none;
 }
 
-/* ── Base Card ── */
+/* -- Base Card -- */
 .settings-card {
   border-radius: 1.5rem;
   border: 1px solid rgba(15, 23, 42, 0.06);
@@ -341,7 +401,7 @@ const settings = ref({
   animation: spring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* ── User card ── */
+/* -- User card -- */
 .settings-user-card {
   display: flex;
   align-items: center;
@@ -418,20 +478,27 @@ const settings = ref({
   color: var(--kompagnon-turquoise);
 }
 
-/* ── Settings grid ── */
+/* -- Settings grid -- */
 .settings-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
-/* ── Section ── */
+/* -- Section -- */
 .settings-section {
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
+  min-height: 100%;
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+}
+
+@media (min-width: 1180px) {
+  .settings-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  }
 }
 
 .settings-grid .settings-section:nth-child(1) { animation-delay: 0.06s; }
@@ -478,7 +545,7 @@ const settings = ref({
   margin: 0;
 }
 
-/* ── Rows ── */
+/* -- Rows -- */
 .settings-rows {
   display: flex;
   flex-direction: column;
@@ -525,7 +592,7 @@ const settings = ref({
   margin: 0;
 }
 
-/* ── About ── */
+/* -- About -- */
 .settings-about {
   display: flex;
   flex-direction: column;
@@ -583,7 +650,7 @@ const settings = ref({
   border-bottom: none;
 }
 
-/* ── Danger ── */
+/* -- Danger -- */
 .settings-danger {
   background: rgba(254, 242, 242, 0.92);
   border-color: rgba(252, 165, 165, 0.5);
@@ -638,8 +705,16 @@ const settings = ref({
   box-shadow: 0 6px 16px rgba(220, 38, 38, 0.22);
 }
 
+@media (max-width: 1023px) and (min-width: 769px) {
+  .settings-grid { grid-template-columns: 1fr; }
+  .settings-header { padding: 1.25rem 1.25rem 0.875rem; }
+  .settings-content { padding: 0 1.25rem 1.25rem; }
+}
+
 @media (max-width: 768px) {
   .settings-grid { grid-template-columns: 1fr; }
+  .settings-header { padding: 1.125rem 1.125rem 0.75rem; }
+  .settings-content { padding: 0 1.125rem 1.125rem; }
 }
 
 @media (max-width: 640px) {

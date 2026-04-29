@@ -1,1123 +1,658 @@
 <script setup>
-import { Clock, MapPin, Send, Shield, Star, Users } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
+import { getUserProfile } from "@/adapters/users.js";
+import KIcon from "@/components/KIcon.vue";
 import { useAuthStore } from "@/stores/auth.js";
 
-const authStore = useAuthStore();
 const router = useRouter();
+const authStore = useAuthStore();
+const profile = ref(null);
 
-function handleLogout() {
-  authStore.logout();
-  router.push({ name: "login" });
-}
+const stats = [];
+
+const communityStats = [];
 
 const actions = [
-  { icon: Send, label: "Transport", description: "Trajets du quotidien et rendez-vous", meta: "3 volontaires proches" },
-  { icon: Star, label: "Courses", description: "Aide ponctuelle près de chez vous", meta: "Disponible aujourd'hui" },
-  { icon: Shield, label: "Médical", description: "Déplacements sensibles et sécurisés", meta: "Priorité sécurisée" },
-  { icon: Users, label: "Social", description: "Sorties accompagnées et entraide locale", meta: "Réseau local actif" },
+  { icon: "map", label: "Déplacement", desc: "À pied, en transports", accent: "var(--c-teal-light)", color: "var(--c-teal)" },
+  { icon: "support", label: "Rendez-vous", desc: "Médical ou administratif", accent: "var(--c-warning-bg)", color: "var(--c-warning)" },
+  { icon: "connect", label: "Courses", desc: "Accompagnement shopping", accent: "var(--c-success-bg)", color: "var(--c-success)" },
+  { icon: "tracking", label: "Voir la carte", desc: "Volontaires à proximité", accent: "#ede3f8", color: "#7c4dcc" },
 ];
 
-const kpis = [
-  { icon: Clock, label: "Temps moyen", value: "8 min", detail: "Validation d'une demande", accent: "var(--kompagnon-turquoise)" },
-  { icon: Users, label: "Volontaires proches", value: "12", detail: "Disponibles maintenant", accent: "#1e2c38" },
-  { icon: Shield, label: "Trajets sécurisés", value: "98%", detail: "Accompagnements confirmés", accent: "var(--kompagnon-turquoise)" },
-  { icon: Star, label: "Satisfaction", value: "4.9/5", detail: "Moyenne des retours", accent: "#f59e0b" },
-];
+const recentActivity = [];
 
-const communityStats = [
-  { icon: Users, value: "2 847", label: "Volontaires", note: "Disponibles dans le réseau", color: "var(--kompagnon-turquoise)" },
-  { icon: Star, value: "4.9", label: "Note", note: "Satisfaction moyenne", color: "#f59e0b" },
-  { icon: Shield, value: "100%", label: "Sécurisé", note: "Profils et échanges vérifiés", color: "var(--kompagnon-turquoise)" },
-];
+const displayGreeting = computed(() => {
+  const firstname = profile.value?.firstname;
+  if (!firstname) {
+    return "Bienvenue sur Kompagnon";
+  }
+  return `Bienvenue, ${firstname}`;
+});
 
-const heroHighlights = [
-  { icon: Clock, title: "Prochain créneau", value: "Aujourd'hui · 14:30" },
-  { icon: MapPin, title: "Zone couverte", value: "Paris 15e et alentours" },
-  { icon: Shield, title: "Accompagnement", value: "Validé en moins de 8 min" },
-];
+onMounted(async () => {
+  const token = authStore.token;
+  if (!token) return;
 
-const recentActivity = [
-  {
-    title: "Accompagnement confirmé",
-    description: "Sophie R. vous accompagne à la Pharmacie Centrale.",
-    time: "Il y a 12 min",
-  },
-  {
-    title: "Nouveau volontaire disponible",
-    description: "3 profils vérifiés sont disponibles dans votre quartier.",
-    time: "Il y a 34 min",
-  },
-  {
-    title: "Itinéraire préparé",
-    description: "Le trajet domicile → cabinet médical a été optimisé.",
-    time: "Aujourd'hui · 09:10",
-  },
-];
-
-const todayLabel = new Intl.DateTimeFormat("fr-FR", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-}).format(new Date());
+  const result = await getUserProfile({ token });
+  if (result.success) {
+    profile.value = result.profile;
+  }
+});
 </script>
 
 <template>
-  <div class="home-view">
-    <header class="home-header">
-      <div class="home-header__left">
-        <div>
-          <div class="home-header__title-row">
-            <h1 class="home-header__title">
-              Bonjour, Marie 👋
-            </h1>
-            <div
-              class="home-header__status"
-              role="status"
-              aria-live="polite"
-              aria-label="Votre statut: en ligne"
-            >
-              <span
-                class="home-header__dot"
-                aria-hidden="true"
-              />
-              En ligne
-            </div>
-          </div>
-          <p class="home-header__subtitle">
-            Comment vous sentez-vous aujourd'hui ?
-          </p>
-        </div>
-      </div>
-
-      <div class="home-header__right">
-        <span class="home-header__date">
-          {{ todayLabel }}
-        </span>
-        <button
-          class="home-header__logout-btn"
-          aria-label="Se déconnecter de l'application"
-          title="Quitter votre session"
-          @click="handleLogout"
-        >
-          Se déconnecter
-        </button>
-      </div>
-    </header>
-
+  <div class="home-view app-page">
+    <!-- ── Contenu principal ── -->
     <div class="home-content">
-      <div class="home-dashboard">
-        <section class="home-hero home-card">
-          <div class="home-hero__layout">
-            <div class="home-hero__content">
-              <span class="home-hero__eyebrow">Accompagnement solidaire</span>
-              <h2 class="home-hero__title">
-                Votre tableau de bord mobilité
-              </h2>
-              <p class="home-hero__desc">
-                Visualisez vos disponibilités, vos accompagnements à venir et les actions prioritaires du jour depuis un espace unique, clair et rassurant.
-              </p>
+      <!-- Hero banner -->
+      <section class="home-hero glass-panel">
+        <svg
+          class="home-hero__blob"
+          viewBox="0 0 200 200"
+          aria-hidden="true"
+        >
+          <path
+            d="M47.8,-61.6C59.8,-52.4,66.2,-36.2,69.8,-19.4C73.4,-2.6,74.2,14.8,67.4,29.2C60.6,43.6,46.2,55,30.4,62.2C14.6,69.4,-2.6,72.4,-19.4,68.2C-36.2,64,-52.6,52.6,-62.6,37.4C-72.6,22.2,-76.2,3.2,-72,-14C-67.8,-31.2,-55.8,-46.6,-41.4,-55.4C-27,-64.2,-10.2,-66.4,4.8,-72.6C19.8,-78.8,35.8,-70.8,47.8,-61.6Z"
+            transform="translate(100,100)"
+            fill="white"
+            opacity="0.07"
+          />
+        </svg>
 
-              <div class="home-hero__row">
-                <div class="home-hero__avatars">
-                  <span class="home-hero__av">M</span>
-                  <span class="home-hero__av">T</span>
-                  <span class="home-hero__av home-hero__av--more">+10</span>
-                </div>
-                <span>12 volontaires disponibles dans votre secteur</span>
-              </div>
-
-              <div class="home-hero__timing">
-                <Clock
-                  :size="13"
-                  :stroke-width="2"
-                />
-                <span>Temps moyen&nbsp;: 8 min</span>
-                <Star
-                  :size="13"
-                  :stroke-width="2"
-                  class="home-hero__star"
-                />
-                <span>4.9/5</span>
-              </div>
-
-              <div class="home-hero__actions">
-                <button
-                  class="home-hero__cta"
-                  aria-label="Demander un accompagnement immédiatement"
-                  title="Commencez une demande d'accompagnement dès maintenant"
-                >
-                  Demander maintenant →
-                </button>
-
-                <span class="home-hero__trust">Service vérifié, humain et sécurisé</span>
-              </div>
-            </div>
-
-            <aside class="home-hero__summary">
-              <p class="home-hero__summary-title">
-                Aperçu rapide
-              </p>
-              <div class="home-hero__summary-grid">
-                <div
-                  v-for="item in heroHighlights"
-                  :key="item.title"
-                  class="home-hero__summary-card"
-                >
-                  <component
-                    :is="item.icon"
-                    :size="16"
-                    :stroke-width="1.85"
-                    class="home-hero__summary-icon"
-                  />
-                  <div>
-                    <p class="home-hero__summary-label">
-                      {{ item.title }}
-                    </p>
-                    <p class="home-hero__summary-value">
-                      {{ item.value }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </aside>
-          </div>
-        </section>
-
-        <aside class="home-journey-card home-card home-card--dark">
-          <div class="home-card__topline">
-            <span class="home-card__eyebrow">Prochain accompagnement</span>
-            <span class="home-journey-card__time">14:30</span>
-          </div>
-          <h3 class="home-journey-card__title">
-            Pharmacie Centrale
-          </h3>
-          <p class="home-journey-card__route">
-            12 rue de la République → Pharmacie Centrale
+        <div class="home-hero__content">
+          <p class="home-hero__date">
+            {{ new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) }}
           </p>
+          <h2 class="home-hero__title">
+            {{ displayGreeting }}
+          </h2>
+          <p class="home-hero__sub">
+            Découvrez les accompagnements disponibles près de vous
+          </p>
+          <span
+            class="home-hero__cta"
+            role="link"
+            tabindex="0"
+            aria-label="Créer une nouvelle demande d'accompagnement"
+            @click="router.push({ name: 'map' })"
+            @keydown.enter="router.push({ name: 'map' })"
+          >
+            + Nouvelle demande
+          </span>
+        </div>
+      </section>
 
-          <div class="home-journey-card__meta">
-            <div class="home-journey-card__meta-item">
-              <span class="home-journey-card__meta-label">Contact</span>
-              <strong>Sophie R.</strong>
-            </div>
-            <div class="home-journey-card__meta-item">
-              <span class="home-journey-card__meta-label">Statut</span>
-              <strong>Confirmé</strong>
-            </div>
+      <!-- Stat cards -->
+      <section
+        class="home-stats"
+        aria-label="Vos statistiques"
+      >
+        <article
+          v-for="stat in stats"
+          :key="stat.label"
+          class="home-stat-card"
+        >
+          <div
+            class="home-stat-card__icon"
+            :style="{ background: stat.bg, color: stat.color }"
+          >
+            <KIcon
+              :name="stat.icon"
+              :size="20"
+            />
           </div>
+          <span class="home-stat-card__value">{{ stat.value }}</span>
+          <span class="home-stat-card__label">{{ stat.label }}</span>
+          <span
+            v-if="stat.trend"
+            class="home-stat-card__trend"
+          >↑ {{ stat.trend }}</span>
+        </article>
+      </section>
 
-          <div class="home-journey-card__footer">
-            <span class="home-journey-card__badge">Départ dans 25 min</span>
-            <span class="home-journey-card__hint">Volontaire vérifiée</span>
+      <!-- Community stats -->
+      <section
+        class="home-community"
+        aria-label="Statistiques de la communauté"
+      >
+        <p class="home-community__label">
+          Notre communauté
+        </p>
+        <div class="home-community__grid">
+          <div
+            v-for="s in communityStats"
+            :key="s.label"
+            class="home-community__item"
+          >
+            <span class="home-community__value">{{ s.value }}</span>
+            <span class="home-community__sub">{{ s.label }}</span>
           </div>
-        </aside>
+        </div>
+      </section>
 
-        <section class="home-kpi-grid">
-          <article
-            v-for="kpi in kpis"
-            :key="kpi.label"
-            class="home-kpi-card home-card"
+      <!-- Next appointment -->
+      <!-- Section removed - no data available -->
+
+
+      <!-- Quick actions -->
+      <section class="home-section home-section--actions">
+        <h3 class="home-section__title">
+          Actions rapides
+        </h3>
+        <div class="home-actions-grid">
+          <div
+            v-for="action in actions"
+            :key="action.label"
+            class="home-action-card"
+            role="button"
+            tabindex="0"
+            :aria-label="`Démarrer une demande : ${action.label}`"
           >
             <div
-              class="home-kpi-card__icon"
-              :style="{ color: kpi.accent }"
+              class="home-action-card__icon"
+              :style="{ background: action.accent, color: action.color }"
             >
-              <component
-                :is="kpi.icon"
-                :size="18"
-                :stroke-width="1.9"
-                aria-hidden="true"
-              />
-            </div>
-            <div class="home-kpi-card__body">
-              <span class="home-kpi-card__label">{{ kpi.label }}</span>
-              <strong class="home-kpi-card__value">{{ kpi.value }}</strong>
-              <span class="home-kpi-card__detail">{{ kpi.detail }}</span>
-            </div>
-          </article>
-        </section>
-
-        <section class="home-panel home-card home-panel--actions">
-          <div class="home-panel__head">
-            <div>
-              <p class="home-panel__eyebrow">
-                Actions prioritaires
-              </p>
-              <h3 class="home-panel__title">
-                Lancer rapidement une demande
-              </h3>
-            </div>
-            <a
-              href="#"
-              class="home-section__more"
-              aria-label="Voir toutes les actions rapides disponibles"
-              title="Affiche la liste complète des actions que vous pouvez effectuer"
-            >Voir tout</a>
-          </div>
-          <div class="home-actions-grid">
-            <button
-              v-for="action in actions"
-              :key="action.label"
-              class="home-action-card"
-              :aria-label="`Commencer une demande de ${action.label.toLowerCase()}`"
-              :title="`Cliquez pour demander un accompagnement pour: ${action.label}`"
-            >
-              <span class="home-action-card__icon">
-                <component
-                  :is="action.icon"
-                  :size="22"
-                  :stroke-width="1.75"
-                  color="var(--kompagnon-turquoise)"
-                  aria-hidden="true"
-                />
-              </span>
-              <span class="home-action-card__label">{{ action.label }}</span>
-              <span class="home-action-card__desc">{{ action.description }}</span>
-              <span class="home-action-card__meta">{{ action.meta }}</span>
-            </button>
-          </div>
-        </section>
-
-        <section class="home-panel home-card home-card--dark home-panel--activity">
-          <div class="home-panel__head home-panel__head--light">
-            <div>
-              <p class="home-panel__eyebrow home-panel__eyebrow--light">
-                Activité récente
-              </p>
-              <h3 class="home-panel__title home-panel__title--light">
-                Ce qui se passe aujourd'hui
-              </h3>
-            </div>
-          </div>
-
-          <div class="home-activity-list">
-            <article
-              v-for="item in recentActivity"
-              :key="item.title"
-              class="home-activity-item"
-            >
-              <span class="home-activity-item__dot" />
-              <div class="home-activity-item__body">
-                <p class="home-activity-item__title">
-                  {{ item.title }}
-                </p>
-                <p class="home-activity-item__desc">
-                  {{ item.description }}
-                </p>
-              </div>
-              <span class="home-activity-item__time">{{ item.time }}</span>
-            </article>
-          </div>
-        </section>
-
-        <section class="home-panel home-card home-panel--community">
-          <div class="home-panel__head">
-            <div>
-              <p class="home-panel__eyebrow">
-                Réseau Kompagnon
-              </p>
-              <h3 class="home-panel__title">
-                Communauté active
-              </h3>
-            </div>
-            <a
-              href="#"
-              class="home-section__more"
-              aria-label="Voir l'activité complète de la communauté"
-              title="Affiche les statistiques détaillées de la communauté Kompagnon"
-            >Activité</a>
-          </div>
-          <div class="home-stats-grid">
-            <div
-              v-for="stat in communityStats"
-              :key="stat.label"
-              class="home-stat-card"
-              :aria-label="`${stat.label}: ${stat.value}`"
-              :title="`Statistique communauté - ${stat.label}: ${stat.value}`"
-            >
-              <component
-                :is="stat.icon"
+              <KIcon
+                :name="action.icon"
                 :size="22"
-                :stroke-width="1.75"
-                :color="stat.color"
-                aria-hidden="true"
               />
-              <span
-                class="home-stat-card__val"
-                :style="{ color: stat.color }"
-              >{{ stat.value }}</span>
-              <span class="home-stat-card__lbl">{{ stat.label }}</span>
-              <span class="home-stat-card__note">{{ stat.note }}</span>
             </div>
+            <span class="home-action-card__label">{{ action.label }}</span>
+            <span class="home-action-card__desc">{{ action.desc }}</span>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
+
+      <!-- Recent activity -->
+      <section class="home-section home-section--activity">
+        <div class="home-section__head">
+          <h3 class="home-section__title">
+            Activité récente
+          </h3>
+        </div>
+        <div class="home-activity">
+          <article
+            v-for="item in recentActivity"
+            :key="item.title"
+            class="home-activity-item"
+          >
+            <span class="home-activity-item__dot" />
+            <div class="home-activity-item__body">
+              <p class="home-activity-item__title">
+                {{ item.title }}
+              </p>
+              <p class="home-activity-item__desc">
+                {{ item.desc }}
+              </p>
+            </div>
+            <span class="home-activity-item__time">{{ item.time }}</span>
+          </article>
+        </div>
+      </section>
     </div>
   </div>
 </template>
 
 <style scoped>
-@keyframes spring-in {
-  0% { opacity: 0; transform: translateY(20px) scale(0.97); }
-  60% { opacity: 1; transform: translateY(-4px) scale(1.01); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-@keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
-  50% { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
-}
-
+/* ── Layout ── */
 .home-view {
-  display: flex;
-  flex-direction: column;
   min-height: 100%;
-  background: transparent;
-}
-
-.home-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 1.5rem 0.75rem;
-  background: transparent;
-  gap: 1rem;
-  flex-shrink: 0;
-}
-
-.home-header__left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.home-header__title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.home-header__title {
-  font-size: clamp(1.6rem, 2.2vw, 2.2rem);
-  font-weight: 700;
-  color: var(--kompagnon-navy);
-  margin: 0;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-}
-
-.home-header__subtitle {
-  font-size: 0.95rem;
-  color: var(--color-text-muted);
-  margin: 0.35rem 0 0;
-  line-height: 1.4;
-}
-
-.home-header__right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.home-header__date {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 0.65rem 1rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  color: #64748b;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-transform: capitalize;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-}
-
-.home-header__logout-btn {
-  display: inline-flex;
-  align-items: center;
-  height: 40px;
-  padding: 0 1rem;
-  border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(255, 255, 255, 0.88);
-  color: #475569;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-
-.home-header__logout-btn:hover {
-  background: #111827;
-  color: white;
-  border-color: #111827;
-  transform: translateY(-1px);
-  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.14);
-}
-
-.home-header__status {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #16a34a;
-  padding: 0.38rem 0.8rem;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 999px;
-}
-
-.home-header__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #22c55e;
-  flex-shrink: 0;
-  animation: pulse-dot 2s ease-in-out infinite;
+  background: var(--c-bg);
 }
 
 .home-content {
-  padding: 0 1.5rem 1.5rem;
+  width: min(100%, 1360px);
+  margin: 0 auto;
+  padding: 1.75rem 1.75rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.home-dashboard {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.home-card {
-  border-radius: 1.75rem;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow:
-    0 14px 40px rgba(15, 23, 42, 0.06),
-    0 2px 6px rgba(15, 23, 42, 0.03);
-  backdrop-filter: blur(10px);
-}
-
-.home-card--dark {
-  background: linear-gradient(160deg, var(--brand-navy-deep) 0%, var(--brand-navy) 55%, #1e3245 100%);
-  border-color: rgba(255, 255, 255, 0.06);
-  color: white;
-  box-shadow: var(--shadow-navy);
-}
-
+/* ── Hero banner ── */
 .home-hero {
-  grid-column: span 8;
   position: relative;
-  padding: 1.6rem;
   overflow: hidden;
-  animation: spring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(135deg, var(--c-navy) 0%, oklch(0.38 0.12 210) 100%);
+  padding: 2rem;
+  min-height: 100%;
+  color: #fff;
+  animation: fadeInUp 0.4s ease-out both;
 }
 
-.home-hero::before {
-  content: '';
+.home-hero__blob {
   position: absolute;
-  top: -10%;
-  right: -5%;
-  width: 360px;
-  height: 360px;
-  background: radial-gradient(circle, rgba(72, 175, 196, 0.18) 0%, rgba(72, 175, 196, 0.04) 45%, transparent 70%);
-  border-radius: 50%;
-  animation: float 10s ease-in-out infinite;
+  width: 300px;
+  height: 300px;
+  top: -80px;
+  right: -60px;
   pointer-events: none;
-}
-
-.home-hero::after {
-  content: '';
-  position: absolute;
-  bottom: -18%;
-  left: -4%;
-  width: 240px;
-  height: 240px;
-  background: radial-gradient(circle, rgba(158, 212, 217, 0.22) 0%, transparent 72%);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.home-hero__layout {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
-  gap: 1rem;
-  align-items: stretch;
 }
 
 .home-hero__content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 0.25rem;
+  position: relative;
+  z-index: 1;
 }
 
-.home-hero__eyebrow {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 999px;
-  background: rgba(72, 175, 196, 0.12);
-  border: 1px solid rgba(72, 175, 196, 0.2);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #2a5f70;
-  letter-spacing: 0.02em;
+.home-hero__date {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  opacity: 0.7;
+  margin: 0 0 0.25rem;
 }
 
 .home-hero__title {
-  font-size: clamp(1.9rem, 3.2vw, 3.2rem);
-  font-weight: 700;
-  color: var(--kompagnon-navy);
-  margin: 0;
-  line-height: 0.98;
-  max-width: 12ch;
-  letter-spacing: -0.05em;
-}
-
-.home-hero__desc {
-  font-size: 0.95rem;
-  color: var(--color-text-muted);
-  margin: 0;
-  max-width: 36rem;
-  line-height: 1.6;
-}
-
-.home-hero__row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.875rem;
-  color: var(--color-text);
-}
-
-.home-hero__avatars {
-  display: flex;
-}
-
-.home-hero__av {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(72, 175, 196, 0.18);
-  color: #1e2c38;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid white;
-  margin-left: -6px;
-  flex-shrink: 0;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.home-hero__av:first-child {
-  margin-left: 0;
-}
-
-.home-hero__av:hover {
-  transform: scale(1.25) translateY(-4px);
-  z-index: 10;
-}
-
-.home-hero__av--more {
-  background: #1e2c38;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 1.875rem);
+  font-weight: 900;
   color: white;
-  font-size: 0.6rem;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
 }
 
-.home-hero__timing {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-}
-
-.home-hero__star {
-  color: #fbbf24;
-  fill: #fbbf24;
-}
-
-.home-hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.875rem;
+.home-hero__sub {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  opacity: 0.85;
+  margin: 0 0 1.5rem;
 }
 
 .home-hero__cta {
-  align-self: flex-start;
-  background: linear-gradient(135deg, #1e2c38 0%, #2a5f70 100%);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6875rem 1.5rem;
+  border-radius: var(--radius-full);
+  background: white;
+  color: var(--c-navy);
   border: none;
-  color: white;
-  border-radius: 999px;
-  padding: 0.9rem 1.5rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
   cursor: pointer;
-  min-height: 46px;
-  transition: background 0.2s, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 14px 28px rgba(30, 44, 56, 0.18);
+  min-height: 44px;
+  min-width: auto;
+  transition: opacity 0.15s ease, transform 0.18s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .home-hero__cta:hover {
-  background: linear-gradient(135deg, #16202b 0%, #245466 100%);
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 18px 32px rgba(30, 44, 56, 0.2);
+  opacity: 0.92;
+  transform: translateY(-1px);
 }
 
-.home-hero__cta:active {
-  transform: translateY(0) scale(0.98);
+/* ── Stat cards ── */
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
 }
 
-.home-hero__trust {
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-}
-
-.home-hero__summary {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-  padding: 1rem;
+.home-stat-card {
+  background: var(--c-surface);
   border-radius: var(--radius-lg);
-  background: var(--brand-navy-deep);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.home-hero__summary-title {
-  margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-  letter-spacing: 0.02em;
-}
-
-.home-hero__summary-grid {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.home-hero__summary-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.875rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.home-hero__summary-icon {
-  flex-shrink: 0;
-  color: #c9f5ff;
-  margin-top: 0.125rem;
-}
-
-.home-hero__summary-label {
-  margin: 0 0 0.2rem;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.68);
-}
-
-.home-hero__summary-value {
-  margin: 0;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: white;
-  line-height: 1.35;
-}
-
-.home-journey-card {
-  grid-column: span 4;
-  padding: 1.4rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 1rem;
-  animation: spring-in 0.58s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  animation-delay: 0.08s;
-}
-
-.home-card__topline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.home-card__eyebrow {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: #7b8794;
-  text-transform: uppercase;
-}
-
-.home-journey-card__time {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 34px;
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  font-size: 0.8125rem;
-  font-weight: 700;
-}
-
-.home-journey-card__title {
-  margin: 0;
-  font-size: 1.5rem;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-}
-
-.home-journey-card__route {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.72);
-  line-height: 1.55;
-  font-size: 0.92rem;
-}
-
-.home-journey-card__meta {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.home-journey-card__meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.85rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.home-journey-card__meta-item strong {
-  font-size: 0.95rem;
-  color: white;
-}
-
-.home-journey-card__meta-label {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.62);
-}
-
-.home-journey-card__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.home-journey-card__badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
-  background: rgba(72, 175, 196, 0.18);
-  color: #bff5ff;
-  font-size: 0.8125rem;
-  font-weight: 700;
-}
-
-.home-journey-card__hint {
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.62);
-}
-
-.home-kpi-grid {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.home-kpi-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.9rem;
-  padding: 1.15rem;
-  animation: spring-in 0.58s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
-.home-kpi-card:nth-child(1) { animation-delay: 0.08s; }
-.home-kpi-card:nth-child(2) { animation-delay: 0.12s; }
-.home-kpi-card:nth-child(3) { animation-delay: 0.16s; }
-.home-kpi-card:nth-child(4) { animation-delay: 0.20s; }
-
-.home-kpi-card__icon {
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 0.95rem;
-  background: rgba(72, 175, 196, 0.08);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.home-kpi-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.home-kpi-card__label {
-  font-size: 0.78rem;
-  color: var(--color-text-muted);
-  font-weight: 600;
-}
-
-.home-kpi-card__value {
-  font-size: 1.5rem;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: var(--kompagnon-navy);
-}
-
-.home-kpi-card__detail {
-  font-size: 0.78rem;
-  color: var(--color-text-subtle);
-}
-
-.home-panel {
   padding: 1.25rem;
-  animation: spring-in 0.58s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
-.home-panel--actions {
-  grid-column: span 7;
-  animation-delay: 0.12s;
-}
-
-.home-panel--activity {
-  grid-column: span 5;
-  animation-delay: 0.18s;
-}
-
-.home-panel--community {
-  grid-column: 1 / -1;
-  animation-delay: 0.22s;
-}
-
-.home-panel__head {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 11rem;
+  box-shadow: var(--shadow-card);
+  animation: fadeInUp 0.4s ease-out both;
 }
 
-.home-panel__head--light {
-  margin-bottom: 0.75rem;
-}
+.home-stat-card:nth-child(1) { animation-delay: 0.05s; }
+.home-stat-card:nth-child(2) { animation-delay: 0.1s; }
+.home-stat-card:nth-child(3) { animation-delay: 0.15s; }
 
-.home-panel__eyebrow {
-  margin: 0 0 0.3rem;
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.home-panel__eyebrow--light {
-  color: rgba(255, 255, 255, 0.56);
-}
-
-.home-panel__title {
-  margin: 0;
-  color: var(--kompagnon-navy);
-  font-size: 1.3rem;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-}
-
-.home-panel__title--light {
-  color: white;
-}
-
-.home-section__more {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--kompagnon-turquoise);
-  text-decoration: none;
-  display: inline-flex;
+.home-stat-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
   align-items: center;
-  gap: 0.25rem;
-  transition: gap 0.2s, color 0.2s;
+  justify-content: center;
+  font-size: 1.125rem;
 }
 
-.home-section__more:hover {
-  color: #3a9bb0;
+.home-stat-card__value {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--c-text);
+  line-height: 1;
+}
+
+.home-stat-card__label {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--c-text-medium);
+}
+
+.home-stat-card__trend {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--c-success);
+}
+
+/* ── Community stats dark card ── */
+.home-community {
+  background: var(--c-navy);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  min-height: 100%;
+  animation: fadeInUp 0.4s ease-out 0.18s both;
+}
+
+.home-community__label {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 0.875rem;
+}
+
+.home-community__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
 }
 
+.home-community__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.home-community__value {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 900;
+  color: var(--brand-aqua);
+  line-height: 1;
+}
+
+.home-community__sub {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ── Section wrapper ── */
+.home-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.home-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.home-section__title {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--c-navy);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* ── Appointment card ── */
+.home-appt-card {
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  min-height: 100%;
+  box-shadow: var(--shadow-card);
+}
+
+.home-appt-card__date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--c-teal-light);
+  border-radius: 14px;
+  padding: 0.75rem 0.875rem;
+  flex-shrink: 0;
+}
+
+.home-appt-card__day {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 900;
+  color: var(--c-teal-dark);
+  line-height: 1;
+}
+
+.home-appt-card__month {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--c-teal-dark);
+  letter-spacing: 0.04em;
+}
+
+.home-appt-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-appt-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.375rem;
+}
+
+.home-appt-card__name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--c-navy);
+}
+
+.home-appt-card__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  background: var(--c-success-bg);
+  color: var(--c-success-text, #1a6b3e);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.home-appt-card__detail {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--c-text-medium);
+  line-height: 1.6;
+  margin: 0 0 0.875rem;
+}
+
+.home-appt-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.home-appt-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: auto;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.home-appt-btn--primary {
+  background: var(--c-beige);
+  color: var(--c-teal-dark);
+}
+
+.home-appt-btn--primary:hover { background: var(--c-teal-light); }
+
+.home-appt-btn--ghost {
+  background: transparent;
+  color: var(--c-text-medium);
+}
+
+.home-appt-btn--ghost:hover { background: var(--c-beige); }
+
+.home-appt-card__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--c-teal);
+  color: white;
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Quick actions ── */
 .home-actions-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.875rem;
 }
 
 .home-action-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(248,250,252,0.95) 100%);
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  border-radius: 1.25rem;
-  padding: 1.1rem 1rem;
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: 0.625rem;
   cursor: pointer;
-  animation: spring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, border-color 0.2s;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
   text-align: left;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 10.5rem;
 }
-
-.home-action-card:nth-child(1) { animation-delay: 0.12s; }
-.home-action-card:nth-child(2) { animation-delay: 0.18s; }
-.home-action-card:nth-child(3) { animation-delay: 0.24s; }
-.home-action-card:nth-child(4) { animation-delay: 0.30s; }
 
 .home-action-card:hover {
-  transform: translateY(-5px) scale(1.03);
-  box-shadow: 0 18px 32px rgba(72, 175, 196, 0.16);
-  border-color: rgba(72, 175, 196, 0.35);
-}
-
-.home-action-card:active {
-  transform: translateY(-1px) scale(0.99);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hov);
 }
 
 .home-action-card__icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 1rem;
-  background: rgba(72, 175, 196, 0.1);
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.home-action-card:hover .home-action-card__icon {
-  background: #48AFC4;
-  transform: rotate(8deg) scale(1.1);
-}
-
-.home-action-card:hover .home-action-card__icon svg {
-  color: white !important;
+  font-size: 1.25rem;
 }
 
 .home-action-card__label {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--kompagnon-navy);
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--c-navy);
   line-height: 1.2;
 }
 
 .home-action-card__desc {
-  font-size: 0.82rem;
-  line-height: 1.45;
-  color: var(--color-text-subtle);
-  max-width: 18rem;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--c-text-light);
+  line-height: 1.4;
 }
 
-.home-action-card__meta {
-  margin-top: auto;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #2a5f70;
+/* ── Activity ── */
+.home-activity {
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
-.home-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.875rem;
+@media (min-width: 1180px) {
+  .home-content {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 1.25rem;
+    padding: 1.5rem 1.5rem 2.5rem;
+  }
+
+  .home-hero {
+    grid-column: 1 / span 7;
+    padding: 2.1rem;
+  }
+
+  .home-stats {
+    grid-column: 8 / -1;
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+
+  .home-community {
+    grid-column: 1 / span 4;
+    padding: 1.35rem 1.4rem;
+  }
+
+  .home-section--appointment {
+    grid-column: 5 / -1;
+  }
+
+  .home-section--actions,
+  .home-section--activity {
+    grid-column: 1 / -1;
+  }
+
+  .home-actions-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
 }
 
-.home-stat-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(248,250,252,0.95) 100%);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 1.125rem;
-  padding: 1.375rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.375rem;
-  animation: spring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, border-color 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  cursor: default;
-}
+@media (min-width: 1024px) and (max-width: 1179px) {
+  .home-content {
+    width: min(100%, 1180px);
+    max-width: none;
+    padding: 1.5rem 1.5rem 2.5rem;
+  }
 
-.home-stat-card:nth-child(1) { animation-delay: 0.22s; }
-.home-stat-card:nth-child(2) { animation-delay: 0.28s; }
-.home-stat-card:nth-child(3) { animation-delay: 0.34s; }
+  .home-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 
-.home-stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(72, 175, 196, 0.12);
-  border-color: rgba(72, 175, 196, 0.25);
-}
+  .home-actions-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 
-.home-stat-card__val {
-  font-size: 1.5rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.home-stat-card:hover .home-stat-card__val {
-  transform: scale(1.08);
-}
-
-.home-stat-card__lbl {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  text-align: center;
-}
-
-.home-stat-card__note {
-  font-size: 0.75rem;
-  line-height: 1.45;
-  color: var(--color-text-subtle);
-  text-align: center;
-}
-
-.home-activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  .home-action-card {
+    min-height: 9.5rem;
+  }
 }
 
 .home-activity-item {
@@ -1125,146 +660,203 @@ const todayLabel = new Intl.DateTimeFormat("fr-FR", {
   grid-template-columns: auto 1fr auto;
   gap: 0.75rem;
   align-items: flex-start;
-  padding: 0.9rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--c-border);
+  transition: background 0.15s ease;
 }
 
 .home-activity-item:last-child {
   border-bottom: none;
-  padding-bottom: 0;
+}
+
+.home-activity-item:hover {
+  background: var(--c-beige);
 }
 
 .home-activity-item__dot {
-  width: 0.7rem;
-  height: 0.7rem;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   margin-top: 0.35rem;
-  background: #48afc4;
-  box-shadow: 0 0 0 4px rgba(72, 175, 196, 0.16);
+  background: var(--c-teal);
+  box-shadow: 0 0 0 3px var(--c-teal-light);
+  flex-shrink: 0;
 }
 
 .home-activity-item__body {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  min-width: 0;
 }
 
 .home-activity-item__title {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--c-text);
   margin: 0;
-  color: white;
-  font-size: 0.93rem;
-  font-weight: 600;
 }
 
 .home-activity-item__desc {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--c-text-medium);
   margin: 0;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 0.8rem;
   line-height: 1.45;
 }
 
 .home-activity-item__time {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--c-text-light);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
-@media (max-width: 1024px) {
-  .home-hero,
-  .home-journey-card,
-  .home-panel--actions,
-  .home-panel--activity,
-  .home-panel--community {
-    grid-column: 1 / -1;
-  }
 
-  .home-hero__layout {
-    grid-template-columns: 1fr;
-  }
+/* ── Responsive ── */
 
-  .home-kpi-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 640px) {
-  .home-header {
-    padding: 1rem 1rem 0.5rem;
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
+/* Breakpoint intermédiaire (769px - 1023px) */
+@media (max-width: 1023px) and (min-width: 769px) {
   .home-content {
-    padding: 0 1rem 1rem;
+    max-width: 100%;
+    padding: 1.5rem 1.5rem 2.5rem;
+    gap: 1.25rem;
   }
 
-  .home-header__title-row {
-    gap: 0.5rem;
+  .home-hero {
+    padding: 1.5rem;
   }
 
-  .home-header__title {
-    font-size: 1.9rem;
+  .home-hero__title {
+    font-size: 1.5rem;
   }
 
-  .home-header__right {
-    width: 100%;
-    justify-content: space-between;
+  .home-stats {
+    gap: 0.75rem;
   }
 
-  .home-header__date {
-    min-height: 36px;
-    padding-inline: 0.85rem;
+  .home-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablette intermédiaire (≤ 768 px) */
+@media (max-width: 768px) {
+  .home-content {
+    padding: 1.25rem 1.25rem 2.5rem;
+    gap: 1.25rem;
   }
 
-  .home-header__logout-btn {
-    height: 36px;
-    padding-inline: 0.9rem;
+  .home-hero {
+    padding: 1.5rem;
+  }
+
+  .home-hero__blob {
+    width: 220px;
+    height: 220px;
+    top: -50px;
+    right: -40px;
+  }
+
+  .home-stats {
+    gap: 0.75rem;
+  }
+
+  .home-community__value {
+    font-size: 1.15rem;
+  }
+}
+
+/* Mobile (≤ 640 px) */
+@media (max-width: 640px) {
+  .home-content {
+    padding: 1rem 1rem 2rem;
+    gap: 1rem;
   }
 
   .home-hero {
     padding: 1.25rem;
+    border-radius: var(--radius-xl);
+  }
+
+  .home-hero__blob {
+    width: 160px;
+    height: 160px;
+    top: -30px;
+    right: -30px;
   }
 
   .home-hero__title {
-    max-width: 100%;
+    font-size: 1.375rem;
   }
 
-  .home-hero__actions {
-    align-items: flex-start;
-  }
-
-  .home-hero__summary {
-    padding: 0.875rem;
-  }
-
-  .home-kpi-grid {
+  /* 1 colonne pour les stats */
+  .home-stats {
     grid-template-columns: 1fr;
   }
 
+  /* Community grid reste à 3 colonnes mais valeurs plus petites */
+  .home-community__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .home-community__value {
+    font-size: 1rem;
+  }
+
+  /* Actions 1 colonne */
   .home-actions-grid {
     grid-template-columns: 1fr;
-    gap: 0.625rem;
   }
 
-  .home-stats-grid {
-    grid-template-columns: 1fr;
-    gap: 0.625rem;
+  /* Appointment card : wrap + cacher avatar */
+  .home-appt-card {
+    flex-wrap: wrap;
   }
 
-  .home-stat-card {
-    padding: 1rem 0.75rem;
+  .home-appt-card__avatar {
+    display: none;
   }
 
-  .home-stat-card__val {
-    font-size: 1.25rem;
-  }
-
+  /* Activity : masquer l'heure sur très petits écrans */
   .home-activity-item {
     grid-template-columns: auto 1fr;
+    padding: 0.875rem 1rem;
   }
 
   .home-activity-item__time {
-    grid-column: 2;
+    display: none;
+  }
+
+  .home-section__head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .home-logout-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Très petit mobile (≤ 375 px) */
+@media (max-width: 375px) {
+  .home-content {
+    padding: 0.75rem 0.75rem 1.5rem;
+  }
+
+  .home-community {
+    padding: 1rem;
+  }
+
+  .home-community__value {
+    font-size: 0.9rem;
+  }
+
+  .home-stat-card__value {
+    font-size: 1.375rem;
   }
 }
 </style>

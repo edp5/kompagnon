@@ -1,68 +1,11 @@
 <script setup>
-import {
-  CheckCircle,
-  Clock,
-  Info,
-  Star,
-  Trash2,
-  User,
-} from "lucide-vue-next";
 import { ref } from "vue";
+
+import KIcon from "@/components/KIcon.vue";
 
 const activeFilter = ref("all");
 
-const notifications = [
-  {
-    icon: CheckCircle,
-    iconColor: "#16a34a",
-    iconBg: "rgba(22,163,74,0.1)",
-    title: "Accompagnement terminé",
-    text: "Votre trajet avec Marie L. vers la pharmacie s'est bien déroulé",
-    time: "Il y a 10 min",
-    unread: true,
-    borderColor: "var(--kompagnon-turquoise)",
-  },
-  {
-    icon: User,
-    iconColor: "var(--kompagnon-turquoise)",
-    iconBg: "rgba(72,175,196,0.1)",
-    title: "Nouveau volontaire disponible",
-    text: "Thomas R. est maintenant disponible dans votre secteur",
-    time: "Il y a 1h",
-    unread: true,
-    borderColor: "var(--kompagnon-turquoise)",
-  },
-  {
-    icon: Clock,
-    iconColor: "#f97316",
-    iconBg: "rgba(249,115,22,0.1)",
-    title: "Rendez-vous dans 30 min",
-    text: "N'oubliez pas votre accompagnement avec Sophie M. à 15h30",
-    time: "Il y a 2h",
-    unread: false,
-    borderColor: "transparent",
-  },
-  {
-    icon: Star,
-    iconColor: "#fbbf24",
-    iconBg: "rgba(251,191,36,0.1)",
-    title: "Nouvel avis reçu",
-    text: "Marie L. vous a laissé un avis 5 étoiles",
-    time: "Hier",
-    unread: false,
-    borderColor: "transparent",
-  },
-  {
-    icon: Info,
-    iconColor: "#a855f7",
-    iconBg: "rgba(168,85,247,0.1)",
-    title: "Mise à jour disponible",
-    text: "Une nouvelle version de Kompagnon est disponible",
-    time: "Il y a 2 jours",
-    unread: false,
-    borderColor: "transparent",
-  },
-];
+const notifications = [];
 
 const unreadCount = notifications.filter((n) => n.unread).length;
 
@@ -75,12 +18,12 @@ function setFilter(f) {
 </script>
 
 <template>
-  <div class="notif-view">
-    <header class="notif-header">
-      <div class="notif-header__left">
-        <span class="notif-header__eyebrow">Centre de messages</span>
+  <div class="notif-view app-page">
+    <header class="notif-header app-page__header">
+      <div class="notif-header__left app-page__header-main">
+        <span class="notif-header__eyebrow app-page__eyebrow">Centre de messages</span>
         <div class="notif-header__title-row">
-          <h1 class="notif-header__title">
+          <h1 class="notif-header__title app-page__title">
             Notifications
           </h1>
           <span
@@ -88,7 +31,7 @@ function setFilter(f) {
             class="notif-header__badge"
           >{{ unreadCount }} non lue{{ unreadCount > 1 ? 's' : '' }}</span>
         </div>
-        <p class="notif-header__sub">
+        <p class="notif-header__sub app-page__subtitle">
           Restez informé de vos accompagnements et activités
         </p>
       </div>
@@ -114,11 +57,11 @@ function setFilter(f) {
       </div>
     </header>
 
-    <div class="notif-content">
+    <div class="notif-content app-page__content app-page__content--stack">
       <!-- Banner unread -->
       <div
         v-if="unreadCount > 0"
-        class="notif-banner notif-card"
+        class="notif-banner notif-card glass-panel"
       >
         <div class="notif-banner__left">
           <div class="notif-banner__dot" />
@@ -137,19 +80,17 @@ function setFilter(f) {
         <article
           v-for="n in displayed"
           :key="n.title"
-          class="notif-item notif-card"
+          class="notif-item notif-card glass-panel"
           :class="{ 'notif-item--unread': n.unread }"
           :style="n.unread ? `border-left-color: ${n.borderColor}` : ''"
         >
           <div
             class="notif-item__icon"
-            :style="{ background: n.iconBg }"
+            :style="{ background: n.iconBg, color: n.iconColor }"
           >
-            <component
-              :is="n.icon"
+            <KIcon
+              :name="n.icon"
               :size="20"
-              :color="n.iconColor"
-              :stroke-width="1.75"
               aria-hidden="true"
             />
           </div>
@@ -180,9 +121,9 @@ function setFilter(f) {
             :aria-label="`Supprimer la notification: ${n.title}`"
             :title="`Supprimer cette notification: ${n.title}`"
           >
-            <Trash2
+            <KIcon
+              name="close"
               :size="15"
-              :stroke-width="1.75"
               aria-hidden="true"
             />
           </button>
@@ -206,7 +147,7 @@ function setFilter(f) {
   background: transparent;
 }
 
-/* ── Header ── */
+/* -- Header -- */
 .notif-header {
   display: flex;
   align-items: flex-end;
@@ -271,7 +212,7 @@ function setFilter(f) {
   margin: 0;
 }
 
-/* ── Filters ── */
+/* -- Filters -- */
 .notif-filters {
   display: flex;
   gap: 0.5rem;
@@ -304,16 +245,18 @@ function setFilter(f) {
   box-shadow: 0 6px 16px rgba(72, 175, 196, 0.28);
 }
 
-/* ── Content ── */
+/* -- Content -- */
 .notif-content {
   padding: 0 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  max-width: 900px;
+  width: min(100%, 1260px);
+  max-width: none;
+  margin: 0 auto;
 }
 
-/* ── Base card ── */
+/* -- Base card -- */
 .notif-card {
   border-radius: 1.5rem;
   border: 1px solid rgba(15, 23, 42, 0.06);
@@ -325,7 +268,7 @@ function setFilter(f) {
   animation: spring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* ── Banner ── */
+/* -- Banner -- */
 .notif-banner {
   display: flex;
   align-items: center;
@@ -366,11 +309,27 @@ function setFilter(f) {
   color: #2a5f70;
 }
 
-/* ── Notification list ── */
+/* -- Notification list -- */
 .notif-list {
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
+}
+
+@media (min-width: 1180px) {
+  .notif-content {
+    width: min(100%, 1320px);
+  }
+
+  .notif-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.875rem;
+  }
+
+  .notif-item {
+    min-height: 100%;
+  }
 }
 
 .notif-item {
@@ -485,6 +444,11 @@ function setFilter(f) {
   border-color: #fca5a5;
   color: #ef4444;
   transform: scale(1.1);
+}
+
+@media (max-width: 1023px) and (min-width: 769px) {
+  .notif-header { padding: 1.25rem 1.25rem 0.875rem; }
+  .notif-content { padding: 0 1.25rem 1.25rem; }
 }
 
 @media (max-width: 640px) {

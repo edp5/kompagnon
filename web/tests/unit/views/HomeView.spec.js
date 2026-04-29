@@ -20,7 +20,8 @@ describe("Unit | Views | HomeView", () => {
 
   it("should render a logout button", () => {
     const wrapper = mount(HomeView);
-    expect(wrapper.find("button").text()).toBe("Se déconnecter");
+    const buttons = wrapper.findAll("button");
+    expect(buttons.at(-1).text()).toBe("Se déconnecter");
   });
 
   it("should clear the store and redirect to login on logout", async () => {
@@ -30,7 +31,8 @@ describe("Unit | Views | HomeView", () => {
     const wrapper = mount(HomeView);
 
     // when
-    await wrapper.find("button").trigger("click");
+    const buttons = wrapper.findAll("button");
+    await buttons.at(-1).trigger("click");
 
     // then
     expect(authStore.token).toBeNull();

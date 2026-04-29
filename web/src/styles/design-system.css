@@ -1,16 +1,1202 @@
-/* ═══════════════════════════════════════════════════════
-   KOMPAGNON — Design System  v2.0
+/* KOMPAGNON Design System v3.0 - Nunito + DM Sans */
+
+/* --- 1. Design Tokens --------------------------------- */
+:root {
+  /* -- Exact brand palette from logo -- */
+  --brand-navy:      #1E2C38;
+  --brand-teal:      #48AFC4;
+  --brand-cream:     #F3EDE6;
+  --brand-aqua:      #9ED4D9;
+
+  /* -- Semantic surface tokens -- */
+  --c-bg:            #f8f4ef;      /* page background - warm off-white */
+  --c-cream:         #F3EDE6;      /* brand cream */
+  --c-beige:         #ede7df;      /* secondary surface */
+  --c-sand:          #ddd6cc;      /* tertiary surface */
+  --c-surface:       #ffffff;      /* card / panel surface */
+  --c-border:        #e8e2db;      /* warm border */
+
+  /* -- Teal accent -- */
+  --c-teal:          #48AFC4;
+  --c-teal-light:    #d4eff3;      /* teal background tint */
+  --c-teal-dark:     #2d8fa3;      /* teal hover / dark variant */
+  --c-teal-shadow:   rgba(72, 175, 196, 0.30);
+
+  /* -- Navy -- */
+  --c-navy:          #1E2C38;
+  --c-navy-light:    #dde3e8;
+
+  /* -- Text -- */
+  --c-text:          #1E2C38;
+  --c-text-medium:   #5a6c7a;      /* secondary text */
+  --c-text-light:    #8fa0ad;      /* tertiary / placeholder */
+
+  /* -- Sidebar (Variation A - light/cream default) -- */
+  --c-sidebar-bg:          #f8f4ef;
+  --c-sidebar-text:        #5a6c7a;
+  --c-sidebar-active-bg:   #d4eff3;
+  --c-sidebar-active-text: #2d8fa3;
+
+  /* -- Status -- */
+  --c-success:        #2d9e60;
+  --c-success-bg:     #d4f0e0;
+  --c-success-text:   #1a6b3e;
+  --c-warning:        #c48a00;
+  --c-warning-bg:     #fef3d4;
+  --c-danger:         #d43a3a;
+  --c-danger-bg:      rgba(212, 58, 58, 0.09);
+  --c-danger-border:  rgba(212, 58, 58, 0.22);
+
+  /* -- Shadows -- */
+  --shadow-xs:      0 1px 3px rgba(30, 44, 56, 0.05);
+  --shadow-sm:      0 2px 8px rgba(30, 44, 56, 0.06);
+  --shadow-md:      0 6px 20px rgba(30, 44, 56, 0.08);
+  --shadow-lg:      0 12px 32px rgba(30, 44, 56, 0.09);
+  --shadow-xl:      0 20px 48px rgba(30, 44, 56, 0.11);
+  --shadow-navy:    0 8px 28px rgba(30, 44, 56, 0.22);
+  --shadow-teal:    0 4px 20px rgba(72, 175, 196, 0.30);
+  --shadow-card:    0 2px 12px rgba(0, 0, 0, 0.06);
+  --shadow-card-hov: 0 8px 32px rgba(72, 175, 196, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  /* -- Border Radius -- */
+  --radius-xs:   0.375rem;   /* 6px */
+  --radius-sm:   0.625rem;   /* 10px */
+  --radius-md:   0.75rem;    /* 12px - inputs */
+  --radius-lg:   1.25rem;    /* 20px - cards (Claude Design standard) */
+  --radius-xl:   1.5rem;     /* 24px - large cards */
+  --radius-2xl:  2rem;       /* 32px - hero/banner */
+  --radius-full: 999px;      /* pills - buttons */
+
+  /* -- Typography -- */
+  --font-display:   'Nunito', system-ui, sans-serif;        /* titles 700–900 */
+  --font-body:      'DM Sans', system-ui, -apple-system, sans-serif;  /* body 400–600 */
+  --font-family:    var(--font-body);
+  --font-size:      16px;
+  --text-xs:        0.75rem;    /* 12px */
+  --text-sm:        0.875rem;   /* 14px */
+  --text-base:      1rem;       /* 16px */
+  --text-lg:        1.125rem;   /* 18px */
+  --text-xl:        1.25rem;    /* 20px */
+  --text-2xl:       1.5rem;     /* 24px */
+  --text-3xl:       1.875rem;   /* 30px */
+  --font-normal:    400;
+  --font-medium:    500;
+  --font-semibold:  600;
+  --font-bold:      700;
+  --font-extrabold: 800;
+  --font-black:     900;
+
+  /* -- Legacy aliases - backwards compatibility -- */
+  --brand-navy-mid:        #2a3d4e;
+  --brand-navy-deep:       #16212b;
+  --brand-turquoise:       var(--c-teal);
+  --brand-turquoise-dark:  var(--c-teal-dark);
+  --kompagnon-navy:        var(--brand-navy);
+  --kompagnon-navy-light:  #2a3d4e;
+  --kompagnon-navy-dark:   #16212b;
+  --kompagnon-turquoise:   var(--c-teal);
+  --kompagnon-turquoise-light: #5bbccf;
+  --kompagnon-turquoise-dark: var(--c-teal-dark);
+  --kompagnon-cream:       var(--brand-cream);
+  --kompagnon-cream-light: #faf6f1;
+  --kompagnon-cream-dark:  #ede7df;
+  --kompagnon-aqua:        var(--brand-aqua);
+  --kompagnon-aqua-light:  #b3e0e4;
+  --kompagnon-aqua-dark:   #89c8ce;
+  --kompagnon-success:     var(--c-success);
+  --kompagnon-warning:     var(--c-warning);
+  --kompagnon-error:       var(--c-danger);
+  --kompagnon-surface:     var(--c-surface);
+  --kompagnon-shadow:      var(--shadow-xl);
+  --kompagnon-shadow-soft: var(--shadow-md);
+  --kompagnon-border:      var(--c-border);
+  --color-bg:              var(--c-bg);
+  --color-surface:         var(--c-surface);
+  --color-surface-alt:     var(--c-beige);
+  --color-surface-navy:    var(--c-navy);
+  --color-primary:         var(--c-teal);
+  --color-primary-dark:    var(--c-teal-dark);
+  --color-primary-bg:      var(--c-teal-light);
+  --color-primary-border:  rgba(72, 175, 196, 0.22);
+  --color-text:            var(--c-text);
+  --color-text-muted:      var(--c-text-medium);
+  --color-text-subtle:     var(--c-text-light);
+  --color-text-on-dark:    #ffffff;
+  --color-text-on-dark-muted: rgba(255, 255, 255, 0.65);
+  --color-border:          var(--c-border);
+  --color-border-subtle:   rgba(30, 44, 56, 0.04);
+  --color-success:         var(--c-success);
+  --color-success-bg:      var(--c-success-bg);
+  --color-success-border:  rgba(45, 158, 96, 0.22);
+  --color-danger:          var(--c-danger);
+  --color-danger-bg:       var(--c-danger-bg);
+  --color-danger-border:   var(--c-danger-border);
+  --color-warning:         var(--c-warning);
+  --color-warning-bg:      var(--c-warning-bg);
+  --font-weight-normal:    var(--font-normal);
+  --font-weight-medium:    var(--font-medium);
+  --font-weight-semibold:  var(--font-semibold);
+  --font-weight-bold:      var(--font-bold);
+
+  font-family: var(--font-body);
+  color: var(--c-text);
+}
+
+/* --- Large Screen Scale ------------------------------- */
+@media (min-width: 1920px) {
+  :root {
+    --font-size: 17px;
+  }
+}
+
+/* --- Keyframes ---------------------------------------- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+@keyframes shimmer {
+  0%   { background-position: -1000px 0; }
+  100% { background-position:  1000px 0; }
+}
+@keyframes pulseDot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
+  50%       { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
+}
+
+/* --- Base Reset --------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--font-size);
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+}
+
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--c-text);
+  background: var(--c-bg);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+}
+
+/* --- Typography --------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
+
+h1 {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* --- Interactive Transitions (scoped - no jank) -------- */
+a,
+button,
+input,
+select,
+textarea,
+[role="button"] {
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.2s ease;
+}
+
+/* --- WCAG Touch Target -------------------------------- */
+button,
+[role="button"],
+a,
+[role="link"] {
+  min-width: 44px;
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* --- Focus Ring --------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--c-teal);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* --- App Shell ---------------------------------------- */
+.app-shell {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-shell__content {
+  flex: 1;
+  width: 100%;
+}
+
+/* --- Page Layout -------------------------------------- */
+.page-container {
+  width: min(100%, 1600px);
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.page-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.app-page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.app-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1.25rem 1.5rem 0.75rem;
+}
+
+.app-page__header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.app-page__eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(72, 175, 196, 0.12);
+  border: 1px solid rgba(72, 175, 196, 0.18);
+  color: var(--c-teal-dark);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.app-page__title {
+  margin: 0;
+  color: var(--c-navy);
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.55rem, 2.5vw, 2.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.app-page__subtitle {
+  margin: 0;
+  max-width: 52rem;
+  color: var(--c-text-medium);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.app-page__content {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.app-page__content--stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.page-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(30, 44, 56, 0.08);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(14px);
+}
+
+.page-toolbar__search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  background: rgba(248, 250, 252, 0.95);
+  border: 1.5px solid rgba(30, 44, 56, 0.08);
+}
+
+.page-toolbar__search:focus-within {
+  border-color: var(--c-teal);
+  box-shadow: 0 0 0 3px rgba(72, 175, 196, 0.12);
+  background: white;
+}
+
+.page-toolbar__search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--c-text);
+}
+
+.page-toolbar__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(72, 175, 196, 0.08);
+  border: 1px solid rgba(72, 175, 196, 0.14);
+  color: var(--c-teal-dark);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(30, 44, 56, 0.08);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(16px);
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-heading__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.section-heading__eyebrow {
+  margin: 0;
+  color: var(--c-text-light);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.section-heading__title {
+  margin: 0;
+  color: var(--c-navy);
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.section-heading__link {
+  color: var(--c-teal-dark);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.section-heading__link:hover {
+  color: var(--c-navy);
+}
+
+/* --- Card Primitive ----------------------------------- */
+/* Base card: white surface, 20px radius (Claude Design standard) */
+.surface-card,
+.base-card {
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.base-card {
+  padding: 1.25rem 1.5rem;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.base-card--interactive {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.base-card--interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hov);
+}
+
+.base-card--hero {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--brand-navy) 0%, oklch(0.38 0.12 210) 100%);
+  border: none;
+  box-shadow: var(--shadow-navy);
+}
+
+.base-card__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  margin-bottom: 0.375rem;
+}
+
+.base-card__description {
+  color: var(--c-text-medium);
+  font-size: var(--text-sm);
+}
+
+/* --- Button System (pill-shaped - Claude Design) ------ */
+.base-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6875rem 1.5rem;
+  min-height: 44px;
+  border: none;
+  border-radius: var(--radius-full);   /* PILL shape */
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.005em;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.2s ease;
+}
+
+.base-button--primary {
+  color: #ffffff;
+  background: var(--c-teal);
+  box-shadow: var(--shadow-teal);
+}
+
+.base-button--primary:hover:not(:disabled) {
+  background: var(--c-teal-dark);
+  box-shadow: 0 6px 20px var(--c-teal-shadow);
+  transform: translateY(-1px);
+}
+
+.base-button--primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.base-button--secondary {
+  color: var(--c-teal-dark);
+  background: var(--c-beige);
+  box-shadow: none;
+}
+
+.base-button--secondary:hover:not(:disabled) {
+  background: var(--c-teal-light);
+}
+
+.base-button--ghost {
+  color: var(--c-text-medium);
+  background: transparent;
+  box-shadow: none;
+}
+
+.base-button--ghost:hover:not(:disabled) {
+  background: var(--c-beige);
+}
+
+.base-button--navy {
+  color: #ffffff;
+  background: var(--c-navy);
+  box-shadow: 0 2px 8px rgba(30, 44, 56, 0.2);
+}
+
+.base-button--navy:hover:not(:disabled) {
+  background: oklch(0.22 0.09 242);
+  box-shadow: 0 6px 20px rgba(30, 44, 56, 0.3);
+  transform: translateY(-1px);
+}
+
+.base-button--full-width {
+  width: 100%;
+}
+
+.base-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* --- Form Controls ------------------------------------ */
+.base-label {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--c-text-medium);
+  font-family: var(--font-body);
+}
+
+.base-input,
+.base-textarea,
+.password-component__input {
+  width: 100%;
+  padding: 0.8125rem 1rem;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.base-input:hover,
+.base-textarea:hover,
+.password-component__input:hover {
+  border-color: var(--c-teal);
+}
+
+.base-input:focus,
+.base-textarea:focus,
+.password-component__input:focus {
+  outline: none;
+  border-color: var(--c-teal);
+  box-shadow: 0 0 0 3px var(--c-teal-light);
+}
+
+.base-input::placeholder,
+.base-textarea::placeholder {
+  color: var(--c-text-light);
+}
+
+.base-input[disabled],
+.base-textarea[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--c-beige);
+}
+
+.password-component__toggle {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--c-border);
+  background: var(--c-beige);
+  color: var(--c-teal);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  min-width: auto;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.password-component__toggle:hover {
+  background: var(--c-teal-light);
+  border-color: var(--c-teal);
+}
+
+.form-control,
+.base-input-field,
+.password-component {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  animation: fadeInUp 0.5s ease-out both;
+  animation-fill-mode: both;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1.125rem;
+}
+
+/* --- Feedback ----------------------------------------- */
+.feedback {
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid transparent;
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  line-height: 1.55;
+  animation: slideInDown 0.3s ease-out both;
+}
+
+.feedback--error,
+.feedback.error {
+  color: var(--c-danger);
+  background: var(--c-danger-bg);
+  border-color: var(--c-danger-border);
+}
+
+.feedback--success,
+.feedback.success {
+  color: var(--c-success-text, #1a6b3e);
+  background: var(--c-success-bg);
+  border-color: var(--color-success-border);
+}
+
+.feedback--neutral {
+  color: var(--c-text-medium);
+  background: var(--c-beige);
+  border-color: var(--c-border);
+}
+
+/* --- Text Links --------------------------------------- */
+.text-link {
+  color: var(--c-teal);
+  font-weight: var(--font-semibold);
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+}
+
+.text-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--c-teal);
+  transition: width 0.22s ease;
+}
+
+.text-link:hover { color: var(--c-teal-dark); }
+.text-link:hover::after { width: 100%; }
+
+/* --- Badges ------------------------------------------- */
+.brand-kicker,
+.section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  color: var(--c-text-medium);
+  background: var(--c-beige);
+  border: 1px solid var(--c-border);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+}
+
+.surface-pill,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.125rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;   /* 11px */
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.01em;
+}
+
+.badge--teal    { background: var(--c-teal-light); color: var(--c-teal-dark); }
+.badge--navy    { background: var(--c-navy-light); color: var(--c-navy); }
+.badge--green   { background: var(--c-success-bg); color: var(--c-success-text, #1a6b3e); }
+.badge--orange  { background: var(--c-warning-bg); color: var(--c-warning); }
+.badge--sand    { background: var(--c-sand); color: var(--c-text-medium); }
+
+/* --- Utility ------------------------------------------ */
+.muted-text   { color: var(--c-text-medium); }
+.display-font { font-family: var(--font-display); }
+
+/* --- Footer ------------------------------------------- */
+.footer-component {
+  width: min(100%, 1600px);
+  margin: 0 auto;
+  padding: 0 1.5rem 1.5rem;
+}
+
+.footer-component__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 1.25rem;
+  border-radius: var(--radius-lg);
+  color: var(--c-text-medium);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  font-size: var(--text-xs);
+}
+
+/* --- Auth Layout stubs -------------------------------- */
+.auth-layout,
+.auth-layout__body,
+.auth-layout__aside,
+.auth-layout__panel,
+.auth-layout__content,
+.auth-layout__actions {
+  /* scoped styles live in AuthLayout.vue */
+}
+
+/* --- Responsive --------------------------------------- */
+@media (min-width: 768px) {
+  .page-container { padding: 2rem; }
+  .form-grid--two-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .page-container { padding: 2rem 2rem 2.5rem; }
+}
+
+@media (min-width: 1536px) {
+  .page-container { padding-inline: 2.5rem; }
+  .page-stack, .page-grid { gap: 1.75rem; }
+}
+
+@media (max-width: 640px) {
+  .app-page__header,
+  .app-page__content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .page-toolbar {
+    padding: 0.75rem;
+    flex-wrap: wrap;
+  }
+}
+
+/* -------------------------------------------------------
+   ACCESSIBILITY MODES
+------------------------------------------------------- */
+
+/* High Contrast */
+:root.a11y-contrast {
+  --c-bg:            #ffffff;
+  --c-surface:       #ffffff;
+  --c-beige:         #f0f0f0;
+  --c-text:          #000000;
+  --c-text-medium:   #333333;
+  --c-text-light:    #555555;
+  --c-teal:          #0055aa;
+  --c-teal-dark:     #004499;
+  --c-teal-light:    rgba(0, 85, 170, 0.1);
+  --c-border:        #000000;
+  --c-sidebar-bg:    #ffffff;
+  --c-sidebar-active-bg: rgba(0, 85, 170, 0.12);
+  --c-sidebar-active-text: #004499;
+}
+
+/* Large Text */
+:root.a11y-large-text {
+  --font-size:  20px;
+  --text-xs:    0.9375rem;
+  --text-sm:    1.09375rem;
+  --text-base:  1.25rem;
+  --text-lg:    1.40625rem;
+  --text-xl:    1.5625rem;
+  --text-2xl:   1.875rem;
+  --text-3xl:   2.34375rem;
+}
+
+/* Reduced Motion */
+:root.a11y-reduced-motion *,
+:root.a11y-reduced-motion *::before,
+:root.a11y-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Dark Mode — principe Chrome : fonds sombres, textes clairs */
+:root.a11y-dark-mode {
+  /* Backgrounds */
+  --c-bg:            #111318;
+  --c-cream:         #111318;
+  --c-beige:         #1e2128;
+  --c-sand:          #252830;
+  --c-surface:       #1a1d24;
+  --c-border:        rgba(255, 255, 255, 0.1);
+
+  /* Text — clair sur fond sombre */
+  --c-text:          #e8eaed;
+  --c-text-medium:   #9aa0a6;
+  --c-text-light:    #5f6368;
+
+  /* Accent — teal plus lumineux */
+  --c-teal:          #5ec5d8;
+  --c-teal-light:    rgba(94, 197, 216, 0.15);
+  --c-teal-dark:     #8ddce8;
+  --c-teal-shadow:   rgba(94, 197, 216, 0.25);
+
+  /* Navy — devient clair sur fond sombre */
+  --c-navy:          #e8eaed;
+  --c-navy-light:    #2a3142;
+
+  /* Sidebar */
+  --c-sidebar-bg:          #0d0f14;
+  --c-sidebar-text:        #9aa0a6;
+  --c-sidebar-active-bg:   rgba(94, 197, 216, 0.15);
+  --c-sidebar-active-text: #5ec5d8;
+
+  /* Status */
+  --c-success:       #34d399;
+  --c-success-bg:    rgba(52, 211, 153, 0.12);
+  --c-warning:       #fbbf24;
+  --c-warning-bg:    rgba(251, 191, 36, 0.12);
+  --c-danger:        #f87171;
+  --c-danger-bg:     rgba(248, 113, 113, 0.12);
+  --c-danger-border: rgba(248, 113, 113, 0.2);
+
+  /* Shadows */
+  --shadow-xs:      0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-sm:      0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-md:      0 6px 20px rgba(0, 0, 0, 0.55);
+  --shadow-lg:      0 12px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl:      0 20px 48px rgba(0, 0, 0, 0.65);
+  --shadow-navy:    0 8px 28px rgba(0, 0, 0, 0.7);
+  --shadow-card:    0 2px 12px rgba(0, 0, 0, 0.5);
+
+  /* Aliases legacy */
+  --kompagnon-surface:     var(--c-surface);
+  --kompagnon-border:      var(--c-border);
+  --kompagnon-shadow:      var(--shadow-xl);
+  --kompagnon-shadow-soft: var(--shadow-md);
+  --kompagnon-cream:       var(--c-bg);
+  --kompagnon-cream-light: var(--c-surface);
+  --color-bg:              var(--c-bg);
+  --color-surface:         var(--c-surface);
+  --color-surface-alt:     var(--c-beige);
+  --color-text:            var(--c-text);
+  --color-text-muted:      var(--c-text-medium);
+  --color-text-subtle:     var(--c-text-light);
+  --color-border:          var(--c-border);
+}
+
+:root.a11y-dark-mode body {
+  background: #111318;
+}
+
+:root.a11y-dark-mode .app-layout {
+  background: #111318;
+}
+
+/* ── TopBar ── */
+:root.a11y-dark-mode .topbar {
+  background: rgba(26, 29, 36, 0.95) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Sidebar ── */
+:root.a11y-dark-mode .sidebar {
+  background: #0d0f14;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+:root.a11y-dark-mode .sidebar__item { color: #9aa0a6; }
+:root.a11y-dark-mode .sidebar__item:hover:not(.sidebar__item--active) {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8eaed;
+}
+:root.a11y-dark-mode .sidebar__brand-name { color: #e8eaed; }
+:root.a11y-dark-mode .sidebar__brand-tagline { color: #5f6368; }
+:root.a11y-dark-mode .sidebar__user { border-color: rgba(255, 255, 255, 0.06); }
+:root.a11y-dark-mode .sidebar__role-switcher {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+:root.a11y-dark-mode .sidebar__collapse-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #9aa0a6;
+}
+
+/* ── Tous les éléments avec background blanc hardcodé ── */
+:root.a11y-dark-mode .glass-panel,
+:root.a11y-dark-mode .home-hero.glass-panel {
+  background: rgba(30, 33, 40, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+:root.a11y-dark-mode .home-stat-card,
+:root.a11y-dark-mode .home-appt-card,
+:root.a11y-dark-mode .home-action-card,
+:root.a11y-dark-mode .home-activity-item,
+:root.a11y-dark-mode .vcard,
+:root.a11y-dark-mode .msg-card,
+:root.a11y-dark-mode .notif-item,
+:root.a11y-dark-mode .settings-section,
+:root.a11y-dark-mode .settings-card,
+:root.a11y-dark-mode .settings-user-card,
+:root.a11y-dark-mode .privacy-section,
+:root.a11y-dark-mode .privacy-card,
+:root.a11y-dark-mode .support-card,
+:root.a11y-dark-mode .notif-card,
+:root.a11y-dark-mode .faq-item,
+:root.a11y-dark-mode .profile-card,
+:root.a11y-dark-mode .base-card,
+:root.a11y-dark-mode .surface-card {
+  background: #1a1d24 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Auth (Login / Register) ── */
+:root.a11y-dark-mode .auth-shell__brand,
+:root.a11y-dark-mode .auth-hero__kicker,
+:root.a11y-dark-mode .auth-hero__pill,
+:root.a11y-dark-mode .auth-hero__card,
+:root.a11y-dark-mode .auth-hero__quote {
+  background: rgba(30, 33, 42, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+:root.a11y-dark-mode .auth-hero__quote strong { color: #e8eaed !important; }
+:root.a11y-dark-mode .auth-hero__quote p { color: #9aa0a6 !important; }
+:root.a11y-dark-mode .auth-panel__box {
+  background: rgba(26, 29, 36, 0.97) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+:root.a11y-dark-mode .login-view__control,
+:root.a11y-dark-mode .register-view__control {
+  background: rgba(26, 29, 36, 0.97) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+:root.a11y-dark-mode .login-view__label,
+:root.a11y-dark-mode .login-view__title,
+:root.a11y-dark-mode .login-view__sub,
+:root.a11y-dark-mode .register-view__label,
+:root.a11y-dark-mode .register-view__title {
+  color: #e8eaed !important;
+}
+
+/* ── Support ── */
+:root.a11y-dark-mode .support-topbar {
+  background: rgba(26, 29, 36, 0.97) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+:root.a11y-dark-mode .support-search {
+  background: rgba(30, 33, 42, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+:root.a11y-dark-mode .support-search-input {
+  background: transparent !important;
+  color: #e8eaed !important;
+}
+
+/* ── Notifications ── */
+:root.a11y-dark-mode .notif-filter-btn {
+  background: rgba(30, 33, 42, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #9aa0a6 !important;
+}
+:root.a11y-dark-mode .notif-filter-btn--active {
+  background: rgba(94, 197, 216, 0.15) !important;
+  color: #5ec5d8 !important;
+  border-color: rgba(94, 197, 216, 0.3) !important;
+}
+:root.a11y-dark-mode .notif-item__del {
+  background: rgba(30, 33, 42, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #9aa0a6 !important;
+}
+
+/* ── Settings ── */
+:root.a11y-dark-mode .settings-danger__btn {
+  background: rgba(30, 33, 42, 0.9) !important;
+  border-color: rgba(248, 113, 113, 0.3) !important;
+  color: #f87171 !important;
+}
+
+/* ── Privacy ── */
+:root.a11y-dark-mode .privacy-score-bar {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+:root.a11y-dark-mode .privacy-dropdown__btn {
+  background: rgba(30, 33, 42, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #e8eaed !important;
+}
+:root.a11y-dark-mode .privacy-dropdown__btn:hover {
+  background: rgba(40, 44, 55, 0.95) !important;
+}
+:root.a11y-dark-mode .privacy-dropdown__menu,
+:root.a11y-dark-mode .privacy-dropdown__item {
+  background: #1a1d24 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e8eaed !important;
+}
+:root.a11y-dark-mode .privacy-dropdown__item:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ── Home ── */
+:root.a11y-dark-mode .home-hero__cta {
+  background: rgba(94, 197, 216, 0.15) !important;
+  color: #5ec5d8 !important;
+}
+
+/* ── Inputs (tous) ── */
+:root.a11y-dark-mode .base-input,
+:root.a11y-dark-mode .base-textarea,
+:root.a11y-dark-mode .password-component__input,
+:root.a11y-dark-mode .map-search {
+  background: #1a1d24 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #e8eaed !important;
+}
+
+/* ── Recherche map  ── */
+:root.a11y-dark-mode .map-topbar {
+  background: rgba(26, 29, 36, 0.97) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Bottom Nav ── */
+:root.a11y-dark-mode .bottom-nav,
+:root.a11y-dark-mode .app-bottom-nav {
+  background: rgba(17, 19, 24, 0.98) !important;
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+:root.a11y-screen-reader .a11y-screen-reader-only,
+:root.a11y-screen-reader .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* -------------------------------------------------------
    Source of truth for all brand tokens, global resets,
    utility classes, and component primitives.
 
    Philosophy: warm, human, calm, inclusive, premium.
    Not a SaaS dashboard. A reassuring digital companion
    for solidarity & mobility.
-═══════════════════════════════════════════════════════ */
+------------------------------------------------------- */
 
-/* ─── 1. Design Tokens ───────────────────────────────── */
+/* --- 1. Design Tokens --------------------------------- */
 :root {
-  /* Brand Raw Palette — source of truth from logo/banner */
+  /* Brand Raw Palette - source of truth from logo/banner */
   --brand-navy:           #1e2c38;
   --brand-navy-mid:       #2a3d4e;
   --brand-navy-deep:      #16212b;
@@ -54,7 +1240,7 @@
   --color-danger-bg:      rgba(212, 58, 58, 0.09);
   --color-danger-border:  rgba(212, 58, 58, 0.22);
 
-  /* Shadow Scale — tinted with brand navy */
+  /* Shadow Scale - tinted with brand navy */
   --shadow-xs:      0 1px 3px rgba(30, 44, 56, 0.05);
   --shadow-sm:      0 2px 8px rgba(30, 44, 56, 0.06);
   --shadow-md:      0 6px 20px rgba(30, 44, 56, 0.08);
@@ -88,7 +1274,7 @@
   --font-bold:      700;
   --font-extrabold: 800;
 
-  /* Legacy aliases — kept for backwards compatibility */
+  /* Legacy aliases - kept for backwards compatibility */
   --kompagnon-navy:            var(--brand-navy);
   --kompagnon-navy-light:      var(--brand-navy-mid);
   --kompagnon-navy-dark:       var(--brand-navy-deep);
@@ -117,7 +1303,7 @@
   color: var(--color-text);
 }
 
-/* ─── Large Screen Scale ─────────────────────────────── */
+/* --- Large Screen Scale ------------------------------- */
 @media (min-width: 1920px) {
   :root {
     --font-size: 17px;
@@ -128,7 +1314,7 @@
   }
 }
 
-/* ─── Keyframes ──────────────────────────────────────── */
+/* --- Keyframes ---------------------------------------- */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0);    }
@@ -179,7 +1365,7 @@
   75%       { transform: rotate(1deg);  }
 }
 
-/* ─── Base Reset ─────────────────────────────────────── */
+/* --- Base Reset --------------------------------------- */
 *,
 *::before,
 *::after {
@@ -204,10 +1390,12 @@ body,
 body,
 #app {
   height: 100%;
+  min-height: 100%;
 }
 
 body {
   color: var(--color-text);
+  overflow-x: hidden;
   background-color: var(--color-bg);
   background-image:
     radial-gradient(ellipse at 80% -10%, rgba(158, 212, 217, 0.25) 0%, transparent 45%),
@@ -236,7 +1424,7 @@ h1, h2, h3, h4, h5, h6, p {
   margin: 0;
 }
 
-/* ─── Typography ─────────────────────────────────────── */
+/* --- Typography --------------------------------------- */
 h1 {
   font-size: clamp(1.5rem, 4vw, var(--text-3xl));
   line-height: 1.1;
@@ -265,8 +1453,8 @@ span {
   line-height: 1.5;
 }
 
-/* ─── Interactive Transitions ────────────────────────── */
-/* Scoped to interactive elements only — NOT `*` (avoids layout-paint jank) */
+/* --- Interactive Transitions -------------------------- */
+/* Scoped to interactive elements only - NOT `*` (avoids layout-paint jank) */
 a,
 button,
 input,
@@ -283,7 +1471,7 @@ textarea,
     transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ─── WCAG Touch Target ──────────────────────────────── */
+/* --- WCAG Touch Target -------------------------------- */
 button,
 [role="button"],
 a,
@@ -304,14 +1492,14 @@ a,
   }
 }
 
-/* ─── Focus Ring ─────────────────────────────────────── */
+/* --- Focus Ring --------------------------------------- */
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
 }
 
-/* ─── App Shell ──────────────────────────────────────── */
+/* --- App Shell ---------------------------------------- */
 .app-shell {
   height: 100%;
   display: flex;
@@ -324,7 +1512,7 @@ a,
   width: 100%;
 }
 
-/* ─── Page Layout ────────────────────────────────────── */
+/* --- Page Layout -------------------------------------- */
 .page-container {
   width: min(100%, 1600px);
   margin: 0 auto;
@@ -342,7 +1530,7 @@ a,
   gap: 1.5rem;
 }
 
-/* ─── Card Primitives ────────────────────────────────── */
+/* --- Card Primitives ---------------------------------- */
 .surface-card,
 .base-card {
   background: var(--color-surface);
@@ -380,7 +1568,7 @@ a,
   color: var(--color-text-muted);
 }
 
-/* ─── Button System ──────────────────────────────────── */
+/* --- Button System ------------------------------------ */
 .base-button {
   display: inline-flex;
   align-items: center;
@@ -458,7 +1646,7 @@ a,
   box-shadow: none !important;
 }
 
-/* ─── Form Controls ──────────────────────────────────── */
+/* --- Form Controls ------------------------------------ */
 .base-label {
   display: block;
   margin-bottom: 0.375rem;
@@ -547,7 +1735,7 @@ a,
   gap: 1.125rem;
 }
 
-/* ─── Feedback / Alerts ──────────────────────────────── */
+/* --- Feedback / Alerts -------------------------------- */
 .feedback {
   padding: 0.875rem 1rem;
   border-radius: var(--radius-md);
@@ -577,7 +1765,7 @@ a,
   border-color: var(--color-border);
 }
 
-/* ─── Text Links ─────────────────────────────────────── */
+/* --- Text Links --------------------------------------- */
 .text-link {
   color: var(--color-primary);
   font-weight: var(--font-semibold);
@@ -605,7 +1793,7 @@ a,
   width: 100%;
 }
 
-/* ─── Badges / Chips ─────────────────────────────────── */
+/* --- Badges / Chips ----------------------------------- */
 .brand-kicker,
 .section-kicker {
   display: inline-flex;
@@ -644,12 +1832,12 @@ a,
   box-shadow: var(--shadow-sm);
 }
 
-/* ─── Utility ────────────────────────────────────────── */
+/* --- Utility ------------------------------------------ */
 .muted-text {
   color: var(--color-text-muted);
 }
 
-/* ─── Footer ─────────────────────────────────────────── */
+/* --- Footer ------------------------------------------- */
 .footer-component {
   width: min(100%, 1600px);
   margin: 0 auto;
@@ -670,7 +1858,7 @@ a,
   animation: slideInUp 0.5s ease-out both;
 }
 
-/* ─── Auth Layout stubs ──────────────────────────────── */
+/* --- Auth Layout stubs -------------------------------- */
 .auth-layout,
 .auth-layout__body,
 .auth-layout__aside,
@@ -686,7 +1874,7 @@ a,
   /* scoped styles live in AuthLayout.vue */
 }
 
-/* ─── Hero Layout ────────────────────────────────────── */
+/* --- Hero Layout -------------------------------------- */
 .hero-layout {
   display: grid;
   gap: 1.5rem;
@@ -723,7 +1911,7 @@ a,
   color: white;
 }
 
-/* ─── Action / Stat Cards ────────────────────────────── */
+/* --- Action / Stat Cards ------------------------------ */
 .action-grid,
 .stats-grid,
 .highlight-grid {
@@ -779,7 +1967,7 @@ a,
   gap: 0.75rem;
 }
 
-/* ─── Responsive ─────────────────────────────────────── */
+/* --- Responsive --------------------------------------- */
 @media (min-width: 768px) {
   .page-container {
     padding: 2rem;
@@ -836,9 +2024,49 @@ a,
   }
 }
 
-/* ═══════════════════════════════════════════════════════
+@media (min-width: 1024px) and (max-height: 900px) {
+  .page-container {
+    padding: 1.15rem 1.25rem 1.5rem;
+  }
+
+  .page-stack,
+  .page-grid,
+  .action-grid,
+  .stats-grid,
+  .highlight-grid,
+  .form-grid {
+    gap: 1rem;
+  }
+
+  .app-page__header {
+    padding: 1rem 1.25rem 0.55rem;
+  }
+
+  .app-page__title {
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  }
+
+  .app-page__subtitle {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .app-page__content {
+    padding: 0 1.25rem 1.25rem;
+  }
+
+  .page-toolbar {
+    padding: 0.75rem 1rem;
+  }
+
+  .base-card {
+    padding: 1.15rem 1.25rem;
+  }
+}
+
+/* -------------------------------------------------------
    ACCESSIBILITY MODES
-═══════════════════════════════════════════════════════ */
+------------------------------------------------------- */
 
 /* High Contrast */
 :root.a11y-contrast {
@@ -883,75 +2111,37 @@ a,
 
 /* Dark Mode */
 :root.a11y-dark-mode {
-  --color-bg:              #0f172a;
-  --color-surface:         #1e293b;
-  --color-surface-alt:     #162032;
-  --color-surface-navy:    #0f172a;
-  --color-text:            #e2e8f0;
-  --color-text-muted:      #94a3b8;
-  --color-text-subtle:     #64748b;
-  --color-border:          rgba(255, 255, 255, 0.08);
+  --color-bg:              #111318;
+  --color-surface:         #1a1d24;
+  --color-surface-alt:     #1e2128;
+  --color-surface-navy:    #111318;
+  --color-text:            #e8eaed;
+  --color-text-muted:      #9aa0a6;
+  --color-text-subtle:     #5f6368;
+  --color-border:          rgba(255, 255, 255, 0.1);
   --color-border-subtle:   rgba(255, 255, 255, 0.04);
-  --shadow-xs:    0 1px 3px   rgba(0, 0, 0, 0.22);
-  --shadow-sm:    0 2px 8px   rgba(0, 0, 0, 0.28);
-  --shadow-md:    0 6px 20px  rgba(0, 0, 0, 0.32);
-  --shadow-lg:    0 12px 32px rgba(0, 0, 0, 0.36);
-  --shadow-xl:    0 20px 48px rgba(0, 0, 0, 0.40);
-  --shadow-navy:  0 8px 28px  rgba(0, 0, 0, 0.50);
+  --shadow-xs:    0 1px 3px   rgba(0, 0, 0, 0.4);
+  --shadow-sm:    0 2px 8px   rgba(0, 0, 0, 0.5);
+  --shadow-md:    0 6px 20px  rgba(0, 0, 0, 0.55);
+  --shadow-lg:    0 12px 32px rgba(0, 0, 0, 0.60);
+  --shadow-xl:    0 20px 48px rgba(0, 0, 0, 0.65);
+  --shadow-navy:  0 8px 28px  rgba(0, 0, 0, 0.70);
   --kompagnon-surface:     var(--color-surface);
   --kompagnon-border:      var(--color-border);
   --kompagnon-shadow:      var(--shadow-xl);
   --kompagnon-shadow-soft: var(--shadow-md);
   --kompagnon-cream:       var(--color-bg);
   --kompagnon-cream-light: var(--color-surface);
+  --kompagnon-navy:        #e8eaed;
 }
 
 :root.a11y-dark-mode body {
-  background: #0f172a;
-  background-image:
-    radial-gradient(ellipse at top right, rgba(72, 175, 196, 0.08) 0%, transparent 40%),
-    linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: #111318;
+  background-image: none;
+  color: #e8eaed;
 }
 
-:root.a11y-dark-mode .app-layout {
-  background: #0f172a;
-}
-
-:root.a11y-dark-mode .sidebar {
-  background: linear-gradient(175deg, #1a2535 0%, #1e2d3d 100%);
-  border-color: rgba(255, 255, 255, 0.06);
-}
-
-:root.a11y-dark-mode .sidebar__item { color: #94a3b8; }
-:root.a11y-dark-mode .sidebar__item:hover:not(.sidebar__item--active) {
-  background: rgba(255, 255, 255, 0.06);
-  color: #e2e8f0;
-}
-:root.a11y-dark-mode .sidebar__section-label { color: #475569; }
-:root.a11y-dark-mode .sidebar__brand-tagline { color: #475569; }
-:root.a11y-dark-mode .sidebar__brand-name { color: #e2e8f0; }
-:root.a11y-dark-mode .sidebar__user { border-color: rgba(255, 255, 255, 0.06); }
-
-/* Dark mode card/panel overrides */
-:root.a11y-dark-mode .home-card,
-:root.a11y-dark-mode .vcard,
-:root.a11y-dark-mode .msg-card,
-:root.a11y-dark-mode .notif-item,
-:root.a11y-dark-mode .settings-section,
-:root.a11y-dark-mode .settings-user-card,
-:root.a11y-dark-mode .privacy-section,
-:root.a11y-dark-mode .faq-item {
-  background: #1e293b;
-  border-color: rgba(255, 255, 255, 0.06);
-}
-
-:root.a11y-dark-mode .base-input,
-:root.a11y-dark-mode .base-textarea,
-:root.a11y-dark-mode .password-component__input {
-  background: #0f172a;
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #e2e8f0;
-}
+:root.a11y-dark-mode .app-layout { background: #111318; }
 
 /* Screen Reader Mode */
 :root.a11y-screen-reader .a11y-screen-reader-only,

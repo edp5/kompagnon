@@ -1,19 +1,17 @@
 <script setup>
-import { ChevronRight, Mail, MessageCircle, Phone, PhoneCall } from "lucide-vue-next";
-
 const contacts = [
-  { icon: MessageCircle, label: "Chat en direct", detail: "Réponse immédiate", time: "< 2 min", bg: "linear-gradient(160deg, #101820 0%, #16212d 55%, #1d3140 100%)" },
-  { icon: Phone, label: "Téléphone", detail: "0800 123 456", time: "< 5 min", bg: "linear-gradient(135deg, #16a34a, #22c55e)" },
-  { icon: Mail, label: "Email", detail: "support@kompagnon.fr", time: "< 2h", bg: "linear-gradient(135deg, #2a5f70, #48afc4)" },
+  { icon: "connect", label: "Chat en direct", detail: "Réponse immédiate", time: "< 2 min", bg: "linear-gradient(160deg, #101820 0%, #16212d 55%, #1d3140 100%)" },
+  { icon: "phone", label: "Téléphone", detail: "0800 123 456", time: "< 5 min", bg: "linear-gradient(135deg, #16a34a, #22c55e)" },
+  { icon: "mail", label: "Email", detail: "support@kompagnon.fr", time: "< 2h", bg: "linear-gradient(135deg, #2a5f70, #48afc4)" },
 ];
 
 const categories = [
-  { emoji: "👤", label: "Mon compte", desc: "Gestion du profil, paramètres, mot de passe", count: 12 },
-  { emoji: "📅", label: "Réservations", desc: "Demande, annulation, modification", count: 8 },
-  { emoji: "🛡️", label: "Sécurité", desc: "Vérifications, signalements, urgences", count: 6 },
-  { emoji: "💳", label: "Paiements", desc: "Frais, remboursements, facturation", count: 4 },
-  { emoji: "♿", label: "Accessibilité", desc: "Besoins spécifiques, équipements", count: 10 },
-  { emoji: "❤️", label: "Volontaires", desc: "Devenir volontaire, formation, évaluation", count: 15 },
+  { icon: "user", label: "Mon compte", desc: "Gestion du profil, paramètres, mot de passe", count: 12 },
+  { icon: "notifications", label: "Réservations", desc: "Demande, annulation, modification", count: 8 },
+  { icon: "shield", label: "Sécurité", desc: "Vérifications, signalements, urgences", count: 6 },
+  { icon: "privacy", label: "Paiements", desc: "Frais, remboursements, facturation", count: 4 },
+  { icon: "accessibility", label: "Accessibilité", desc: "Besoins spécifiques, équipements", count: 10 },
+  { icon: "heart", label: "Volontaires", desc: "Devenir volontaire, formation, évaluation", count: 15 },
 ];
 
 const faq = [
@@ -32,10 +30,10 @@ const resources = [
 </script>
 
 <template>
-  <div class="support-view">
+  <div class="support-view app-page">
     <!-- Topbar -->
-    <div class="support-topbar">
-      <div class="support-search">
+    <div class="support-topbar page-toolbar">
+      <div class="support-search page-toolbar__search">
         <span>🔍</span>
         <input
           type="text"
@@ -44,20 +42,20 @@ const resources = [
           aria-label="Rechercher dans le centre d'aide"
         >
       </div>
-      <div class="support-topbar__status">
+      <div class="support-topbar__status page-toolbar__pill">
         <span class="support-dot" />
         En ligne
       </div>
     </div>
 
-    <div class="support-content">
+    <div class="support-content app-page__content app-page__content--stack">
       <!-- Header -->
-      <header class="support-page-header">
-        <span class="support-page-header__eyebrow">Centre d'aide</span>
-        <h1 class="support-page-header__title">
+      <header class="support-page-header app-page__header-main">
+        <span class="support-page-header__eyebrow app-page__eyebrow">Centre d'aide</span>
+        <h1 class="support-page-header__title app-page__title">
           Comment pouvons-nous vous aider ?
         </h1>
-        <p class="support-page-header__sub">
+        <p class="support-page-header__sub app-page__subtitle">
           Notre équipe est disponible 24h/24, 7j/7 pour vous accompagner
         </p>
       </header>
@@ -109,7 +107,7 @@ const resources = [
           <button
             v-for="cat in categories"
             :key="cat.label"
-            class="cat-card support-card"
+            class="cat-card support-card glass-panel"
             :aria-label="`Catégorie: ${cat.label} - ${cat.count} articles disponibles. ${cat.desc}`"
             :title="`Cliquez pour voir les articles sur: ${cat.label}`"
           >
@@ -138,7 +136,7 @@ const resources = [
           <article
             v-for="item in faq"
             :key="item.q"
-            class="faq-item support-card"
+            class="faq-item support-card glass-panel"
           >
             <div class="faq-item__icon">
               💬
@@ -163,7 +161,7 @@ const resources = [
             Ressources utiles
           </h2>
         </div>
-        <div class="support-resources support-card">
+        <div class="support-resources support-card glass-panel">
           <button
             v-for="r in resources"
             :key="r.label"
@@ -175,10 +173,10 @@ const resources = [
               class="resource-row__icon"
               aria-hidden="true"
             >{{ r.emoji }}</span>
-            <div class="resource-row__info">
+            <span class="resource-row__info">
               <strong>{{ r.label }}</strong>
               <span>{{ r.desc }}</span>
-            </div>
+            </span>
             <ChevronRight
               :size="17"
               :stroke-width="1.75"
@@ -190,7 +188,7 @@ const resources = [
       </section>
 
       <!-- Emergency -->
-      <div class="support-emergency support-card support-card--dark">
+      <div class="support-emergency support-card support-card--dark glass-panel">
         <div
           class="support-emergency__icon"
           aria-hidden="true"
@@ -235,7 +233,7 @@ const resources = [
   background: transparent;
 }
 
-/* ── Topbar ── */
+/* -- Topbar -- */
 .support-topbar {
   display: flex;
   align-items: center;
@@ -304,16 +302,18 @@ const resources = [
   flex-shrink: 0;
 }
 
-/* ── Content ── */
+/* -- Content -- */
 .support-content {
   padding: 1.25rem 1.5rem 1.5rem;
+  width: min(100%, 1320px);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  max-width: 1100px;
+  max-width: none;
 }
 
-/* ── Page header ── */
+/* -- Page header -- */
 .support-page-header {
   display: flex;
   flex-direction: column;
@@ -350,7 +350,7 @@ const resources = [
   margin: 0;
 }
 
-/* ── Section ── */
+/* -- Section -- */
 .support-section {
   display: flex;
   flex-direction: column;
@@ -384,7 +384,7 @@ const resources = [
   letter-spacing: -0.025em;
 }
 
-/* ── Base card ── */
+/* -- Base card -- */
 .support-card {
   border-radius: 1.5rem;
   border: 1px solid rgba(15, 23, 42, 0.06);
@@ -401,7 +401,7 @@ const resources = [
   box-shadow: 0 18px 44px rgba(15, 23, 42, 0.18);
 }
 
-/* ── Contact cards ── */
+/* -- Contact cards -- */
 .support-contacts {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -453,11 +453,21 @@ const resources = [
   border-radius: 999px;
 }
 
-/* ── Categories ── */
+/* -- Categories -- */
 .support-categories {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 0.875rem;
+}
+
+@media (min-width: 1180px) {
+  .support-contacts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .support-categories {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .cat-card {
@@ -506,7 +516,7 @@ const resources = [
   margin-top: 0.25rem;
 }
 
-/* ── FAQ ── */
+/* -- FAQ -- */
 .support-faq {
   display: flex;
   flex-direction: column;
@@ -554,7 +564,7 @@ const resources = [
   line-height: 1.55;
 }
 
-/* ── Resources ── */
+/* -- Resources -- */
 .support-resources {
   overflow: hidden;
 }
@@ -613,7 +623,7 @@ const resources = [
   color: #6b7280;
 }
 
-/* ── Emergency ── */
+/* -- Emergency -- */
 .support-emergency {
   display: flex;
   align-items: center;
@@ -696,9 +706,18 @@ const resources = [
   box-shadow: 0 10px 24px rgba(239, 68, 68, 0.44);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1024px) and (min-width: 769px) {
   .support-contacts { grid-template-columns: 1fr 1fr 1fr; }
   .support-categories { grid-template-columns: repeat(2, 1fr); }
+  .support-topbar { padding: 1rem 1.25rem; }
+  .support-content { padding: 1.25rem 1.25rem 1.75rem; }
+}
+
+@media (max-width: 768px) {
+  .support-contacts { grid-template-columns: 1fr 1fr; }
+  .support-categories { grid-template-columns: repeat(2, 1fr); }
+  .support-topbar { padding: 0.875rem 1.125rem; }
+  .support-content { padding: 1.125rem 1.125rem 1.5rem; }
 }
 
 @media (max-width: 640px) {

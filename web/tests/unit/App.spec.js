@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { createMemoryHistory, createRouter } from "vue-router";
 
@@ -41,25 +41,38 @@ async function mountApp() {
 }
 
 describe("Unit | App", () => {
+  it("should display a loader while the api check is pending", async () => {
+    // given
+    apiCheck.mockImplementation(() => new Promise(() => {}));
+
+    // when
+    const wrapper = await mountApp();
+
+    // then
+    expect(wrapper.text()).toContain("Chargement de Kompagnon");
+  });
+
   it("should display app if api is ok", async () => {
     // given
     apiCheck.mockResolvedValue(true);
 
     // when
     const wrapper = await mountApp();
+    await flushPromises();
 
     // then
     expect(wrapper.text()).not.toBe("");
   });
 
-  it("should not display app if api is not ok", async () => {
+  it("should display an unavailable state if api is not ok", async () => {
     // given
     apiCheck.mockResolvedValue(false);
 
     // when
     const wrapper = await mountApp();
+    await flushPromises();
 
     // then
-    expect(wrapper.text()).toBe("");
+    expect(wrapper.text()).toContain("Impossible de joindre Kompagnon pour le moment");
   });
 });

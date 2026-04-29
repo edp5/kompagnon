@@ -1,19 +1,9 @@
 <script setup>
-import {
-  CalendarDays,
-  Camera,
-  CheckCircle,
-  Clock3,
-  Edit,
-  Mail,
-  Shield,
-  Star,
-  User,
-} from "lucide-vue-next";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { getUserProfile } from "@/adapters/users.js";
+import KIcon from "@/components/KIcon.vue";
 import { USER_GENRE, USER_ROLES } from "@/constants.js";
 import { useAuthStore } from "@/stores/auth.js";
 
@@ -47,35 +37,43 @@ onMounted(async () => {
 });
 
 const displayName = computed(() => {
-  const firstname = profile.value?.firstname ?? "Marie";
-  const lastname = profile.value?.lastname ?? "Dupont";
+  const firstname = profile.value?.firstname;
+  const lastname = profile.value?.lastname;
+
+  if (!firstname || !lastname) {
+    return "-";
+  }
 
   return `${firstname} ${lastname}`.trim();
 });
 
 const initials = computed(() => {
-  const firstname = profile.value?.firstname?.[0] ?? "M";
-  const lastname = profile.value?.lastname?.[0] ?? "D";
+  const firstname = profile.value?.firstname?.[0];
+  const lastname = profile.value?.lastname?.[0];
+
+  if (!firstname || !lastname) {
+    return "-";
+  }
 
   return `${firstname}${lastname}`.toUpperCase();
 });
 
-const displayGenre = computed(() => USER_GENRE[profile.value?.genre] ?? "—");
-const displayRole = computed(() => USER_ROLES[profile.value?.role] ?? "—");
+const displayGenre = computed(() => USER_GENRE[profile.value?.genre] ?? "-");
+const displayRole = computed(() => USER_ROLES[profile.value?.role] ?? "-");
 
 const stats = computed(() => [
   { value: displayGenre.value, label: "Civilité", accent: "var(--kompagnon-turquoise)" },
   { value: displayRole.value, label: "Rôle", accent: "var(--kompagnon-navy)" },
-  { value: profile.value?.birthday ?? "—", label: "Naissance", accent: "#f59e0b" },
-  { value: profile.value?.email ? "Actif" : "—", label: "Compte", accent: "var(--kompagnon-turquoise)" },
+  { value: profile.value?.birthday ?? "-", label: "Naissance", accent: "#f59e0b" },
+  { value: profile.value?.email ? "Actif" : "-", label: "Compte", accent: "var(--kompagnon-turquoise)" },
 ]);
 
 const detailItems = computed(() => [
   { label: "Civilité", value: displayGenre.value },
-  { label: "Prénom", value: profile.value?.firstname ?? "—" },
-  { label: "Nom", value: profile.value?.lastname ?? "—" },
-  { label: "Email", value: profile.value?.email ?? "—" },
-  { label: "Date de naissance", value: profile.value?.birthday ?? "—" },
+  { label: "Prénom", value: profile.value?.firstname ?? "-" },
+  { label: "Nom", value: profile.value?.lastname ?? "-" },
+  { label: "Email", value: profile.value?.email ?? "-" },
+  { label: "Date de naissance", value: profile.value?.birthday ?? "-" },
   { label: "Vous êtes", value: displayRole.value },
 ]);
 
@@ -96,31 +94,20 @@ const highlights = computed(() => [
   },
 ]);
 
-const reviews = [
-  {
-    author: "par Sylvie M.",
-    time: "Il y a 2 jours",
-    text: "Très bienveillante et patiente, l’accompagnement a été fluide et rassurant.",
-  },
-  {
-    author: "par Robert D.",
-    time: "Il y a 1 semaine",
-    text: "Un profil clair, une communication simple et une expérience très agréable.",
-  },
-];
+const reviews = [];
 </script>
 
 <template>
-  <div class="profile-view">
-    <header class="profile-header">
-      <div>
-        <p class="profile-header__eyebrow">
+  <div class="profile-view app-page">
+    <header class="profile-header app-page__header">
+      <div class="app-page__header-main">
+        <p class="profile-header__eyebrow app-page__eyebrow">
           Espace personnel
         </p>
-        <h1 class="profile-header__title">
+        <h1 class="profile-header__title app-page__title">
           Mon profil
         </h1>
-        <p class="profile-header__subtitle">
+        <p class="profile-header__subtitle app-page__subtitle">
           Retrouvez vos informations essentielles dans une vue claire, sécurisée et cohérente avec le reste de l’application.
         </p>
       </div>
@@ -144,9 +131,9 @@ const reviews = [
 
     <div
       v-else-if="profile"
-      class="profile-content"
+      class="profile-content app-page__content app-page__content--stack"
     >
-      <section class="profile-banner">
+      <section class="profile-banner glass-panel">
         <div
           class="profile-banner__orb"
           aria-hidden="true"
@@ -156,11 +143,10 @@ const reviews = [
           class="profile-banner__edit"
           type="button"
           aria-label="Modifier votre profil"
-          title="Fonctionnalité bientôt disponible"
         >
-          <Edit
+          <KIcon
+            name="settings"
             :size="15"
-            :stroke-width="1.75"
             aria-hidden="true"
           />
           Modifier
@@ -175,11 +161,10 @@ const reviews = [
               class="profile-avatar__camera"
               type="button"
               aria-label="Changer votre photo de profil"
-              title="Fonctionnalité bientôt disponible"
             >
-              <Camera
+              <KIcon
+                name="plus"
                 :size="12"
-                :stroke-width="2"
                 aria-hidden="true"
               />
             </button>
@@ -191,9 +176,9 @@ const reviews = [
                 {{ displayName }}
               </h2>
               <span class="profile-banner__verified">
-                <CheckCircle
+                <KIcon
+                  name="check"
                   :size="13"
-                  :stroke-width="2"
                   aria-hidden="true"
                 />
                 Vérifié
@@ -202,17 +187,17 @@ const reviews = [
 
             <div class="profile-banner__meta">
               <span class="profile-banner__meta-item">
-                <Mail
+                <KIcon
+                  name="mail"
                   :size="14"
-                  :stroke-width="1.75"
                   aria-hidden="true"
                 />
                 {{ profile.email }}
               </span>
               <span class="profile-banner__meta-item">
-                <CalendarDays
+                <KIcon
+                  name="star"
                   :size="14"
-                  :stroke-width="1.75"
                   aria-hidden="true"
                 />
                 {{ profile.birthday }}
@@ -221,25 +206,25 @@ const reviews = [
 
             <div class="profile-banner__badges">
               <span class="profile-badge">
-                <User
+                <KIcon
+                  name="user"
                   :size="11"
-                  :stroke-width="1.75"
                   aria-hidden="true"
                 />
                 {{ displayGenre }}
               </span>
               <span class="profile-badge">
-                <Shield
+                <KIcon
+                  name="shield"
                   :size="11"
-                  :stroke-width="1.75"
                   aria-hidden="true"
                 />
                 {{ displayRole }}
               </span>
               <span class="profile-badge">
-                <Clock3
+                <KIcon
+                  name="lock"
                   :size="11"
-                  :stroke-width="1.75"
                   aria-hidden="true"
                 />
                 Session sécurisée
@@ -253,7 +238,7 @@ const reviews = [
         <article
           v-for="stat in stats"
           :key="stat.label"
-          class="profile-stat profile-card"
+          class="profile-stat profile-card glass-panel"
         >
           <span
             class="profile-stat__value"
@@ -264,7 +249,7 @@ const reviews = [
       </section>
 
       <div class="profile-grid">
-        <section class="profile-card profile-details-card">
+        <section class="profile-card profile-details-card glass-panel">
           <div class="profile-section__head">
             <div>
               <p class="profile-section__eyebrow">
@@ -288,7 +273,7 @@ const reviews = [
           </dl>
         </section>
 
-        <section class="profile-card profile-highlights-card">
+        <section class="profile-card profile-highlights-card glass-panel">
           <div class="profile-section__head">
             <div>
               <p class="profile-section__eyebrow">
@@ -307,9 +292,9 @@ const reviews = [
               class="profile-highlight"
             >
               <span class="profile-highlight__icon">
-                <CheckCircle
+                <KIcon
+                  name="check"
                   :size="16"
-                  :stroke-width="1.9"
                   aria-hidden="true"
                 />
               </span>
@@ -325,7 +310,7 @@ const reviews = [
           </div>
         </section>
 
-        <section class="profile-card profile-card--dark profile-reviews-card">
+        <section class="profile-card profile-card--dark profile-reviews-card glass-panel">
           <div class="profile-section__head profile-section__head--light">
             <div>
               <p class="profile-section__eyebrow profile-section__eyebrow--light">
@@ -345,11 +330,11 @@ const reviews = [
             >
               <div class="profile-review__top">
                 <div class="profile-review__stars">
-                  <Star
+                  <KIcon
                     v-for="star in 5"
                     :key="star"
+                    name="star"
                     :size="12"
-                    :stroke-width="1.75"
                     class="profile-review__star"
                     aria-hidden="true"
                   />
@@ -437,6 +422,8 @@ const reviews = [
 
 .profile-content {
   padding: 0 1.5rem 1.5rem;
+  width: min(100%, 1320px);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -631,7 +618,25 @@ const reviews = [
   gap: 0.25rem;
   align-items: center;
   text-align: center;
+  min-height: 8.75rem;
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+}
+
+@media (min-width: 1180px) {
+  .profile-content {
+    gap: 1.2rem;
+  }
+
+  .profile-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+    gap: 1.2rem;
+  }
+
+  .profile-details-card,
+  .profile-highlights-card,
+  .profile-reviews-card {
+    padding: 1.4rem;
+  }
 }
 
 .profile-stat:hover {
@@ -824,13 +829,35 @@ const reviews = [
   color: rgba(255, 255, 255, 0.72);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1024px) and (min-width: 769px) {
   .profile-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .profile-grid {
     grid-template-columns: 1fr;
+  }
+
+  .profile-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+
+  .profile-content {
+    padding: 0 1.25rem 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profile-header {
+    padding: 1.125rem 1.125rem 0.625rem;
+  }
+
+  .profile-content {
+    padding: 0 1.125rem 1.125rem;
   }
 }
 

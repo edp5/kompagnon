@@ -1,726 +1,747 @@
 <script setup>
-import { CheckCircle, MapPin, MessageCircle, Phone, Plus, Shield, Zap } from "lucide-vue-next";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-const messages = [
-  {
-    initials: "MD",
-    name: "Marie D.",
-    time: "14:32",
-    badge: 2,
-    text: "Je vous accompagne à la pharmacie dans 5 minutes !",
-    status: "En route",
-    statusClass: "msg__status--green",
-    online: true,
-  },
-  {
-    initials: "TR",
-    name: "Thomas R.",
-    time: "12:15",
-    text: "Parfait ! À bientôt alors",
-    status: "Terminé",
-    statusClass: "msg__status--gray",
-    online: false,
-  },
-  {
-    initials: "SM",
-    name: "Sophie M.",
-    time: "Hier",
-    text: "Merci pour votre aide hier !",
-    status: "Terminé",
-    statusClass: "msg__status--gray",
-    online: false,
-  },
-];
+import KIcon from "@/components/KIcon.vue";
+
+const router = useRouter();
+const tab = ref("messages");
+
+const statusColor = {
+  online: "#2ecc71",
+  away: "#f0a500",
+  offline: "var(--c-border)",
+};
+
+const messages = [];
+
+const volunteers = [];
+
+const onlineVolunteers = volunteers.filter((v) => v.status === "online");
 </script>
 
 <template>
   <div class="connect-view">
     <header class="connect-header">
-      <div class="connect-header__left">
-        <span class="connect-header__eyebrow">Réseau actif</span>
-        <h1 class="connect-header__title">
-          Mise en relation
-        </h1>
-        <p class="connect-header__sub">
-          Vos demandes d'accompagnement et messages
-        </p>
-      </div>
-      <button
-        class="connect-new-btn"
-        aria-label="Créer une nouvelle demande d'accompagnement"
-        title="Commencez par remplir vos besoins d'accompagnement"
-      >
-        <Plus
-          :size="16"
-          :stroke-width="2.5"
-          aria-hidden="true"
-        />
-        Nouvelle demande
-      </button>
+      <p class="connect-header__eyebrow">
+        Mise en relation
+      </p>
+      <h1 class="connect-header__title">
+        Vos demandes d'accompagnement
+      </h1>
     </header>
 
-    <div class="connect-content">
-      <div class="connect-dashboard">
-        <!-- Active accompagnement -->
-        <section class="connect-active-card connect-card connect-card--dark">
+    <!-- Tab switcher -->
+    <div class="connect-tabs">
+      <button
+        class="connect-tab"
+        :class="{ 'connect-tab--active': tab === 'messages' }"
+        @click="tab = 'messages'"
+      >
+        Messages
+      </button>
+      <button
+        class="connect-tab"
+        :class="{ 'connect-tab--active': tab === 'volontaires' }"
+        @click="tab = 'volontaires'"
+      >
+        Volontaires actifs
+      </button>
+    </div>
+
+    <!-- Messages tab -->
+    <div
+      v-if="tab === 'messages'"
+      class="connect-content"
+    >
+      <div class="connect-list">
+        <div
+          v-for="m in messages"
+          :key="m.name"
+          class="msg-row"
+        >
+          <div class="msg-row__avatar-wrap">
+            <div class="msg-row__avatar">
+              {{ m.initials }}
+            </div>
+            <span
+              class="msg-row__dot"
+              :style="{ background: statusColor[m.status] }"
+            />
+          </div>
+          <div class="msg-row__body">
+            <div class="msg-row__top">
+              <span class="msg-row__name">{{ m.name }}</span>
+              <span class="msg-row__time">{{ m.time }}</span>
+            </div>
+            <span class="msg-row__status">{{ m.journeyStatus }}</span>
+            <p class="msg-row__preview">
+              {{ m.preview }}
+            </p>
+          </div>
           <div
-            class="connect-active-card__pulse"
-            aria-hidden="true"
-          />
-          <div class="connect-active-card__top">
-            <span class="connect-card__eyebrow">En cours maintenant</span>
-            <span class="connect-active-badge">Actif</span>
-          </div>
-          <h2 class="connect-active-card__title">
-            Accompagnement en cours
-          </h2>
-          <div class="connect-active-card__route">
-            <MapPin
-              :size="13"
-              :stroke-width="1.75"
-              aria-hidden="true"
-            />
-            <span>12 rue de la République → Pharmacie Centrale</span>
-          </div>
-          <div class="connect-active-card__meta">
-            <div class="connect-active-meta-item">
-              <span class="connect-active-meta-item__label">Volontaire</span>
-              <strong>Marie D.</strong>
-            </div>
-            <div class="connect-active-meta-item">
-              <span class="connect-active-meta-item__label">Statut</span>
-              <strong>En route</strong>
-            </div>
-          </div>
-          <CheckCircle
-            :size="18"
-            color="#22c55e"
-            :stroke-width="2"
-            aria-hidden="true"
-          />
-        </section>
-
-        <!-- Messages -->
-        <section class="connect-panel connect-card">
-          <div class="connect-panel__head">
-            <div>
-              <p class="connect-panel__eyebrow">
-                Conversations
-              </p>
-              <h3 class="connect-panel__title">
-                Messages récents
-              </h3>
-            </div>
-            <a
-              href="#"
-              class="connect-section__more"
-              aria-label="Voir tous les messages"
-            >Voir tout</a>
-          </div>
-          <div class="connect-messages-grid">
-            <div
-              v-for="msg in messages"
-              :key="msg.name"
-              class="msg-card"
-            >
-              <div class="msg-card__top">
-                <div class="msg-card__avatar-wrap">
-                  <div class="msg-card__avatar">
-                    {{ msg.initials }}
-                  </div>
-                  <span
-                    v-if="msg.online"
-                    class="msg-card__online"
-                  />
-                </div>
-                <div class="msg-card__header">
-                  <strong class="msg-card__name">{{ msg.name }}</strong>
-                  <div class="msg-card__time-row">
-                    <span class="msg-card__time">{{ msg.time }}</span>
-                    <span
-                      v-if="msg.badge"
-                      class="msg-card__badge"
-                    >{{ msg.badge }}</span>
-                  </div>
-                </div>
-              </div>
-              <p class="msg-card__text">
-                {{ msg.text }}
-              </p>
-              <div class="msg-card__footer">
-                <span
-                  class="msg__status"
-                  :class="msg.statusClass"
-                >{{ msg.status }}</span>
-                <div class="msg-card__actions">
-                  <button
-                    class="msg-card__action-btn"
-                    :aria-label="`Envoyer un message à ${msg.name}`"
-                    :title="`Ouvrir la conversation avec ${msg.name}`"
-                  >
-                    <MessageCircle
-                      :size="16"
-                      :stroke-width="1.75"
-                      aria-hidden="true"
-                    />
-                  </button>
-                  <button
-                    class="msg-card__action-btn"
-                    :aria-label="`Appeler ${msg.name}`"
-                    :title="`Appel direct avec ${msg.name}`"
-                  >
-                    <Phone
-                      :size="16"
-                      :stroke-width="1.75"
-                      aria-hidden="true"
-                    />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Support card -->
-        <section class="connect-support connect-card">
-          <div class="connect-support__icon">
-            <Shield
-              :size="22"
-              color="white"
-              :stroke-width="1.75"
-              aria-hidden="true"
-            />
-          </div>
-          <div class="connect-support__body">
-            <p class="connect-panel__eyebrow">
-              Support
-            </p>
-            <h3 class="connect-support__title">
-              Besoin d'aide ?
-            </h3>
-            <p class="connect-support__desc">
-              Notre équipe est disponible 24h/24 pour vous accompagner
-            </p>
-          </div>
-          <button
-            class="connect-support__btn"
-            aria-label="Contacter le support Kompagnon"
-            title="Ouvrir le centre d'aide et de support"
+            v-if="m.unread > 0"
+            class="msg-row__badge"
           >
-            <Zap
-              :size="15"
-              :stroke-width="2"
-              aria-hidden="true"
+            {{ m.unread }}
+          </div>
+        </div>
+
+        <!-- Branded CTA -->
+        <div class="connect-cta">
+          <div class="connect-cta__icon">
+            <KIcon
+              name="connect"
+              :size="24"
+              color="white"
             />
-            Contacter le support
+          </div>
+          <h3 class="connect-cta__title">
+            Besoin d'aide pour un déplacement ?
+          </h3>
+          <p class="connect-cta__sub">
+            Faites une demande et un volontaire vous répondra en moins de 8 min.
+          </p>
+          <button
+            class="connect-cta__btn connect-new-btn"
+            aria-label="Créer une nouvelle demande d'accompagnement"
+            @click="router.push({ name: 'map' })"
+          >
+            Nouvelle demande
           </button>
-        </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- Volontaires tab -->
+    <div
+      v-else
+      class="connect-content"
+    >
+      <!-- Horizontal scroll strip of online volunteers -->
+      <div class="vol-strip">
+        <div
+          v-for="v in onlineVolunteers"
+          :key="v.name"
+          class="vol-strip__item"
+        >
+          <div class="vol-strip__avatar-wrap">
+            <div class="vol-strip__avatar">
+              {{ v.initials }}
+            </div>
+            <span class="vol-strip__online" />
+            <span
+              v-if="v.trust"
+              class="vol-strip__trust"
+            >
+              <KIcon
+                name="check"
+                :size="8"
+                color="white"
+              />
+            </span>
+          </div>
+          <span class="vol-strip__name">{{ v.name.split(" ")[0] }}</span>
+        </div>
+      </div>
+
+      <!-- Volunteer cards grid -->
+      <div class="vol-grid">
+        <div
+          v-for="v in volunteers"
+          :key="v.name"
+          class="vol-card"
+        >
+          <div class="vol-card__header">
+            <div class="vol-card__avatar-wrap">
+              <div class="vol-card__avatar">
+                {{ v.initials }}
+              </div>
+              <span
+                class="vol-card__dot"
+                :style="{ background: statusColor[v.status] }"
+              />
+            </div>
+            <div class="vol-card__meta">
+              <div class="vol-card__name-row">
+                <span class="vol-card__name">{{ v.name }}</span>
+                <span
+                  v-if="v.trust"
+                  class="vol-card__trust"
+                >
+                  <KIcon
+                    name="check"
+                    :size="8"
+                    color="white"
+                  />
+                </span>
+              </div>
+              <div class="vol-card__sub">
+                <KIcon
+                  name="star"
+                  :size="10"
+                  color="#f4b942"
+                />
+                {{ v.rating }} · {{ v.dist }}
+              </div>
+            </div>
+          </div>
+
+          <span
+            class="vol-card__badge"
+            :class="v.status === 'online' ? 'vol-card__badge--green' : 'vol-card__badge--gray'"
+          >
+            {{ v.status === "online" ? "Disponible" : "Indisponible" }}
+          </span>
+
+          <button
+            class="vol-card__btn"
+            :class="{ 'vol-card__btn--disabled': v.status !== 'online' }"
+            :disabled="v.status !== 'online'"
+          >
+            <KIcon
+              name="message"
+              :size="13"
+              :color="v.status === 'online' ? 'white' : 'var(--c-text-light)'"
+            />
+            Contacter
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-@keyframes spring-in {
-  0% { opacity: 0; transform: translateY(20px) scale(0.97); }
-  60% { opacity: 1; transform: translateY(-4px) scale(1.01); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
-  50% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-}
-
 .connect-view {
+  width: min(100%, 1360px);
+  margin: 0 auto;
+  padding: 1.75rem 1.75rem 3rem;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
-  background: transparent;
+  gap: 1.5rem;
 }
 
-/* ── Header ── */
 .connect-header {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.25rem 1.5rem 0.75rem;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.connect-header__left {
-  display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.2rem;
 }
 
 .connect-header__eyebrow {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: 999px;
-  background: rgba(72, 175, 196, 0.12);
-  border: 1px solid rgba(72, 175, 196, 0.2);
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #2a5f70;
-  letter-spacing: 0.04em;
+  margin: 0;
+  color: var(--c-text-light);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .connect-header__title {
-  font-size: clamp(1.6rem, 2.2vw, 2.2rem);
-  font-weight: 700;
-  color: var(--kompagnon-navy);
   margin: 0;
+  color: var(--c-navy);
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
   line-height: 1.05;
-  letter-spacing: -0.03em;
 }
 
-.connect-header__sub {
-  font-size: 0.9rem;
-  color: #7b8794;
-  margin: 0;
+/* ── Tabs ── */
+.connect-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--c-beige);
+  border-radius: 14px;
+  padding: 4px;
 }
 
-.connect-new-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 999px;
+.connect-tab {
+  flex: 1;
+  padding: 0.625rem;
+  border-radius: 11px;
   border: none;
-  background: linear-gradient(135deg, #1e2c38 0%, #2a5f70 100%);
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 600;
   cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.875rem;
+  background: transparent;
+  color: var(--c-text-medium);
+  transition: all 0.18s;
   min-height: 44px;
-  box-shadow: 0 8px 20px rgba(30, 44, 56, 0.2);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
 }
 
-.connect-new-btn:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 14px 28px rgba(30, 44, 56, 0.25);
+.connect-tab--active {
+  background: var(--c-surface);
+  color: var(--c-teal-dark);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 /* ── Content ── */
 .connect-content {
-  padding: 0 1.5rem 1.5rem;
-}
-
-.connect-dashboard {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-/* ── Base Card ── */
-.connect-card {
-  border-radius: 1.75rem;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow:
-    0 14px 40px rgba(15, 23, 42, 0.06),
-    0 2px 6px rgba(15, 23, 42, 0.03);
-  backdrop-filter: blur(10px);
-  animation: spring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
-.connect-card--dark {
-  background: linear-gradient(160deg, #101820 0%, #16212d 50%, #1d3140 100%);
-  border-color: rgba(255, 255, 255, 0.06);
-  color: white;
-  box-shadow:
-    0 18px 44px rgba(15, 23, 42, 0.18),
-    0 2px 8px rgba(15, 23, 42, 0.12);
-}
-
-.connect-card__eyebrow {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.56);
-}
-
-/* ── Active card ── */
-.connect-active-card {
-  grid-column: span 4;
-  padding: 1.4rem;
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
-  position: relative;
-  overflow: hidden;
-  animation-delay: 0.06s;
 }
 
-.connect-active-card__pulse {
-  position: absolute;
-  top: -40px;
-  right: -40px;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(72, 175, 196, 0.22) 0%, transparent 70%);
-  pointer-events: none;
+/* ── Message rows ── */
+.connect-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
 }
 
-.connect-active-card__top {
+.msg-row {
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.35rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  position: relative;
-  z-index: 1;
+  gap: 0.875rem;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.connect-active-badge {
+.msg-row:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hov);
+}
+
+.msg-row__avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.msg-row__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--c-teal);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.msg-row__dot {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--c-surface);
+}
+
+.msg-row__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.msg-row__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.msg-row__name {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--c-navy);
+}
+
+.msg-row__time {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--c-text-light);
+  flex-shrink: 0;
+}
+
+.msg-row__preview {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  color: var(--c-text-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.msg-row__status {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.75rem;
+  width: fit-content;
+  margin-bottom: 0.35rem;
+  padding: 0.18rem 0.55rem;
   border-radius: 999px;
-  background: rgba(34, 197, 94, 0.18);
-  color: #86efac;
-  font-size: 0.75rem;
+  background: rgba(72, 175, 196, 0.1);
+  color: var(--c-teal-dark);
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
-.connect-active-card__title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-  margin: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.connect-active-card__route {
+.msg-row__badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--c-teal);
+  color: white;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.72);
-  position: relative;
-  z-index: 1;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 22px;
+  min-height: 22px;
 }
 
-.connect-active-card__meta {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.625rem;
-  position: relative;
-  z-index: 1;
-}
-
-.connect-active-meta-item {
+/* ── Branded CTA ── */
+.connect-cta {
+  border-radius: var(--radius-xl);
+  padding: 1.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--c-teal-light) 0%, #d8f0f4 100%);
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.75rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 
-.connect-active-meta-item__label {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.56);
-}
-
-.connect-active-meta-item strong {
-  font-size: 0.9rem;
-  color: white;
-}
-
-/* ── Panel (messages) ── */
-.connect-panel {
-  grid-column: span 8;
-  padding: 1.4rem;
-  animation-delay: 0.1s;
-}
-
-.connect-panel__head {
+.connect-cta__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--c-teal);
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  align-items: center;
+  justify-content: center;
 }
 
-.connect-panel__eyebrow {
-  margin: 0 0 0.2rem;
-  font-size: 0.72rem;
-  color: #7b8794;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.connect-panel__title {
+.connect-cta__title {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 900;
+  color: var(--c-navy);
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--kompagnon-navy);
-  letter-spacing: -0.025em;
 }
 
-.connect-section__more {
+.connect-cta__sub {
+  font-family: var(--font-body);
   font-size: 0.8125rem;
+  color: var(--c-text-medium);
+  margin: 0;
+  max-width: 360px;
+}
+
+.connect-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6875rem 1.5rem;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--c-teal);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
   font-weight: 600;
-  color: var(--kompagnon-turquoise);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color 0.2s;
+  cursor: pointer;
+  min-height: 44px;
+  box-shadow: var(--shadow-teal);
+  transition: background 0.15s, transform 0.2s;
 }
 
-.connect-section__more:hover {
-  color: #3a9bb0;
+.connect-cta__btn:hover {
+  background: var(--c-teal-dark);
+  transform: translateY(-1px);
 }
 
-/* ── Message cards ── */
-.connect-messages-grid {
+/* ── Volunteer strip ── */
+.vol-strip {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+
+.vol-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.vol-strip__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  width: 72px;
+}
+
+.vol-strip__avatar-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+}
+
+.vol-strip__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--c-teal);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.vol-strip__online {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #2ecc71;
+  border: 2.5px solid var(--c-surface);
+}
+
+.vol-strip__trust {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2ecc71;
+  border: 2px solid var(--c-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vol-strip__name {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  color: var(--c-text-medium);
+  font-weight: 600;
+  text-align: center;
+  max-width: 72px;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+/* ── Volunteer grid ── */
+.vol-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 0.875rem;
 }
 
-.msg-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.95) 100%);
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  border-radius: 1.25rem;
-  padding: 1rem;
+@media (min-width: 1180px) {
+  .connect-view {
+    padding: 1.5rem 1.5rem 2.5rem;
+  }
+
+  .connect-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.875rem;
+  }
+
+  .connect-cta {
+    grid-column: 1 / -1;
+    padding: 1.9rem 1.6rem;
+  }
+
+  .vol-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.vol-card {
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  padding: 1.125rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, border-color 0.2s;
+  gap: 0.875rem;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.msg-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 14px 28px rgba(72, 175, 196, 0.14);
-  border-color: rgba(72, 175, 196, 0.3);
+.vol-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hov);
 }
 
-.msg-card__top {
+.vol-card__header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.msg-card__avatar-wrap {
+.vol-card__avatar-wrap {
   position: relative;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
 }
 
-.msg-card__avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 0.875rem;
-  background: rgba(72, 175, 196, 0.18);
-  color: var(--kompagnon-navy);
-  font-weight: 700;
-  font-size: 0.875rem;
+.vol-card__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--c-teal);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 
-.msg-card__online {
+.vol-card__dot {
   position: absolute;
-  bottom: -2px;
-  right: -2px;
+  bottom: 1px;
+  right: 1px;
   width: 11px;
   height: 11px;
   border-radius: 50%;
-  background: #22c55e;
-  border: 2px solid white;
-  animation: pulse-dot 2s ease-in-out infinite;
+  border: 2px solid var(--c-surface);
 }
 
-.msg-card__header {
+.vol-card__meta {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   min-width: 0;
 }
 
-.msg-card__name {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--kompagnon-navy);
-  white-space: nowrap;
+.vol-card__name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.vol-card__name {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--c-navy);
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.msg-card__time-row {
+.vol-card__trust {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #2ecc71;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-.msg-card__time {
-  font-size: 0.72rem;
-  color: #9ca3af;
-}
-
-.msg-card__badge {
-  background: #48AFC4;
-  color: white;
-  font-size: 0.65rem;
-  font-weight: 700;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 999px;
+.vol-card__sub {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 0 4px;
+  gap: 3px;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  color: var(--c-text-medium);
 }
 
-.msg-card__text {
-  font-size: 0.85rem;
-  color: #374151;
-  margin: 0;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.msg-card__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.msg__status {
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 0.2rem 0.625rem;
-  border-radius: 999px;
-}
-
-.msg__status--green { background: #dcfce7; color: #166534; }
-.msg__status--gray { background: #f3f4f6; color: #374151; }
-
-.msg-card__actions {
-  display: flex;
-  gap: 0.375rem;
-}
-
-.msg-card__action-btn {
-  width: 32px;
-  height: 32px;
-  border: 1.5px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0.75rem;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #6b7280;
-  min-width: 32px;
-  min-height: 32px;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
-}
-
-.msg-card__action-btn:hover {
-  background: #e0f5f8;
-  border-color: #48AFC4;
-  color: #48AFC4;
-  transform: scale(1.1);
-}
-
-/* ── Support card ── */
-.connect-support {
-  grid-column: 1 / -1;
-  padding: 1.4rem 1.6rem;
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  animation-delay: 0.16s;
-}
-
-.connect-support__icon {
-  flex-shrink: 0;
-  width: 52px;
-  height: 52px;
-  border-radius: 1.1rem;
-  background: linear-gradient(135deg, var(--kompagnon-navy), var(--kompagnon-turquoise));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 20px rgba(72, 175, 196, 0.28);
-}
-
-.connect-support__body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.connect-support__title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--kompagnon-navy);
-}
-
-.connect-support__desc {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-.connect-support__btn {
+.vol-card__badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-  padding: 0.75rem 1.25rem;
+  padding: 0.125rem 0.625rem;
   border-radius: 999px;
-  border: 1.5px solid rgba(72, 175, 196, 0.3);
-  background: rgba(72, 175, 196, 0.06);
-  color: var(--kompagnon-turquoise-dark);
-  font-size: 0.875rem;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.vol-card__badge--green {
+  background: var(--c-success-bg);
+  color: var(--c-success-text, #1a6b3e);
+}
+
+.vol-card__badge--gray {
+  background: var(--c-sand);
+  color: var(--c-text-medium);
+}
+
+.vol-card__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 0.5625rem 1rem;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--c-teal);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
-  min-height: 44px;
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  min-height: 40px;
+  transition: background 0.15s, transform 0.2s;
 }
 
-.connect-support__btn:hover {
-  background: rgba(72, 175, 196, 0.14);
+.vol-card__btn:hover:not(.vol-card__btn--disabled) {
+  background: var(--c-teal-dark);
   transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(72, 175, 196, 0.15);
 }
 
-@media (max-width: 1024px) {
-  .connect-active-card,
-  .connect-panel { grid-column: 1 / -1; }
-  .connect-messages-grid { grid-template-columns: 1fr 1fr; }
+.vol-card__btn--disabled {
+  background: transparent;
+  color: var(--c-text-light);
+  border: 1.5px solid var(--c-border);
+  cursor: not-allowed;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1023px) and (min-width: 769px) {
+  .connect-view {
+    padding: 1.5rem 1.5rem 2.5rem;
+  }
+
+  .vol-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .connect-view {
+    padding: 1.25rem 1.25rem 2.5rem;
+  }
+
+  .vol-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 640px) {
-  .connect-header { padding: 1rem 1rem 0.75rem; flex-direction: column; align-items: flex-start; }
-  .connect-content { padding: 0 1rem 1rem; }
-  .connect-messages-grid { grid-template-columns: 1fr; }
-  .connect-support { flex-direction: column; text-align: center; }
-  .connect-support__icon { align-self: center; }
-  .connect-support__btn { width: 100%; justify-content: center; }
+  .connect-view {
+    padding: 1rem 1rem 2rem;
+  }
+
+  .vol-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 </style>
-
