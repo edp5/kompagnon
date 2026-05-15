@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/edp5/kompagnon/compare/v1.1.0...v1.1.1) (2026-05-15)
+
+### 🛠️ Technical
+
+* create journeys data ([#526](https://github.com/edp5/kompagnon/issues/526)) ([7ad132c](https://github.com/edp5/kompagnon/commit/7ad132cc13a63e8fd5fbae5be19a77da12305470))
+
 ## [1.1.0](https://github.com/edp5/kompagnon/compare/v1.0.1...v1.1.0) (2026-04-29)
 
 ### 🚀 New features
