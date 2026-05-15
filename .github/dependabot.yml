@@ -14,6 +14,7 @@ updates:
     labels:
       - dependencies
       - Ready to merge
+      - no-coverage
     commit-message:
       prefix: bump
       include: scope
@@ -27,6 +28,7 @@ updates:
     open-pull-requests-limit: 2
     labels:
       - Ready to merge
+      - no-coverage
 
     commit-message:
       prefix: bump
@@ -41,6 +43,7 @@ updates:
     open-pull-requests-limit: 2
     labels:
       - Ready to merge
+      - no-coverage
 
     commit-message:
       prefix: bump
@@ -55,6 +58,7 @@ updates:
     open-pull-requests-limit: 2
     labels:
       - Ready to merge
+      - no-coverage
 
     commit-message:
       prefix: bump
