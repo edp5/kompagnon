@@ -88,6 +88,7 @@ jobs:
         working-directory: ./api
 
       - name: Upload coverage reports to Codecov
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'no-coverage') }}
         uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -137,6 +138,7 @@ jobs:
         working-directory: ./web
 
       - name: Upload coverage reports to Codecov
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'no-coverage') }}
         uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -186,6 +188,7 @@ jobs:
         working-directory: ./admin
 
       - name: Upload coverage reports to Codecov
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'no-coverage') }}
         uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
