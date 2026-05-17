@@ -1,0 +1,55 @@
+name: swagger
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
+on:
+  merge_group:
+  pull_request:
+    paths:
+      - api/src/**/*routes.js
+    branches:
+      - main
+    types:
+      - opened
+      - ready_for_review
+      - synchronize
+      - reopened
+
+jobs:
+  swagger:
+    if: github.event.pull_request.merged == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6
+
+      - name: setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Run swagger checking
+        working-directory: ./api
+        run: npm run swagger:jsdoc:templates
+
+      - name: Check if swagger markdown has generated
+        working-directory: ./api
+        run: |
+          if [ -f "./docs/swagger-jsdoc-templates/undocumented-routes.md" ]; then
+            echo "Swagger markdown generated successfully."
+            echo "SWAGGER_MARKDOWN_GENERATED=true" >> $GITHUB_ENV
+          else
+            echo "No swagger markdown generated."
+            echo "SWAGGER_MARKDOWN_GENERATED=false" >> $GITHUB_ENV
+          fi
+      - name: Comment on PR if swagger markdown is generated
+        working-directory: ./api
+        if: env.SWAGGER_MARKDOWN_GENERATED == 'true'
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body-file "./docs/swagger-jsdoc-templates/undocumented-routes.md"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
