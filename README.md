@@ -96,7 +96,25 @@ function exampleFunction(paramName) {
 }
 ```
 
+##### Swagger route documentation helper (API)
+Swagger UI is available on `/api/docs` and is generated from route-level `@swagger` JSDoc blocks in `api/src/**/*routes*.js`.
+
+To quickly document new routes:
+
+1. Generate templates for routes that do not have a `@swagger` block yet:
+```bash
+cd api
+npm run swagger:jsdoc:templates
+```
+2. If undocumented routes are found, a markdown file is generated at `api/docs/swagger-jsdoc-templates/undocumented-routes.md` (all missing routes in one file, with copy-ready code blocks).
+3. Copy the generated block for your route.
+4. Paste it directly above the related route declaration in the route file.
+5. Replace every `TODO` placeholder with the real endpoint details (summary, description, responses, request body, params, auth, etc.).
+6. Start the API and verify the result in Swagger UI (`/api/docs`).
+
+If the command prints `All detected routes already have a matching @swagger JSDoc block.`, no route is missing documentation and the command exits with code `0`.
+
 ### Commits and pull request
-Your commit must respect conventional commit with "feat" or "fix" or "refactor" the scope and the title of your commit. For exemple:
+Your commit must respect conventional commit with "feat" or "fix" or "refactor" the scope and the title of your commit. For example:
 "feat(api): add the db configuration".
-Pull requests must respect similare rules.
+Pull requests must respect similar rules.

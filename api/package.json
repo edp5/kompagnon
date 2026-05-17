@@ -30,7 +30,8 @@
     "db:seed": "knex --knexfile ./db/knexfile.js seed:run",
     "db:reset": "npm run db:prepare && npm run db:seed",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "swagger:jsdoc:templates": "node ./scripts/generate-swagger-jsdoc.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

@@ -11,3 +11,6 @@
 
 # dists in api
 **/dists/**
+
+# Generated swagger jsdoc templates
+api/docs/swagger-jsdoc-templates/
