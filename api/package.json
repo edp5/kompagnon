@@ -54,7 +54,7 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/coverage-v8": "^4.1.6",
     "@vitest/ui": "^4.0.4",
     "cross-env": "^10.1.0",
     "eslint-plugin-jsdoc": "^62.9.0",
