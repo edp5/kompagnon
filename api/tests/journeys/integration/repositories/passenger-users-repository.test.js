@@ -44,7 +44,7 @@ describe("Integration | Journeys | Repositories | Passenger users repository", (
     it("should return the journey when it exists", async () => {
       // given
       const user = await databaseBuilder.factory.buildUser();
-      const data = {
+      const passengerJourney = await databaseBuilder.factory.buildPassengerJourney({
         userId: user.id,
         departureTime: new Date().toISOString(),
         arrivalTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // +30m
@@ -54,17 +54,16 @@ describe("Integration | Journeys | Repositories | Passenger users repository", (
         departureLat: 4.56,
         arrivalLon: 7.89,
         arrivalLat: 0.12,
-      };
+      });
 
       // when
-      const id = await passengerUsersRepository.saveJourney(data);
-      const found = await passengerUsersRepository.findJourneyById(id);
+      const found = await passengerUsersRepository.findJourneyById(passengerJourney.id);
 
       // then
       expect(found).toBeDefined();
-      expect(found.id).toBe(id);
+      expect(found.id).toBe(passengerJourney.id);
       expect(found.userId).toBe(user.id);
-      expect(found.departureAddress).toBe(data.departureAddress);
+      expect(found.departureAddress).toBe(passengerJourney.departureAddress);
     });
 
     it("should return null when journey does not exist", async () => {

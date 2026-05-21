@@ -1,8 +1,9 @@
 import { knex } from "../../knex-database-connection.js";
+import { buildUser } from "./build-user.js";
 
 const TABLE_NAME = "passenger_journeys";
 async function buildPassengerJourney({
-  userId,
+  userId = null,
   departureTime = new Date("2021-01-01T00:00:00Z"),
   arrivalTime = new Date("2021-01-01T01:00:00Z"),
   departureAddress = "5 rue de la cantoche, 75015 Cherbour",
@@ -12,6 +13,10 @@ async function buildPassengerJourney({
   arrivalLat = 0.0,
   arrivalLon = 0.0,
 } = {}) {
+  if (!userId) {
+    const user = await buildUser({ email: `${crypto.randomUUID()}@example.net` });
+    userId = user.id;
+  }
   const [values] = await knex(TABLE_NAME).insert({
     userId,
     departureTime,
