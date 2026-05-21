@@ -69,6 +69,12 @@ onMounted(async () => {
           <p class="home-hero__sub">
             Découvrez les accompagnements disponibles près de vous
           </p>
+          <router-link
+            to="/carte"
+            class="home-hero__cta"
+          >
+            Voir la carte
+          </router-link>
         </div>
       </section>
 
