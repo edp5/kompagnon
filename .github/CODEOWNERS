@@ -1,0 +1,17 @@
+# This file is used to define code owners for the repository. Code owners are automatically requested for review when someone opens a pull request that modifies code they own.
+
+# api
+/api/db @edp5/data
+/api/src @edp5/back
+/api/tests @edp5/back
+/api/email-templates @edp5/fullstack
+
+# Admin
+/admin/ @edp5/front
+
+# Web
+/web/ @edp5/front
+
+# YAML files
+*.yaml @edp5/fullstack
+*.yml @edp5/fullstack
