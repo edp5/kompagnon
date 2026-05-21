@@ -1,4 +1,5 @@
 import { knex } from "../../knex-database-connection.js";
+import { buildUser } from "./build-user.js";
 
 const TABLE_NAME = "companion_journeys";
 async function buildCompanionJourney({
@@ -12,6 +13,10 @@ async function buildCompanionJourney({
   arrivalLat = 0.0,
   arrivalLon = 0.0,
 } = {}) {
+  if (!userId) {
+    const user = await buildUser({ email: `${crypto.randomUUID()}@example.net` });
+    userId = user.id;
+  }
   const [values] = await knex(TABLE_NAME).insert({
     userId,
     departureTime,
