@@ -5,13 +5,11 @@ import { useAuthStore } from "@/stores/auth.js";
 import ActivateAccountView from "@/views/authentication/ActivateAccountView.vue";
 import LoginView from "@/views/authentication/LoginView.vue";
 import RegisterView from "@/views/authentication/RegisterView.vue";
-import ConnectView from "@/views/ConnectView.vue";
 import HomeView from "@/views/HomeView.vue";
 import MapView from "@/views/MapView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import PrivacyView from "@/views/PrivacyView.vue";
 import ProfileView from "@/views/ProfileView.vue";
-import SettingsView from "@/views/SettingsView.vue";
 import SupportView from "@/views/SupportView.vue";
 
 function withAppLayout(path, name, component) {
@@ -63,16 +61,10 @@ const router = createRouter({
       ...withAppLayout("/map", "map", MapView),
     },
     {
-      ...withAppLayout("/connect", "connect", ConnectView),
-    },
-    {
       ...withAppLayout("/profile", "profile", ProfileView),
     },
     {
       ...withAppLayout("/notifications", "notifications", NotificationsView),
-    },
-    {
-      ...withAppLayout("/settings", "settings", SettingsView),
     },
     {
       ...withAppLayout("/support", "support", SupportView),

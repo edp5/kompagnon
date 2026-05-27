@@ -105,7 +105,7 @@ describe("Unit | Components | DesktopSidebar", () => {
 
     // then
     const navItems = wrapper.findAll(".sidebar__item");
-    expect(navItems.length).toBeGreaterThanOrEqual(8);
+    expect(navItems.length).toBeGreaterThanOrEqual(6);
   });
 
   it("should display notification badge for notifications item", () => {

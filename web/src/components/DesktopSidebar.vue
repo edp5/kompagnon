@@ -15,12 +15,10 @@ const isAdmin = ref(false);
 
 const navItems = [
   { name: "home", icon: "home", label: "Tableau de bord" },
-  { name: "connect", icon: "connect", label: "Messages" },
   { name: "map", icon: "map", label: "Carte" },
   { name: "notifications", icon: "notifications", label: "Notifications" },
   { name: "profile", icon: "profile", label: "Mon profil" },
   { name: "support", icon: "support", label: "Support" },
-  { name: "settings", icon: "settings", label: "Paramètres" },
   { name: "privacy", icon: "privacy", label: "Confidentialité" },
 ];
 

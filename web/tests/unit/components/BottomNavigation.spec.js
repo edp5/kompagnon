@@ -10,7 +10,6 @@ describe("Unit | Components | BottomNavigation", () => {
       history: createMemoryHistory(),
       routes: [
         { path: "/", name: "home", component: { template: "<div />" } },
-        { path: "/connect", name: "connect", component: { template: "<div />" } },
         { path: "/map", name: "map", component: { template: "<div />" } },
         { path: "/notifications", name: "notifications", component: { template: "<div />" } },
         { path: "/profile", name: "profile", component: { template: "<div />" } },
@@ -35,10 +34,10 @@ describe("Unit | Components | BottomNavigation", () => {
     expect(wrapper.find("nav").attributes("aria-label")).toBe("Navigation principale mobile");
   });
 
-  it("should render all 5 nav items", () => {
+  it("should render all 4 nav items", () => {
     const wrapper = createWrapper();
     const items = wrapper.findAll(".bottom-nav__item");
-    expect(items.length).toBe(5);
+    expect(items.length).toBe(4);
   });
 
   it("should render home item", () => {
@@ -46,10 +45,6 @@ describe("Unit | Components | BottomNavigation", () => {
     expect(wrapper.text()).toContain("Accueil");
   });
 
-  it("should render messages item", () => {
-    const wrapper = createWrapper();
-    expect(wrapper.text()).toContain("Messages");
-  });
 
   it("should render map item", () => {
     const wrapper = createWrapper();
