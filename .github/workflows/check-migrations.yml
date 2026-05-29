@@ -1,0 +1,81 @@
+name: check-migrations
+
+permissions:
+  pull-requests: write
+  contents: read
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - api/db/migrations/**
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  migration-check:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: setup docker
+        uses: docker/setup-buildx-action@v4
+
+      - name: configure project
+        run: |
+          npm ci
+          cp sample.env .env
+        working-directory: ./api
+
+      - name: start docker
+        run: docker compose up -d
+
+      - name: wait for db and create database
+        run: |
+          sleep 5
+          npm run db:create
+        working-directory: ./api
+
+      - name: run migrations
+        run: npm run db:migrate
+        working-directory: ./api
+
+      - name: Get file number in migration directory
+        id: get_migration_files
+        run: echo "migration_files=$(ls *.js | wc -l)" >> $GITHUB_OUTPUT
+        working-directory: ./api/db/migrations
+
+      - name: Rollback all migrations
+        run: |
+          for i in $(seq 1 ${{ steps.get_migration_files.outputs.migration_files }}); do
+            npm run db:rollback:latest
+            done
+        working-directory: ./api
+
+      - name: Comment on pull request if an error occured
+        if: failure()
+        run: |
+          echo "Migrations failed. Please check the migration files for errors." > comment.txt
+          gh pr review ${{ github.event.pull_request.number }} --request-changes --body-file comment.txt
+          exit 1
+        env:
+          GITHUB_TOKEN: ${{ secrets.SERVICE_TOKEN }}
+
+      - name: Approve pull request if migrations are successful
+        if: success()
+        run: |
+          gh pr review ${{ github.event.pull_request.number }} --approve --body "Migrations are successful. Approving the pull request."
+        env:
+          GITHUB_TOKEN: ${{ secrets.SERVICE_TOKEN }}
