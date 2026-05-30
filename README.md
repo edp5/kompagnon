@@ -118,3 +118,26 @@ If the command prints `All detected routes already have a matching @swagger JSDo
 Your commit must respect conventional commit with "feat" or "fix" or "refactor" the scope and the title of your commit. For example:
 "feat(api): add the db configuration".
 Pull requests must respect similar rules.
+
+## EditorConfig (Editing Rules and Conventions)
+
+The repository contains a `.editorconfig` file at its root that centralizes editing conventions (encoding, line endings, indentation, etc.). The key settings are:
+
+* `indent_style = space`
+* `indent_size = 2` (the main indentation style used in `.vue` and `.js` files)
+* `tab_width = 2`
+
+Note: Specific sections (`.vue`, `.js`, `.json`, etc.) may define targeted settings when necessary.
+
+### Why?
+
+* Ensure a consistent coding style across contributors and avoid irrelevant diffs.
+* Allow IDEs and tools (EditorConfig plugins, Prettier, ESLint) to automatically apply the expected formatting.
+
+### How to use it
+
+* Install and enable the EditorConfig plugin in your editor (VS Code, JetBrains IDEs, etc.).
+* Run the project's linter/formatter:
+
+    * `npm run lint`
+    * `npm run lint:fix` to automatically fix formatting and linting issues.
