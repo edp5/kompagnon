@@ -3,24 +3,13 @@ import { knex } from "../../knex-database-connection.js";
 import { buildCompanionJourney } from "./build-companion-journey.js";
 import { buildPassengerJourney } from "./build-passenger-journey.js";
 
-let defaultPassengerJourneyPromise = null;
-let defaultCompanionJourneyPromise = null;
-
 async function getDefaultPassengerJourneyId() {
-  if (!defaultPassengerJourneyPromise) {
-    defaultPassengerJourneyPromise = buildPassengerJourney();
-  }
-
-  const passengerJourney = await defaultPassengerJourneyPromise;
+  const passengerJourney = await buildPassengerJourney();
   return passengerJourney.id;
 }
 
 async function getDefaultCompanionJourneyId() {
-  if (!defaultCompanionJourneyPromise) {
-    defaultCompanionJourneyPromise = buildCompanionJourney();
-  }
-
-  const companionJourney = await defaultCompanionJourneyPromise;
+  const companionJourney = await buildCompanionJourney();
   return companionJourney.id;
 }
 
