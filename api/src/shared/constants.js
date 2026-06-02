@@ -25,6 +25,10 @@ export const DEFAULT_USER_TYPE = USER_TYPES.USER;
 export const JOURNEY_STATUS = {
   /** Waiting for confirmation */
   WAITING: "waiting",
+  /** Journey accepted by companion but waiting passenger */
+  WAITING_PASSENGER: "waiting_passenger",
+  /** Journey accepted by passenger but waiting companion */
+  WAITING_COMPANION: "waiting_companion",
   /** Journey accepted by both parties */
   ACCEPTED: "accepted",
   /** Journey rejected */
