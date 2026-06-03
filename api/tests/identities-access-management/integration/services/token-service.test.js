@@ -97,7 +97,7 @@ describe("Integration | Identities Access Management | Services | Token service"
         const token = jwt.sign({ ...data, exp: expiredTimestamp }, config.jwt.tokenSecret);
 
         // when & then
-        expect(() => decodedToken(token)).toThrow(ERRORS.TOKEN.EXPIRED_TOKEN);
+        expect(() => decodedToken(token)).toThrow(ERRORS.TOKEN.EXPIRED_TOKEN, { cause: expect.objectContaining({ name: "TokenExpiredError" }) });
       });
 
       it(`should throw an ${ERRORS.TOKEN.INVALID_TOKEN}`, () => {
@@ -105,7 +105,7 @@ describe("Integration | Identities Access Management | Services | Token service"
         const invalidToken = "invalid.token.here";
 
         // when & then
-        expect(() => decodedToken(invalidToken)).toThrow(ERRORS.TOKEN.INVALID_TOKEN);
+        expect(() => decodedToken(invalidToken)).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
       });
 
       it(`should throw an ${ERRORS.TOKEN.INVALID_TOKEN} for malformed token`, () => {
@@ -113,7 +113,7 @@ describe("Integration | Identities Access Management | Services | Token service"
         const malformedToken = "malformed-token-without-dots";
 
         // when & then
-        expect(() => decodedToken(malformedToken)).toThrow(ERRORS.TOKEN.INVALID_TOKEN);
+        expect(() => decodedToken(malformedToken)).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
       });
 
       it(`should throw an ${ERRORS.TOKEN.INVALID_TOKEN} for token with wrong signature`, () => {
@@ -122,22 +122,22 @@ describe("Integration | Identities Access Management | Services | Token service"
         const tokenWithWrongSecret = jwt.sign(data, "wrong-secret", { expiresIn: "1h" });
 
         // when & then
-        expect(() => decodedToken(tokenWithWrongSecret)).toThrow(ERRORS.TOKEN.INVALID_TOKEN);
+        expect(() => decodedToken(tokenWithWrongSecret)).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
       });
 
       it("should handle null token in decodedToken", () => {
         // when & then
-        expect(() => decodedToken(null)).toThrow(ERRORS.TOKEN.INVALID_TOKEN);
+        expect(() => decodedToken(null)).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
       });
 
       it("should handle undefined token in decodedToken", () => {
         // when & then
-        expect(() => decodedToken(undefined)).toThrow(ERRORS.TOKEN.INVALID_TOKEN);
+        expect(() => decodedToken(undefined)).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
       });
 
       it("should handle empty string token in decodedToken", () => {
         // when & then
-        expect(() => decodedToken("")).toThrow(ERRORS.TOKEN.INVALID_TOKEN);
+        expect(() => decodedToken("")).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
       });
     });
   });
