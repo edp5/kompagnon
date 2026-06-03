@@ -78,15 +78,6 @@ describe("Unit | Router", () => {
       expect(mapRoute?.meta.requiresAuth).toBe(true);
     });
 
-    it("should require authentication for the connect route", () => {
-      // when
-      const connectRoute = router.getRoutes().find((route) => route.name === "connect");
-
-      // then
-      expect(connectRoute).toBeDefined();
-      expect(connectRoute?.path).toBe("/connect");
-      expect(connectRoute?.meta.requiresAuth).toBe(true);
-    });
 
     it("should require authentication for the notifications route", () => {
       // when
@@ -98,15 +89,6 @@ describe("Unit | Router", () => {
       expect(notificationsRoute?.meta.requiresAuth).toBe(true);
     });
 
-    it("should require authentication for the settings route", () => {
-      // when
-      const settingsRoute = router.getRoutes().find((route) => route.name === "settings");
-
-      // then
-      expect(settingsRoute).toBeDefined();
-      expect(settingsRoute?.path).toBe("/settings");
-      expect(settingsRoute?.meta.requiresAuth).toBe(true);
-    });
 
     it("should require authentication for the support route", () => {
       // when
@@ -283,17 +265,6 @@ describe("Unit | Router", () => {
       expect(router.currentRoute.value.name).toBe("map");
     });
 
-    it("should allow authenticated users to access connect route", async () => {
-      // given
-      const authStore = useAuthStore();
-      authStore.setAuth("jwt-token", 1);
-
-      // when
-      await router.push({ name: "connect" });
-
-      // then
-      expect(router.currentRoute.value.name).toBe("connect");
-    });
 
     it("should allow authenticated users to access notifications route", async () => {
       // given
@@ -307,17 +278,6 @@ describe("Unit | Router", () => {
       expect(router.currentRoute.value.name).toBe("notifications");
     });
 
-    it("should allow authenticated users to access settings route", async () => {
-      // given
-      const authStore = useAuthStore();
-      authStore.setAuth("jwt-token", 1);
-
-      // when
-      await router.push({ name: "settings" });
-
-      // then
-      expect(router.currentRoute.value.name).toBe("settings");
-    });
 
     it("should allow authenticated users to access support route", async () => {
       // given

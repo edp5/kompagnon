@@ -1,12 +1,10 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 
 import { getUserProfile } from "@/adapters/users.js";
 import KIcon from "@/components/KIcon.vue";
 import { useAuthStore } from "@/stores/auth.js";
 
-const router = useRouter();
 const authStore = useAuthStore();
 const profile = ref(null);
 
@@ -71,16 +69,12 @@ onMounted(async () => {
           <p class="home-hero__sub">
             Découvrez les accompagnements disponibles près de vous
           </p>
-          <span
+          <router-link
+            to="/carte"
             class="home-hero__cta"
-            role="link"
-            tabindex="0"
-            aria-label="Créer une nouvelle demande d'accompagnement"
-            @click="router.push({ name: 'map' })"
-            @keydown.enter="router.push({ name: 'map' })"
           >
-            + Nouvelle demande
-          </span>
+            Voir la carte
+          </router-link>
         </div>
       </section>
 
@@ -261,28 +255,6 @@ onMounted(async () => {
   margin: 0 0 1.5rem;
 }
 
-.home-hero__cta {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.6875rem 1.5rem;
-  border-radius: var(--radius-full);
-  background: white;
-  color: var(--c-navy);
-  border: none;
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  cursor: pointer;
-  min-height: 44px;
-  min-width: auto;
-  transition: opacity 0.15s ease, transform 0.18s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.home-hero__cta:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
-}
 
 /* ── Stat cards ── */
 .home-stats {

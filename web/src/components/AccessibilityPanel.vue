@@ -94,11 +94,10 @@ onMounted(() => {
 
     <!-- Drawer -->
     <transition name="slide-up">
-      <div
+      <dialog
         v-if="isOpen"
         class="a11y-drawer"
-        role="dialog"
-        aria-modal="true"
+        open
         aria-label="Options d'accessibilité"
       >
         <div class="a11y-drawer__header">
@@ -164,7 +163,7 @@ onMounted(() => {
           </button>
           <p>Les paramètres sont sauvegardés automatiquement.</p>
         </div>
-      </div>
+      </dialog>
     </transition>
 
     <!-- Overlay -->
@@ -269,6 +268,9 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   z-index: 9999;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
 }
 
 .a11y-drawer__header {

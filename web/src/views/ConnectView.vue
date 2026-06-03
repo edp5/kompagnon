@@ -1,10 +1,8 @@
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 
 import KIcon from "@/components/KIcon.vue";
 
-const router = useRouter();
 const tab = ref("messages");
 
 const statusColor = {
@@ -85,30 +83,6 @@ const onlineVolunteers = volunteers.filter((v) => v.status === "online");
           >
             {{ m.unread }}
           </div>
-        </div>
-
-        <!-- Branded CTA -->
-        <div class="connect-cta">
-          <div class="connect-cta__icon">
-            <KIcon
-              name="connect"
-              :size="24"
-              color="white"
-            />
-          </div>
-          <h3 class="connect-cta__title">
-            Besoin d'aide pour un déplacement ?
-          </h3>
-          <p class="connect-cta__sub">
-            Faites une demande et un volontaire vous répondra en moins de 8 min.
-          </p>
-          <button
-            class="connect-cta__btn connect-new-btn"
-            aria-label="Créer une nouvelle demande d'accompagnement"
-            @click="router.push({ name: 'map' })"
-          >
-            Nouvelle demande
-          </button>
         </div>
       </div>
     </div>
@@ -401,66 +375,6 @@ const onlineVolunteers = volunteers.filter((v) => v.status === "online");
   min-height: 22px;
 }
 
-/* ── Branded CTA ── */
-.connect-cta {
-  border-radius: var(--radius-xl);
-  padding: 1.75rem 1.5rem;
-  background: linear-gradient(135deg, var(--c-teal-light) 0%, #d8f0f4 100%);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.connect-cta__icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--c-teal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.connect-cta__title {
-  font-family: var(--font-display);
-  font-size: 1.0625rem;
-  font-weight: 900;
-  color: var(--c-navy);
-  margin: 0;
-}
-
-.connect-cta__sub {
-  font-family: var(--font-body);
-  font-size: 0.8125rem;
-  color: var(--c-text-medium);
-  margin: 0;
-  max-width: 360px;
-}
-
-.connect-cta__btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.6875rem 1.5rem;
-  border-radius: var(--radius-full);
-  border: none;
-  background: var(--c-teal);
-  color: white;
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  min-height: 44px;
-  box-shadow: var(--shadow-teal);
-  transition: background 0.15s, transform 0.2s;
-}
-
-.connect-cta__btn:hover {
-  background: var(--c-teal-dark);
-  transform: translateY(-1px);
-}
 
 /* ── Volunteer strip ── */
 .vol-strip {
@@ -558,10 +472,6 @@ const onlineVolunteers = volunteers.filter((v) => v.status === "online");
     gap: 0.875rem;
   }
 
-  .connect-cta {
-    grid-column: 1 / -1;
-    padding: 1.9rem 1.6rem;
-  }
 
   .vol-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
