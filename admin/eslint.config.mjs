@@ -15,12 +15,17 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
+const i18nJsonConfigs = compat.extends(
+  "plugin:i18n-json/recommended",
+).map((config) => ({
+  ...config,
+  files: ["**/*.json"],
+}));
+
 export default [
   js.configs.recommended,
   ...pluginVue.configs["flat/recommended"],
-  ...compat.extends(
-    "plugin:i18n-json/recommended",
-  ),
+  ...i18nJsonConfigs,
   {
     plugins: {
       "simple-import-sort": simpleImportSort,
