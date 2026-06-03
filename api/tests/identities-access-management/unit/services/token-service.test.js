@@ -10,7 +10,7 @@ describe("Unit | Identiites Access Management | Services | Token service", () =>
       // given
       vi.spyOn(jwt, "sign").mockImplementation(() => { throw new Error("Signing error"); });
       // when & then
-      expect(() => encodedToken({ userId: 1 })).toThrow("Signing error");
+      expect(() => encodedToken({ userId: 1 })).toThrow("Token encoding failed", { cause: "Signing error" });
     });
   });
 
@@ -24,9 +24,7 @@ describe("Unit | Identiites Access Management | Services | Token service", () =>
       });
 
       // when & then
-      expect(() => decodedToken("any-token")).toThrow(ERRORS.TOKEN.VERIFICATION_FAILED);
+      expect(() => decodedToken("any-token")).toThrow(ERRORS.TOKEN.VERIFICATION_FAILED, { cause: "Generic error" });
     });
-
-
   });
 });

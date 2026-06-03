@@ -14,7 +14,7 @@ function encodedToken(data) {
     });
   } catch (error) {
     logger.error(`Token encoding failed ${error}`);
-    throw error;
+    throw new Error("Token encoding failed", { cause: error });
   }
 }
 
@@ -24,11 +24,11 @@ function decodedToken(token) {
   } catch (error) {
     logger.error(`Token decoding failed ${error}`);
     if (error.name === "TokenExpiredError") {
-      throw new Error(ERRORS.TOKEN.EXPIRED_TOKEN);
+      throw new Error(ERRORS.TOKEN.EXPIRED_TOKEN, { cause: error });
     } else if (error.name === "JsonWebTokenError") {
-      throw new Error(ERRORS.TOKEN.INVALID_TOKEN);
+      throw new Error(ERRORS.TOKEN.INVALID_TOKEN, { cause: error });
     } else {
-      throw new Error(ERRORS.TOKEN.VERIFICATION_FAILED);
+      throw new Error(ERRORS.TOKEN.VERIFICATION_FAILED, { cause: error });
     }
   }
 }

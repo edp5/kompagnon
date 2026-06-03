@@ -12,6 +12,7 @@ describe("Unit | Identities Access Management | Controller | Get user profile co
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),
     };
+    next = vi.fn();
   });
 
   it("should return 200 with authenticated profile", async () => {

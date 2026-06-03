@@ -15,7 +15,7 @@ async function generatePassword(password) {
     return await bcrypt.hash(password, passwordHash);
   } catch (error) {
     logger.error(`Error generating password hash ${error}`);
-    throw new Error(error);
+    throw new Error("Error generating password hash", { cause: error });
   }
 }
 
@@ -30,7 +30,7 @@ async function checkPassword(input, hashedPassword) {
     return await bcrypt.compare(input, hashedPassword);
   } catch (error) {
     logger.error(`Error checking password hash ${error}`);
-    throw new Error(error);
+    throw new Error("Error checking password hash", { cause: error });
   }
 }
 
