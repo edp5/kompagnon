@@ -234,7 +234,7 @@ async function acceptedJourney(databasebuilder) {
     arrivalLon: 6.024053,
   });
 
-  await databasebuilder.factory.buildFoundJourney({ passengerJourneyId: passenger.id, companionJourneyId: companion.id, status: JOURNEY_STATUS.ACCEPTED });
+  await databasebuilder.factory.buildFoundJourney({ passengerJourneyId: passenger.id, companionJourneyId: companion.id, companionStatus: JOURNEY_STATUS.ACCEPTED, passengerStatus: JOURNEY_STATUS.ACCEPTED });
 }
 
 async function journeys(databasebuilder) {
