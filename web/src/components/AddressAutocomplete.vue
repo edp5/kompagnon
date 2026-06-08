@@ -38,14 +38,19 @@ const isLoading = ref(false);
 const errorMessage = ref("");
 let debounceTimer = null;
 
-// Keep the displayed text in sync if the parent resets the selection.
+// Keep the displayed text in sync with the parent selection. When the parent
+// clears the selection (e.g. after a successful submission) we also clear the
+// visible text, but only if the user has not started typing a new query over it.
 watch(
   () => props.modelValue,
-  (place) => {
-    if (!place) {
+  (place, previous) => {
+    if (place) {
+      query.value = place.label;
       return;
     }
-    query.value = place.label;
+    if (previous && query.value === previous.label) {
+      query.value = "";
+    }
   },
 );
 
@@ -109,13 +114,7 @@ function selectSuggestion(place) {
       {{ label }}
     </label>
 
-    <div
-      class="address-autocomplete__control"
-      role="combobox"
-      :aria-expanded="isOpen"
-      :aria-owns="`${id}-listbox`"
-      aria-haspopup="listbox"
-    >
+    <div class="address-autocomplete__control">
       <input
         :id="id"
         class="address-autocomplete__input"
@@ -124,8 +123,10 @@ function selectSuggestion(place) {
         :placeholder="placeholder"
         :required="required"
         autocomplete="off"
-        role="searchbox"
+        role="combobox"
         aria-autocomplete="list"
+        aria-haspopup="listbox"
+        :aria-expanded="isOpen"
         :aria-controls="`${id}-listbox`"
         @input="onInput"
       >

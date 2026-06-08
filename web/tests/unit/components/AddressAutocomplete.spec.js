@@ -58,6 +58,35 @@ describe("Unit | Components | AddressAutocomplete", () => {
     expect(wrapper.text()).toContain("10 Rue de Rivoli, Paris");
   });
 
+  it("should expose the combobox role and state on the input itself", () => {
+    // given
+    const wrapper = mountComponent();
+
+    // when
+    const input = wrapper.get("input");
+
+    // then
+    expect(input.attributes("role")).toBe("combobox");
+    expect(input.attributes("aria-expanded")).toBe("false");
+    expect(input.attributes("aria-autocomplete")).toBe("list");
+    expect(input.attributes("aria-controls")).toBe("departure-listbox");
+  });
+
+  it("should clear the displayed address when the parent resets the selection", async () => {
+    // given
+    const place = { label: "10 Rue de Rivoli, Paris", lat: 48.8566, lon: 2.3522 };
+    const wrapper = mount(AddressAutocomplete, {
+      props: { id: "departure", label: "Adresse de départ", modelValue: place },
+    });
+    expect(wrapper.get("input").element.value).toBe(place.label);
+
+    // when
+    await wrapper.setProps({ modelValue: null });
+
+    // then
+    expect(wrapper.get("input").element.value).toBe("");
+  });
+
   it("should emit the selected place when a suggestion is clicked", async () => {
     // given
     const place = { label: "10 Rue de Rivoli, Paris", lat: 48.8566, lon: 2.3522 };
