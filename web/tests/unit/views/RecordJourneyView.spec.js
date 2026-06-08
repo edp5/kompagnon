@@ -14,7 +14,10 @@ const AddressStub = {
   name: "AddressAutocomplete",
   props: ["id", "modelValue"],
   emits: ["update:modelValue"],
-  template: "<button type=\"button\" :data-test=\"id\" @click=\"$emit('update:modelValue', { label: id + ' address', lat: 1, lon: 2 })\">set-{{ id }}</button>",
+  template: `<div>
+    <button type="button" :data-test="id" @click="$emit('update:modelValue', { label: id + ' address', lat: 1, lon: 2 })">set-{{ id }}</button>
+    <span :data-value="id">{{ modelValue ? modelValue.label : '' }}</span>
+  </div>`,
 };
 
 function mountView() {
@@ -64,6 +67,23 @@ describe("Unit | Views | RecordJourneyView", () => {
       arrivalTime: new Date("2026-05-16T09:00").toISOString(),
     });
     expect(wrapper.text()).toContain("Vos informations de trajet ont bien été enregistrées.");
+  });
+
+  it("should reset the form after a successful submission", async () => {
+    // given
+    recordJourney.mockResolvedValue({ success: true, journeyId: "journey-1" });
+
+    // when
+    const wrapper = mountView();
+    await fillForm(wrapper);
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+
+    // then
+    expect(wrapper.get("[data-value=\"departure\"]").text()).toBe("");
+    expect(wrapper.get("[data-value=\"arrival\"]").text()).toBe("");
+    expect(wrapper.get("input[name=\"departureTime\"]").element.value).toBe("");
+    expect(wrapper.get("input[name=\"arrivalTime\"]").element.value).toBe("");
   });
 
   it("should block submission when arrival is not after departure", async () => {

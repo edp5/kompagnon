@@ -7,12 +7,16 @@ import { useAuthStore } from "@/stores/auth.js";
 
 const authStore = useAuthStore();
 
-const form = reactive({
-  departure: null,
-  arrival: null,
-  departureTime: "",
-  arrivalTime: "",
-});
+function initialFormState() {
+  return {
+    departure: null,
+    arrival: null,
+    departureTime: "",
+    arrivalTime: "",
+  };
+}
+
+const form = reactive(initialFormState());
 
 const isSubmitting = ref(false);
 const successMessage = ref("");
@@ -33,10 +37,7 @@ function resetFeedback() {
 }
 
 function resetForm() {
-  form.departure = null;
-  form.arrival = null;
-  form.departureTime = "";
-  form.arrivalTime = "";
+  Object.assign(form, initialFormState());
 }
 
 async function handleSubmit() {
@@ -116,7 +117,7 @@ async function handleSubmit() {
               class="base-label"
               for="departureTime"
             >
-              Heure de départ
+              Date et heure de départ
             </label>
             <input
               id="departureTime"
@@ -133,7 +134,7 @@ async function handleSubmit() {
               class="base-label"
               for="arrivalTime"
             >
-              Heure d'arrivée
+              Date et heure d'arrivée souhaitée
             </label>
             <input
               id="arrivalTime"
@@ -158,8 +159,8 @@ async function handleSubmit() {
         <p
           v-if="successMessage"
           class="feedback success feedback--success record-journey__feedback"
-          role="status"
-          aria-live="polite"
+          role="alert"
+          aria-live="assertive"
         >
           {{ successMessage }}
         </p>
