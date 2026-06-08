@@ -251,8 +251,8 @@ async function handleSubmit() {
   min-height: 3.2rem;
   padding: 0.35rem 1rem;
   border-radius: 0.875rem;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(30, 44, 56, 0.1);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
   color: var(--c-navy);
   font-size: 0.95rem;
 }

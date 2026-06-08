@@ -312,7 +312,7 @@ onMounted(async () => {
 
 /* ── Community stats dark card ── */
 .home-community {
-  background: var(--c-navy);
+  background: var(--brand-navy);
   border-radius: var(--radius-lg);
   padding: 1.25rem 1.5rem;
   min-height: 100%;

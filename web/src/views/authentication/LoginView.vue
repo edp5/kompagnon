@@ -340,7 +340,7 @@ function togglePasswordVisibility() {
   padding: 0.95rem 1.2rem;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--c-navy) 0%, #263c4d 100%);
+  background: linear-gradient(135deg, var(--brand-navy) 0%, #263c4d 100%);
   color: #ffffff;
   box-shadow: 0 18px 34px rgba(30, 44, 56, 0.22);
   font-size: 0.96rem;

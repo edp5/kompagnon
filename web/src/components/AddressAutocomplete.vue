@@ -184,8 +184,8 @@ function selectSuggestion(place) {
   min-height: 3.2rem;
   padding: 0.35rem 1rem;
   border-radius: 0.875rem;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(30, 44, 56, 0.1);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
 }
 
 .address-autocomplete__control:focus-within {
@@ -220,8 +220,8 @@ function selectSuggestion(place) {
   margin: 0.35rem 0 0;
   padding: 0.35rem;
   list-style: none;
-  background: #ffffff;
-  border: 1px solid rgba(30, 44, 56, 0.1);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
   border-radius: 0.875rem;
   box-shadow: 0 18px 40px rgba(30, 44, 56, 0.12);
   max-height: 16rem;
