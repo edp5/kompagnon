@@ -86,6 +86,17 @@ describe("Unit | Views | RecordJourneyView", () => {
     expect(wrapper.get("input[name=\"arrivalTime\"]").element.value).toBe("");
   });
 
+  it("should block submission and warn when required fields are missing", async () => {
+    // when
+    const wrapper = mountView();
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+
+    // then
+    expect(recordJourney).not.toHaveBeenCalled();
+    expect(wrapper.text()).toContain("Veuillez renseigner le départ, l'arrivée et les horaires.");
+  });
+
   it("should block submission when arrival is not after departure", async () => {
     // given
     const wrapper = mountView();
