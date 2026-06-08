@@ -1,11 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { DomainError } from "../../../../../src/shared/domain/models/domain-error.js";
 import { errorHandler } from "../../../../../src/shared/infrastructure/middlewares/error-handler.js";
+vi.mock("celebrate", async () => {
+  const actual = await vi.importActual("celebrate");
+
+  return {
+    ...actual,
+    isCelebrateError: vi.fn(),
+  };
+});
+
+import { isCelebrateError } from "celebrate";
 
 describe("Unit | Shared | Infrastructure | Middlewares | Error handler", () => {
   let req, res, next;
 
   beforeEach(() => {
+    isCelebrateError.mockReset();
+    isCelebrateError.mockReturnValue(false);
     req = {};
     res = {
       status: vi.fn().mockReturnThis(),
@@ -15,13 +28,9 @@ describe("Unit | Shared | Infrastructure | Middlewares | Error handler", () => {
   });
 
   describe("#errorHandler", () => {
-    // Note: Testing celebrate validation errors is better done in integration/acceptance tests
-    // as the CelebrateError structure is complex and relies on celebrate's internal implementation
-
-    it("should handle custom errors with statusCode", () => {
+    it("should handle domain errors with statusCode", () => {
       // given
-      const customError = new Error("Invalid credentials");
-      customError.statusCode = 401;
+      const customError = new DomainError("Invalid credentials", 401);
 
       // when
       errorHandler(customError, req, res, next);
@@ -29,22 +38,42 @@ describe("Unit | Shared | Infrastructure | Middlewares | Error handler", () => {
       // then
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
-        error: "Invalid credentials",
+        status: "error",
+        message: "Invalid credentials",
       });
     });
 
-    it("should handle errors with 404 status code", () => {
+    it("should handle celebrate validation errors", () => {
       // given
-      const notFoundError = new Error("Resource not found");
-      notFoundError.statusCode = 404;
+      isCelebrateError.mockReturnValue(true);
+      const validationError = {
+        details: new Map([
+          ["body", {
+            message: "\"departureLat\" must be a number",
+            details: [
+              {
+                path: ["departureLat"],
+              },
+            ],
+          }],
+        ]),
+      };
 
       // when
-      errorHandler(notFoundError, req, res, next);
+      errorHandler(validationError, req, res, next);
 
       // then
-      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
-        error: "Resource not found",
+        status: "error",
+        message: "Validation failed",
+        details: {
+          body: {
+            source: "body",
+            keys: ["departureLat"],
+            message: "\"departureLat\" must be a number",
+          },
+        },
       });
     });
 
@@ -58,7 +87,8 @@ describe("Unit | Shared | Infrastructure | Middlewares | Error handler", () => {
       // then
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
-        error: "Internal server error",
+        status: "error",
+        message: "Internal server error",
       });
     });
 
@@ -72,7 +102,8 @@ describe("Unit | Shared | Infrastructure | Middlewares | Error handler", () => {
       // then
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
-        error: "Internal server error",
+        status: "error",
+        message: "Internal server error",
       });
     });
   });

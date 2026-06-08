@@ -1,6 +1,23 @@
 import { isCelebrateError } from "celebrate";
 
 import { logger } from "../../../../logger.js";
+import { DomainError } from "../../domain/models/domain-error.js";
+
+const ERROR_STATUS = "error";
+const INTERNAL_SERVER_ERROR_MESSAGE = "Internal server error";
+
+function createErrorResponse(message, details) {
+  const response = {
+    status: ERROR_STATUS,
+    message,
+  };
+
+  if (details) {
+    response.details = details;
+  }
+
+  return response;
+}
 
 /**
  * Centralized error handler middleware for Express
@@ -29,27 +46,20 @@ function errorHandler(error, req, res, next) {
 
     logger.warn({ validationErrors }, "Validation error");
 
-    return res.status(400).json({
-      message: "Validation failed",
-      details: validationErrors,
-    });
+    return res.status(400).json(createErrorResponse("Validation failed", validationErrors));
   }
 
   // Handle custom application errors with status codes
-  if (error.statusCode) {
+  if (error instanceof DomainError) {
     logger.warn({ error: error.message, statusCode: error.statusCode }, "Application error");
 
-    return res.status(error.statusCode).json({
-      error: error.message,
-    });
+    return res.status(error.statusCode).json(createErrorResponse(error.message || INTERNAL_SERVER_ERROR_MESSAGE));
   }
 
   // Handle unknown errors
   logger.error({ error: error.message, stack: error.stack }, "Unhandled error");
 
-  return res.status(500).json({
-    error: "Internal server error",
-  });
+  return res.status(500).json(createErrorResponse(INTERNAL_SERVER_ERROR_MESSAGE));
 }
 
 export { errorHandler };

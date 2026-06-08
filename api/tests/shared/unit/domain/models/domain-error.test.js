@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import DomainError from "../../../../../src/shared/domain/models/domain-error.js";
+import { DomainError } from "../../../../../src/shared/domain/models/domain-error.js";
 
 describe("Unit | Shared | Domain | Models | Domain error", () => {
   describe("#constructor", () => {
@@ -27,6 +27,17 @@ describe("Unit | Shared | Domain | Models | Domain error", () => {
       // when & then
       expect(error.stack).toBeDefined();
       expect(error.stack).toContain("DomainError");
+    });
+
+    it("should default to 500 when status code is invalid", () => {
+      // given
+      const statusCode = 200;
+
+      // when
+      const error = new DomainError("Test error message", statusCode);
+
+      // then
+      expect(error.statusCode).toBe(500);
     });
   });
 });
