@@ -75,4 +75,15 @@ describe("Unit | Components | BottomNavigation", () => {
       expect(item.attributes("aria-label")).toBeTruthy();
     });
   });
+
+  it("should render a menu item and emit open-menu when clicked", async () => {
+    const wrapper = createWrapper();
+    const menuButton = wrapper.get(".bottom-nav__item--menu");
+
+    expect(menuButton.text()).toContain("Menu");
+
+    await menuButton.trigger("click");
+
+    expect(wrapper.emitted("open-menu")).toBeTruthy();
+  });
 });

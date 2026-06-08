@@ -12,6 +12,9 @@ vi.mock("vue-router", () => ({
   useRoute: () => ({
     name: "home",
   }),
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
 }));
 
 describe("Unit | Components | DesktopSidebar", () => {

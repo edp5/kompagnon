@@ -1,14 +1,26 @@
 <script setup>
-import { RouterView } from "vue-router";
+import { ref, watch } from "vue";
+import { RouterView, useRoute } from "vue-router";
 
 import BottomNavigation from "@/components/BottomNavigation.vue";
 import DesktopSidebar from "@/components/DesktopSidebar.vue";
 import TopBar from "@/components/TopBar.vue";
+
+const route = useRoute();
+const isMenuOpen = ref(false);
+
+// Close the mobile drawer whenever the route changes.
+watch(() => route.fullPath, () => {
+  isMenuOpen.value = false;
+});
 </script>
 
 <template>
   <div class="app-layout">
-    <DesktopSidebar />
+    <DesktopSidebar
+      :open="isMenuOpen"
+      @close="isMenuOpen = false"
+    />
     <div class="app-layout__body">
       <TopBar />
       <main
@@ -20,7 +32,7 @@ import TopBar from "@/components/TopBar.vue";
           <RouterView />
         </div>
       </main>
-      <BottomNavigation />
+      <BottomNavigation @open-menu="isMenuOpen = true" />
     </div>
   </div>
 </template>
