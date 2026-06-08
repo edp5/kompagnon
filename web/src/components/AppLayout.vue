@@ -28,8 +28,8 @@ import TopBar from "@/components/TopBar.vue";
 <style scoped>
 .app-layout {
   display: flex;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: transparent;
 }
@@ -39,17 +39,18 @@ import TopBar from "@/components/TopBar.vue";
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 0;
   min-width: 0;
   width: 100%;
 }
 
+/* Single scroll container: only the main area scrolls, so the top bar and
+   the bottom navigation stay pinned on every screen, mobile and desktop. */
 .app-layout__main {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: calc(5.75rem + env(safe-area-inset-bottom));
+  min-height: 0;
   width: 100%;
 }
 
@@ -58,22 +59,5 @@ import TopBar from "@/components/TopBar.vue";
   width: 100%;
 }
 
-/* Breakpoint intermédiaire pour tablettes */
-@media (max-width: 1024px) and (min-width: 641px) {
-  .app-layout__main {
-    padding-bottom: calc(5.75rem + env(safe-area-inset-bottom));
-  }
-}
-
-/* Breakpoint desktop */
-@media (min-width: 1024px) {
-  .app-layout {
-    height: 100vh;
-    height: 100dvh;
-  }
-
-  .app-layout__main {
-    padding-bottom: 0;
-  }
-}
+/* The bottom navigation is hidden on desktop via its own component styles. */
 </style>
