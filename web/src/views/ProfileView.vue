@@ -852,6 +852,10 @@ const reviews = [];
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
   .profile-header {
     padding: 1.125rem 1.125rem 0.625rem;
   }
