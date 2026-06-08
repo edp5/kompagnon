@@ -9,6 +9,7 @@ const route = useRoute();
 const items = [
   { name: "home", label: "Accueil", icon: "home" },
   { name: "map", label: "Carte", icon: "map" },
+  { name: "record-journey", label: "Trajet", icon: "plus" },
   { name: "notifications", label: "Alertes", icon: "notifications" },
   { name: "profile", label: "Profil", icon: "profile" },
 ];
@@ -45,7 +46,7 @@ const activeRouteName = computed(() => route.name);
   bottom: 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(18px);

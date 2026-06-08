@@ -70,7 +70,7 @@ onMounted(async () => {
             Découvrez les accompagnements disponibles près de vous
           </p>
           <router-link
-            to="/carte"
+            :to="{ name: 'map' }"
             class="home-hero__cta"
           >
             Voir la carte

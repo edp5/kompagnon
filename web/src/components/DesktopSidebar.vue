@@ -15,6 +15,7 @@ const isAdmin = ref(false);
 
 const navItems = [
   { name: "home", icon: "home", label: "Tableau de bord" },
+  { name: "record-journey", icon: "plus", label: "Nouveau trajet" },
   { name: "map", icon: "map", label: "Carte" },
   { name: "notifications", icon: "notifications", label: "Notifications" },
   { name: "profile", icon: "profile", label: "Mon profil" },

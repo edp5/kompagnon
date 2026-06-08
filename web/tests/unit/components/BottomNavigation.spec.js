@@ -11,6 +11,7 @@ describe("Unit | Components | BottomNavigation", () => {
       routes: [
         { path: "/", name: "home", component: { template: "<div />" } },
         { path: "/map", name: "map", component: { template: "<div />" } },
+        { path: "/journeys/new", name: "record-journey", component: { template: "<div />" } },
         { path: "/notifications", name: "notifications", component: { template: "<div />" } },
         { path: "/profile", name: "profile", component: { template: "<div />" } },
       ],
@@ -34,15 +35,20 @@ describe("Unit | Components | BottomNavigation", () => {
     expect(wrapper.find("nav").attributes("aria-label")).toBe("Navigation principale mobile");
   });
 
-  it("should render all 4 nav items", () => {
+  it("should render all 5 nav items", () => {
     const wrapper = createWrapper();
     const items = wrapper.findAll(".bottom-nav__item");
-    expect(items.length).toBe(4);
+    expect(items.length).toBe(5);
   });
 
   it("should render home item", () => {
     const wrapper = createWrapper();
     expect(wrapper.text()).toContain("Accueil");
+  });
+
+  it("should render record-journey item", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.text()).toContain("Trajet");
   });
 
 
