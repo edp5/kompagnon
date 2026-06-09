@@ -104,10 +104,51 @@ journeysRoutes.post("/api/journeys", authMiddleware, recordJourneyControllerSche
  *               properties:
  *                 data:
  *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 12
+ *                     userId:
+ *                       type: integer
+ *                       example: 3
+ *                     departureAddress:
+ *                       type: string
+ *                       example: 10 Rue de Rivoli, Paris
+ *                     arrivalAddress:
+ *                       type: string
+ *                       example: 5 Avenue Anatole France, Paris
+ *                     departureLat:
+ *                       type: number
+ *                       example: 48.8566
+ *                     departureLon:
+ *                       type: number
+ *                       example: 2.3522
+ *                     arrivalLat:
+ *                       type: number
+ *                       example: 48.8584
+ *                     arrivalLon:
+ *                       type: number
+ *                       example: 2.2945
+ *                     departureTime:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2026-05-16T08:30:00.000Z
+ *                     arrivalTime:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2026-05-16T09:00:00.000Z
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized - missing or invalid token
  *       404:
  *         description: Journey not found or not owned by the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Journey not found
  *       500:
  *         description: Internal server error
  */
