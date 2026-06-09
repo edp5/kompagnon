@@ -97,6 +97,16 @@ function extractDeclaredRoutes(fileContent) {
 }
 
 /**
+ * Normalizes an Express path to the OpenAPI path syntax so a route declared
+ * with ":param" matches a swagger block documented with "{param}".
+ * @param {string} routePath - The route path to normalize.
+ * @returns {string} The path with ":param" segments rewritten as "{param}".
+ */
+function toOpenApiPath(routePath) {
+  return routePath.replace(/:([A-Za-z0-9_]+)/g, "{$1}");
+}
+
+/**
  * Provides the default success HTTP status code by method.
  * @param {string} method - HTTP method.
  * @returns {number} Suggested success status code.
@@ -185,7 +195,7 @@ async function main() {
     const relativeFilePath = path.relative(ROOT_DIRECTORY, routeFile);
 
     for (const route of declaredRoutes) {
-      const endpointKey = `${route.method} ${route.path}`;
+      const endpointKey = `${route.method} ${toOpenApiPath(route.path)}`;
 
       if (!documentedEndpoints.has(endpointKey)) {
         missingRoutes.push({
