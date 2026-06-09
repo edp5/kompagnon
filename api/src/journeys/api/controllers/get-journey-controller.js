@@ -46,7 +46,7 @@ async function getJourneyController(
     }
     return res.status(200).json({ data: journey });
   } catch (error) {
-    logger.error(`Error during journey retrieval, ${error}`);
+    logger.error({ err: error }, "Error during journey retrieval");
     return res.status(500).send();
   }
 }
