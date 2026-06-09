@@ -49,7 +49,7 @@ async function recordJourneyController(
       return res.status(201).json({ data: result });
     }
   } catch (error) {
-    logger.error(`Error during journey recording, ${error}`);
+    logger.error({ err: error }, "Error during journey recording");
     return res.status(500).send();
   }
 }
