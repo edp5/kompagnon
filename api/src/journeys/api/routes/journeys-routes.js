@@ -1,6 +1,7 @@
 import express from "express";
 
 import { authMiddleware } from "../../../shared/infrastructure/middlewares/auth-middleware.js";
+import { getJourneyController, getJourneyControllerSchema } from "../controllers/get-journey-controller.js";
 import { recordJourneyController, recordJourneyControllerSchema } from "../controllers/record-journey-controller.js";
 
 const journeysRoutes = express.Router();
@@ -77,5 +78,39 @@ const journeysRoutes = express.Router();
  *         description: Internal server error
  */
 journeysRoutes.post("/api/journeys", authMiddleware, recordJourneyControllerSchema, recordJourneyController);
+
+/**
+ * @swagger
+ * /api/journeys/{journeyId}:
+ *   get:
+ *     summary: Get a journey's information
+ *     description: Returns the information of a journey belonging to the authenticated user. The journey is read from the passenger or companion table depending on the user role.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: journeyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The id of the journey to retrieve.
+ *     responses:
+ *       200:
+ *         description: Journey found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Journey not found or not owned by the user
+ *       500:
+ *         description: Internal server error
+ */
+journeysRoutes.get("/api/journeys/:journeyId", authMiddleware, getJourneyControllerSchema, getJourneyController);
 
 export default journeysRoutes;
