@@ -551,122 +551,11 @@ const stats = [
   color: var(--c-text-medium);
 }
 
-@media (max-width: 1279px) {
-  .auth-shell {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .auth-hero {
-    padding: 6rem 0 0;
-  }
-
-  .auth-hero__cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .auth-panel {
-    padding-top: 0;
-  }
-}
-
-@media (min-width: 1024px) and (max-height: 900px) {
-  .auth-shell {
-    gap: 1rem;
-    padding: 1rem 1rem 1.25rem;
-  }
-
-  .auth-shell__brand {
-    top: 1rem;
-    left: 1rem;
-    padding: 0.55rem 0.8rem;
-  }
-
-  .auth-hero {
-    gap: 1rem;
-    padding: 4.75rem 0.5rem 0.5rem;
-  }
-
-  .auth-hero__intro {
-    gap: 0.95rem;
-  }
-
-  .auth-hero__title {
-    font-size: clamp(1.9rem, 3.6vw, 3rem);
-  }
-
-  .auth-hero__description {
-    font-size: 0.94rem;
-    line-height: 1.58;
-  }
-
-  .auth-hero__cards {
-    display: none;
-  }
-
-  .auth-hero__stats {
-    gap: 0.65rem;
-  }
-
-  .auth-hero__stat {
-    padding: 0.8rem 0.9rem;
-  }
-
-  .auth-hero__stat strong {
-    font-size: 1.15rem;
-  }
-
-  .auth-hero__quote {
-    gap: 0.75rem;
-    padding: 0.9rem 1rem;
-  }
-
-  .auth-panel {
-    padding: 4.6rem 0 0.75rem;
-  }
-
-  .auth-panel__box {
-    gap: 1rem;
-    padding: 1.1rem 1.1rem 1rem;
-    border-radius: 1.5rem;
-  }
-
-  .auth-panel__header {
-    gap: 0.4rem;
-  }
-
-  .auth-panel__title {
-    font-size: clamp(1.35rem, 2.4vw, 1.9rem);
-  }
-
-  .auth-panel__description {
-    font-size: 0.9rem;
-    line-height: 1.45;
-  }
-
-  .auth-panel__footer {
-    padding-top: 0.55rem;
-  }
-}
-
-@media (min-width: 1024px) and (max-height: 820px) {
-  .auth-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .auth-hero {
-    display: none;
-  }
-
-  .auth-panel {
-    padding-top: 4.6rem;
-  }
-
-  .auth-panel__box {
-    width: min(100%, 36rem);
-  }
-}
-
+/*
+ * Two clean states only:
+ * - Desktop (>= 1024px): the two-column layout defined above (hero + form).
+ * - Mobile (< 1024px): form only, hero hidden.
+ */
 @media (max-width: 1023px) {
   .auth-page {
     background:
@@ -675,6 +564,7 @@ const stats = [
   }
 
   .auth-shell {
+    grid-template-columns: 1fr;
     padding: 1rem;
   }
 

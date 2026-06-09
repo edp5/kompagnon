@@ -11,8 +11,10 @@ describe("Unit | Components | BottomNavigation", () => {
       routes: [
         { path: "/", name: "home", component: { template: "<div />" } },
         { path: "/map", name: "map", component: { template: "<div />" } },
+        { path: "/journeys/new", name: "record-journey", component: { template: "<div />" } },
         { path: "/notifications", name: "notifications", component: { template: "<div />" } },
         { path: "/profile", name: "profile", component: { template: "<div />" } },
+        { path: "/privacy", name: "privacy", component: { template: "<div />" } },
       ],
     });
 
@@ -34,15 +36,20 @@ describe("Unit | Components | BottomNavigation", () => {
     expect(wrapper.find("nav").attributes("aria-label")).toBe("Navigation principale mobile");
   });
 
-  it("should render all 4 nav items", () => {
+  it("should render all 6 nav items", () => {
     const wrapper = createWrapper();
     const items = wrapper.findAll(".bottom-nav__item");
-    expect(items.length).toBe(4);
+    expect(items.length).toBe(6);
   });
 
   it("should render home item", () => {
     const wrapper = createWrapper();
     expect(wrapper.text()).toContain("Accueil");
+  });
+
+  it("should render record-journey item", () => {
+    const wrapper = createWrapper();
+    expect(wrapper.text()).toContain("Trajet");
   });
 
 
@@ -67,5 +74,16 @@ describe("Unit | Components | BottomNavigation", () => {
     items.forEach((item) => {
       expect(item.attributes("aria-label")).toBeTruthy();
     });
+  });
+
+  it("should render a menu item and emit open-menu when clicked", async () => {
+    const wrapper = createWrapper();
+    const menuButton = wrapper.get(".bottom-nav__item--menu");
+
+    expect(menuButton.text()).toContain("Menu");
+
+    await menuButton.trigger("click");
+
+    expect(wrapper.emitted("open-menu")).toBeTruthy();
   });
 });

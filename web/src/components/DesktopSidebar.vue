@@ -1,20 +1,59 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 
 import { getUserProfile } from "@/adapters/users.js";
 import { useAuthStore } from "@/stores/auth.js";
 
 import KIcon from "./KIcon.vue";
 
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const emit = defineEmits(["close"]);
+
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 const collapsed = ref(false);
 const profile = ref(null);
 const isAdmin = ref(false);
 
+function closeDrawer() {
+  emit("close");
+}
+
+function handleLogout() {
+  authStore.logout();
+  router.push({ name: "login" });
+}
+
+function onKeydown(event) {
+  if (event.key === "Escape" && props.open) {
+    closeDrawer();
+  }
+}
+
+watch(() => props.open, (open) => {
+  document.body.style.overflow = open ? "hidden" : "";
+});
+
+onMounted(() => {
+  document.addEventListener("keydown", onKeydown);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("keydown", onKeydown);
+  document.body.style.overflow = "";
+});
+
 const navItems = [
   { name: "home", icon: "home", label: "Tableau de bord" },
+  { name: "record-journey", icon: "plus", label: "Nouveau trajet" },
   { name: "map", icon: "map", label: "Carte" },
   { name: "notifications", icon: "notifications", label: "Notifications" },
   { name: "profile", icon: "profile", label: "Mon profil" },
@@ -65,9 +104,15 @@ function isActive(routeName) {
 </script>
 
 <template>
+  <div
+    v-if="open"
+    class="sidebar-backdrop"
+    @click="closeDrawer"
+  />
   <aside
     class="sidebar"
-    :class="{ 'sidebar--collapsed': collapsed }"
+    :class="{ 'sidebar--collapsed': collapsed, 'sidebar--open': open }"
+    aria-label="Menu de navigation"
   >
     <div class="sidebar__brand">
       <img
@@ -91,6 +136,17 @@ function isActive(routeName) {
           />
         </button>
       </template>
+      <button
+        class="sidebar__close"
+        type="button"
+        aria-label="Fermer le menu"
+        @click="closeDrawer"
+      >
+        <KIcon
+          name="close"
+          :size="18"
+        />
+      </button>
     </div>
 
     <div
@@ -157,29 +213,76 @@ function isActive(routeName) {
         </div>
       </template>
     </div>
+
+    <button
+      class="sidebar__logout"
+      type="button"
+      @click="handleLogout"
+    >
+      <KIcon
+        name="logout"
+        :size="18"
+        aria-hidden="true"
+      />
+      <span>Se déconnecter</span>
+    </button>
   </aside>
 </template>
 
 <style scoped>
+/* Mobile: off-canvas drawer opened from the bottom-nav "Menu" button. */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
+  animation: sidebar-fade 0.2s ease both;
+}
+
+@keyframes sidebar-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .sidebar {
-  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 60;
+  display: flex;
   flex-direction: column;
-  width: 240px;
-  min-width: 240px;
-  height: 100vh;
+  width: min(86vw, 320px);
   height: 100dvh;
   background: var(--c-sidebar-bg);
   border-right: 1px solid var(--c-border);
   overflow-y: auto;
   overflow-x: hidden;
   flex-shrink: 0;
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 10;
+  transform: translateX(-100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.3);
+}
+
+.sidebar--open {
+  transform: translateX(0);
 }
 
 @media (min-width: 1024px) {
+  .sidebar-backdrop {
+    display: none;
+  }
+
   .sidebar {
-    display: flex;
+    position: static;
+    transform: none;
+    width: 240px;
+    min-width: 240px;
+    height: 100dvh;
+    z-index: 10;
+    box-shadow: none;
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
@@ -511,5 +614,65 @@ function isActive(routeName) {
 .sidebar__user-status {
   font-size: 0.6875rem;
   color: var(--c-text-light);
+}
+
+/* Close button — drawer only (mobile) */
+.sidebar__close {
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--c-beige);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-medium);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar__close:hover {
+  background: var(--c-teal-light);
+  color: var(--c-teal-dark);
+}
+
+/* Logout — drawer only (desktop has it in the top bar) */
+.sidebar__logout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.25rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--c-border);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--c-danger, #d43a3a);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sidebar__logout:hover {
+  background: var(--c-danger-bg, rgba(212, 58, 58, 0.08));
+}
+
+/* Drawer-only controls are hidden on desktop; desktop-only controls are
+   hidden on mobile. */
+@media (max-width: 1023px) {
+  .sidebar__collapse-btn,
+  .sidebar__expand {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .sidebar__close,
+  .sidebar__logout {
+    display: none;
+  }
 }
 </style>

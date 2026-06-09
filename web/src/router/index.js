@@ -10,6 +10,7 @@ import MapView from "@/views/MapView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import PrivacyView from "@/views/PrivacyView.vue";
 import ProfileView from "@/views/ProfileView.vue";
+import RecordJourneyView from "@/views/RecordJourneyView.vue";
 import SupportView from "@/views/SupportView.vue";
 
 function withAppLayout(path, name, component) {
@@ -59,6 +60,9 @@ const router = createRouter({
     },
     {
       ...withAppLayout("/map", "map", MapView),
+    },
+    {
+      ...withAppLayout("/journeys/new", "record-journey", RecordJourneyView),
     },
     {
       ...withAppLayout("/profile", "profile", ProfileView),

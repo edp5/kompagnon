@@ -6,9 +6,12 @@ import KIcon from "./KIcon.vue";
 
 const route = useRoute();
 
+defineEmits(["open-menu"]);
+
 const items = [
   { name: "home", label: "Accueil", icon: "home" },
   { name: "map", label: "Carte", icon: "map" },
+  { name: "record-journey", label: "Trajet", icon: "plus" },
   { name: "notifications", label: "Alertes", icon: "notifications" },
   { name: "profile", label: "Profil", icon: "profile" },
 ];
@@ -36,6 +39,20 @@ const activeRouteName = computed(() => route.name);
       />
       <span>{{ item.label }}</span>
     </RouterLink>
+
+    <button
+      type="button"
+      class="bottom-nav__item bottom-nav__item--menu"
+      aria-label="Ouvrir le menu"
+      @click="$emit('open-menu')"
+    >
+      <KIcon
+        name="menu"
+        :size="20"
+        aria-hidden="true"
+      />
+      <span>Menu</span>
+    </button>
   </nav>
 </template>
 
@@ -45,7 +62,7 @@ const activeRouteName = computed(() => route.name);
   bottom: 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(18px);
@@ -73,6 +90,13 @@ const activeRouteName = computed(() => route.name);
 .bottom-nav__item--active {
   color: var(--c-teal-dark);
   background: rgba(72, 175, 196, 0.1);
+}
+
+.bottom-nav__item--menu {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 @media (min-width: 1024px) {

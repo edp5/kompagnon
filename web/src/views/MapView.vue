@@ -147,7 +147,7 @@ const volunteers = [];
   flex: 1;
   max-height: 30%;
   overflow-y: auto;
-  background: white;
+  background: var(--c-surface);
   border-top: 1px solid var(--c-border);
 }
 

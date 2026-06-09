@@ -68,6 +68,16 @@ describe("Unit | Router", () => {
       expect(profileRoute?.meta.requiresAuth).toBe(true);
     });
 
+    it("should register the record-journey route with requiresAuth", () => {
+      // when
+      const recordJourneyRoute = router.getRoutes().find((route) => route.name === "record-journey");
+
+      // then
+      expect(recordJourneyRoute).toBeDefined();
+      expect(recordJourneyRoute?.path).toBe("/journeys/new");
+      expect(recordJourneyRoute?.meta.requiresAuth).toBe(true);
+    });
+
     it("should require authentication for the map route", () => {
       // when
       const mapRoute = router.getRoutes().find((route) => route.name === "map");
@@ -251,6 +261,27 @@ describe("Unit | Router", () => {
 
       // then
       expect(router.currentRoute.value.name).toBe("home");
+    });
+
+    it("should redirect unauthenticated users from record-journey route to login with redirect", async () => {
+      // when
+      await router.push({ name: "record-journey" });
+
+      // then
+      expect(router.currentRoute.value.name).toBe("login");
+      expect(router.currentRoute.value.query.redirect).toBe("/journeys/new");
+    });
+
+    it("should allow authenticated users to access record-journey route", async () => {
+      // given
+      const authStore = useAuthStore();
+      authStore.setAuth("jwt-token", 1);
+
+      // when
+      await router.push({ name: "record-journey" });
+
+      // then
+      expect(router.currentRoute.value.name).toBe("record-journey");
     });
 
     it("should allow authenticated users to access map route", async () => {

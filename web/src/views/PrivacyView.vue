@@ -561,6 +561,22 @@ const score = 75;
   .privacy-header { padding: 1rem 1rem 0.75rem; }
   .privacy-content { padding: 0 1rem 1rem; }
   .privacy-score-card { flex-wrap: wrap; }
+
+  /* The visibility dropdown can't shrink, so stack its row on mobile to keep
+     the label readable instead of squeezing it into a narrow column. */
+  .privacy-row:has(.privacy-dropdown) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .privacy-row:has(.privacy-dropdown) .privacy-dropdown,
+  .privacy-row:has(.privacy-dropdown) .privacy-dropdown__btn {
+    width: 100%;
+  }
+
+  .privacy-row:has(.privacy-dropdown) .privacy-dropdown__btn {
+    justify-content: space-between;
+  }
 }
 </style>
 

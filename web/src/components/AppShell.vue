@@ -47,7 +47,7 @@ function focusMainContent() {
   transform: translateY(-200%);
   padding: 0.75rem 1rem;
   border-radius: 999px;
-  background: var(--c-navy);
+  background: var(--brand-navy);
   color: white;
   font-weight: 700;
 }

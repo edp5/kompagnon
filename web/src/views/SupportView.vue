@@ -559,7 +559,7 @@ const resources = [
 
 .faq-item__a {
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--c-text-medium);
   margin: 0;
   line-height: 1.55;
 }

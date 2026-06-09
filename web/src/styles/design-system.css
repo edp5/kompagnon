@@ -1055,6 +1055,27 @@ a,
   border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
+/* Profile: banner card, detail rows, avatar and badges are light surfaces
+   whose text uses --kompagnon-navy (which flips to a light color in dark
+   mode). Darken the surfaces so the text stays readable. */
+:root.a11y-dark-mode .profile-banner__card {
+  background: rgba(26, 29, 36, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+:root.a11y-dark-mode .profile-detail-row {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+:root.a11y-dark-mode .profile-avatar__circle {
+  background: rgba(94, 197, 216, 0.18);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+:root.a11y-dark-mode .profile-badge {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #e8eaed !important;
+}
+
 /* ── Auth (Login / Register) ── */
 :root.a11y-dark-mode .auth-shell__brand,
 :root.a11y-dark-mode .auth-hero__kicker,
@@ -1124,6 +1145,9 @@ a,
 /* ── Privacy ── */
 :root.a11y-dark-mode .privacy-score-bar {
   background: rgba(255, 255, 255, 0.1) !important;
+}
+:root.a11y-dark-mode .privacy-row--warning {
+  background: rgba(251, 191, 36, 0.1) !important;
 }
 :root.a11y-dark-mode .privacy-dropdown__btn {
   background: rgba(30, 33, 42, 0.9) !important;

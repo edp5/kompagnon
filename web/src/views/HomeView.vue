@@ -70,7 +70,7 @@ onMounted(async () => {
             Découvrez les accompagnements disponibles près de vous
           </p>
           <router-link
-            to="/carte"
+            :to="{ name: 'map' }"
             class="home-hero__cta"
           >
             Voir la carte
@@ -312,7 +312,7 @@ onMounted(async () => {
 
 /* ── Community stats dark card ── */
 .home-community {
-  background: var(--c-navy);
+  background: var(--brand-navy);
   border-radius: var(--radius-lg);
   padding: 1.25rem 1.5rem;
   min-height: 100%;

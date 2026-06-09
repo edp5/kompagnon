@@ -187,6 +187,14 @@ onMounted(() => {
   font-family: var(--font-body), system-ui, sans-serif;
 }
 
+/* On mobile the bottom navigation occupies the bottom edge, so the launcher
+   sits above it instead of overlapping the last nav item. */
+@media (max-width: 1023px) {
+  .a11y-panel {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+}
+
 /* ── Toggle button ── */
 .a11y-toggle {
   display: inline-flex;
@@ -463,7 +471,7 @@ onMounted(() => {
 
 @media (max-width: 600px) {
   .a11y-panel {
-    bottom: 1rem;
+    bottom: calc(5.5rem + env(safe-area-inset-bottom));
     right: 1rem;
   }
 
