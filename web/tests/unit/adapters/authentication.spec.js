@@ -144,24 +144,12 @@ describe("Unit | Adapters | Authentication", () => {
 
       // then
       expect(result).toEqual({ success: true, message: "Compte activé avec succès !" });
-      expect(fetchSpy).toHaveBeenCalledWith("/api/authentication/activate?token=test-activation-token", {
+      expect(fetchSpy).toHaveBeenCalledWith("/api/authentication/activate", {
         method: "GET",
+        headers: {
+          authorization: "Bearer test-activation-token",
+        },
       });
-    });
-
-    it("should encode the token in the URL", async () => {
-      // given
-      const token = "token with spaces & special=chars";
-      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({ status: 201 });
-
-      // when
-      await activateAccount({ token });
-
-      // then
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `/api/authentication/activate?token=${encodeURIComponent(token)}`,
-        expect.any(Object),
-      );
     });
 
     it("should return a specific failure message if response status is 400 (invalid token)", async () => {
