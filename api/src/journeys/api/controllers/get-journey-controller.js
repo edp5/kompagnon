@@ -2,7 +2,7 @@ import { celebrate, Joi, Segments } from "celebrate";
 
 import { findUserById } from "../../../identities-access-management/repositories/user-repository.js";
 import { USER_ROLE } from "../../../shared/constants.js";
-import { DomainError } from "../../../shared/domain/models/domain-error.js";
+import { JourneyNotFound, UserHasNoRole } from "../../errors.js";
 import usecases from "../../usecases/index.js";
 
 const getJourneyControllerSchema = celebrate({
@@ -14,9 +14,9 @@ const getJourneyControllerSchema = celebrate({
 /**
  * Controller that returns the information of a single journey. The journey is
  * looked up in the passenger or companion table depending on the user's role.
- * Errors are forwarded to the centralized error handler: a DomainError(404) when
+ * Errors are forwarded to the centralized error handler: a JourneyNotFound when
  * the journey does not exist or does not belong to the authenticated user, and a
- * DomainError(400) for an unknown user role.
+ * UserHasNoRole error for an unknown user role.
  * @param {object} req - The request object, holding the authenticated user and the journeyId param.
  * @param {object} res - The response object used to reply to the client.
  * @param {Function} next - The next middleware in the Express pipeline (error handling).
@@ -42,10 +42,10 @@ async function getJourneyController(
     } else if (user.role === USER_ROLE.VALID) {
       journey = await getCompanionJourney({ journeyId, userId: user.id });
     } else {
-      throw new DomainError("Invalid user role", 400);
+      throw new UserHasNoRole();
     }
     if (!journey) {
-      throw new DomainError("Journey not found", 404);
+      throw new JourneyNotFound();
     }
     return res.status(200).json({ data: journey });
   } catch (error) {

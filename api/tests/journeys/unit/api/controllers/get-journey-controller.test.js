@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getJourneyController } from "../../../../../src/journeys/api/controllers/get-journey-controller.js";
+import { JourneyNotFound, UserHasNoRole } from "../../../../../src/journeys/errors.js";
 import { USER_ROLE } from "../../../../../src/shared/constants.js";
-import { DomainError } from "../../../../../src/shared/domain/models/domain-error.js";
 
 describe("Unit | Journey | Api | Controller | Get journey controller", () => {
   let res, next, getPassengerJourney, getCompanionJourney, findUserRepository;
@@ -54,7 +54,7 @@ describe("Unit | Journey | Api | Controller | Get journey controller", () => {
   });
 
   describe("journey not found or not owned", () => {
-    it("should forward a 404 DomainError to next", async () => {
+    it("should forward a JourneyNotFound error to next", async () => {
       // given
       const req = { auth: { userId: 123 }, params: { journeyId: "7" } };
       findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.INVALID });
@@ -65,15 +65,12 @@ describe("Unit | Journey | Api | Controller | Get journey controller", () => {
 
       // then
       expect(res.status).not.toHaveBeenCalled();
-      expect(next).toHaveBeenCalledTimes(1);
-      const error = next.mock.calls[0][0];
-      expect(error).toBeInstanceOf(DomainError);
-      expect(error.statusCode).toBe(404);
+      expect(next).toHaveBeenCalledWith(new JourneyNotFound());
     });
   });
 
   describe("user without role", () => {
-    it("should forward a 400 DomainError to next and call no usecase", async () => {
+    it("should forward a UserHasNoRole error to next and call no usecase", async () => {
       // given
       const req = { auth: { userId: 123 }, params: { journeyId: "7" } };
       findUserRepository.mockResolvedValue({ id: 123 });
@@ -84,9 +81,7 @@ describe("Unit | Journey | Api | Controller | Get journey controller", () => {
       // then
       expect(getPassengerJourney).not.toHaveBeenCalled();
       expect(getCompanionJourney).not.toHaveBeenCalled();
-      const error = next.mock.calls[0][0];
-      expect(error).toBeInstanceOf(DomainError);
-      expect(error.statusCode).toBe(400);
+      expect(next).toHaveBeenCalledWith(new UserHasNoRole());
     });
   });
 
