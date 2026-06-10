@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import databaseBuilder from "../../../db/database-builder/index.js";
 import { knex } from "../../../db/knex-database-connection.js";
 import server from "../../../server.js";
-import { USER_ROLE } from "../../../src/shared/constants.js";
+import { JOURNEY_STATUS, USER_ROLE } from "../../../src/shared/constants.js";
 import { generateAuthenticatedUser } from "../../helpers/generate-authenticated-user.js";
 
 describe("Acceptance | Journeys | Journey routes", () => {
@@ -164,8 +164,14 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
     it("should return 404 when the journey belongs to another user", async () => {
       // given
-      const owner = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID, email: `owner-${crypto.randomUUID()}@example.net` });
-      const otherUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID, email: `other-${crypto.randomUUID()}@example.net` });
+      const owner = await databaseBuilder.factory.buildUser({
+        role: USER_ROLE.INVALID,
+        email: `owner-${crypto.randomUUID()}@example.net`,
+      });
+      const otherUser = await databaseBuilder.factory.buildUser({
+        role: USER_ROLE.INVALID,
+        email: `other-${crypto.randomUUID()}@example.net`,
+      });
       const journey = await databaseBuilder.factory.buildPassengerJourney({ userId: owner.id });
       const auth = generateAuthenticatedUser(otherUser.id, otherUser.userType);
 
@@ -194,6 +200,169 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
       // then
       expect(response.status).toBe(401);
+    });
+  });
+  describe("PUT /journeys/found/:id", () => {
+    describe("valid users", () => {
+      describe("success cases", () => {
+        it("should return http 201 status code if user accepts journey", async () => {
+          // given
+          const validUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+          const validJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: validUser.id });
+
+          const foundJourney = await databaseBuilder.factory.buildFoundJourney({ companionJourneyId: validJourney.id });
+          const authorization = generateAuthenticatedUser(validUser.id, validUser.userType);
+
+          const body = { updatedStatus: true };
+
+          // when
+          const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
+
+          // then
+          expect(response.status).toBe(201);
+          const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
+          expect(updatedFoundJourney.companionStatus).toBe(JOURNEY_STATUS.ACCEPTED);
+        });
+
+        it("should return http 201 status code if user refuses journey", async () => {
+          // given
+          const validUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+          const validJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: validUser.id });
+
+          const foundJourney = await databaseBuilder.factory.buildFoundJourney({ companionJourneyId: validJourney.id });
+          const authorization = generateAuthenticatedUser(validUser.id, validUser.userType);
+
+          const body = { updatedStatus: false };
+
+          // when
+          const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
+
+          // then
+          expect(response.status).toBe(201);
+          const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
+          expect(updatedFoundJourney.companionStatus).toBe(JOURNEY_STATUS.REJECTED);
+        });
+      });
+
+      describe("error cases", () => {
+        it("should throw an error if foundJourneyId param is not a number", async () => {
+          // given
+          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+          const journey = await databaseBuilder.factory.buildCompanionJourney({ userId: user.id });
+          await databaseBuilder.factory.buildFoundJourney({ companionJourneyId: journey.id });
+          const authorization = generateAuthenticatedUser(user.id, user.userType);
+          const body = { updatedStatus: true };
+
+          // when
+          const response = await request(server).put("/api/journeys/found/foundJourneyId").send(body).set("Authorization", authorization);
+
+          // then
+          expect(response.status).toEqual(400);
+          expect(response.body.message).toBe("Validation failed");
+        });
+
+        it("should throw an error if updatedStatus is not a boolean", async () => {
+          // given
+          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+          const journey = await databaseBuilder.factory.buildCompanionJourney({ userId: user.id });
+          const foundJourney = await databaseBuilder.factory.buildFoundJourney({ companionJourneyId: journey.id });
+          const authorization = generateAuthenticatedUser(user.id, user.userType);
+          const body = { updatedStatus: "test" };
+
+          // when
+          const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).send(body).set("Authorization", authorization);
+
+          // then
+          expect(response.status).toEqual(400);
+          expect(response.body.message).toBe("Validation failed");
+        });
+      });
+    });
+
+    describe("invalid users", () => {
+      describe("success cases", () => {
+        it("should return http 201 status code if user accepts journey", async () => {
+          // given
+          const invalidUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+          const invalidJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: invalidUser.id });
+
+          const foundJourney = await databaseBuilder.factory.buildFoundJourney({ passengerJourneyId: invalidJourney.id });
+          const authorization = generateAuthenticatedUser(invalidUser.id, invalidUser.userType);
+
+          const body = { updatedStatus: true };
+
+          // when
+          const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
+
+          // then
+          expect(response.status).toBe(201);
+          const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
+          expect(updatedFoundJourney.passengerStatus).toBe(JOURNEY_STATUS.ACCEPTED);
+        });
+
+        it("should return http 201 status code if user refuses journey", async () => {
+          // given
+          const invalidUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+          const invalidJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: invalidUser.id });
+
+          const foundJourney = await databaseBuilder.factory.buildFoundJourney({ passengerJourneyId: invalidJourney.id });
+          const authorization = generateAuthenticatedUser(invalidUser.id, invalidUser.userType);
+
+          const body = { updatedStatus: false };
+
+          // when
+          const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
+
+          // then
+          expect(response.status).toBe(201);
+          const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
+          expect(updatedFoundJourney.passengerStatus).toBe(JOURNEY_STATUS.REJECTED);
+        });
+      });
+
+      describe("error cases", () => {
+        it("should throw an error if foundJourneyId param is not a number", async () => {
+          // given
+          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+          const journey = await databaseBuilder.factory.buildPassengerJourney({ userId: user.id });
+          await databaseBuilder.factory.buildFoundJourney({ passengerJourneyId: journey.id });
+          const authorization = generateAuthenticatedUser(user.id, user.userType);
+          const body = { updatedStatus: true };
+
+          // when
+          const response = await request(server).put("/api/journeys/found/foundJourneyId").send(body).set("Authorization", authorization);
+
+          // then
+          expect(response.status).toEqual(400);
+          expect(response.body.message).toBe("Validation failed");
+        });
+
+        it("should throw an error if updatedStatus is not a boolean", async () => {
+          // given
+          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+          const journey = await databaseBuilder.factory.buildPassengerJourney({ userId: user.id });
+          const foundJourney = await databaseBuilder.factory.buildFoundJourney({ passengerJourneyId: journey.id });
+          const authorization = generateAuthenticatedUser(user.id, user.userType);
+          const body = { updatedStatus: "test" };
+
+          // when
+          const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).send(body).set("Authorization", authorization);
+
+          // then
+          expect(response.status).toEqual(400);
+          expect(response.body.message).toBe("Validation failed");
+        });
+      });
+    });
+
+    describe("general cases", () => {
+      it("should return 401 error if token is missing", async () => {
+        // when
+        const response = await request(server).put("/api/journeys/found/123");
+
+        // then
+        expect(response.status).toBe(401);
+      });
     });
   });
 });

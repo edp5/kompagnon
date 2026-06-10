@@ -3,6 +3,10 @@ import express from "express";
 import { authMiddleware } from "../../../shared/infrastructure/middlewares/auth-middleware.js";
 import { getJourneyController, getJourneyControllerSchema } from "../controllers/get-journey-controller.js";
 import { recordJourneyController, recordJourneyControllerSchema } from "../controllers/record-journey-controller.js";
+import {
+  updateFoundJourneyStatusController,
+  updateFoundJourneyStatusSchema,
+} from "../controllers/update-found-journey-status-controller.js";
 
 const journeysRoutes = express.Router();
 
@@ -152,6 +156,56 @@ journeysRoutes.post("/api/journeys", authMiddleware, recordJourneyControllerSche
  *       500:
  *         description: Internal server error
  */
-journeysRoutes.get("/api/journeys/:journeyId", authMiddleware, getJourneyControllerSchema, getJourneyController);
+journeysRoutes.get(
+  "/api/journeys/:journeyId",
+  authMiddleware,
+  getJourneyControllerSchema,
+  getJourneyController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/found/{foundJourneyId}:
+ *   put:
+ *     summary: Update found journey status
+ *     description: Updates the status of a found journey for the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: foundJourneyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the found journey to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - updatedStatus
+ *             properties:
+ *               updatedStatus:
+ *                 type: boolean
+ *     responses:
+ *       204:
+ *         description: Found journey status updated successfully
+ *       400:
+ *         description: Validation failed
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Found journey not found
+ *       500:
+ *         description: Internal server error
+ */
+journeysRoutes.put(
+  "/api/journeys/found/:foundJourneyId",
+  authMiddleware,
+  updateFoundJourneyStatusSchema,
+  updateFoundJourneyStatusController,
+);
 
 export default journeysRoutes;

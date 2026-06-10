@@ -13,14 +13,14 @@ async function getDefaultCompanionJourneyId() {
   return companionJourney.id;
 }
 
-async function buildFoundJourney({ passengerJourneyId = null, companionJourneyId = null, status = JOURNEY_STATUS.WAITING } = {}) {
+async function buildFoundJourney({ passengerJourneyId = null, companionJourneyId = null, companionStatus = JOURNEY_STATUS.WAITING, passengerStatus = JOURNEY_STATUS.WAITING } = {}) {
   if (!passengerJourneyId) {
     passengerJourneyId = await getDefaultPassengerJourneyId();
   }
   if (!companionJourneyId) {
     companionJourneyId = await getDefaultCompanionJourneyId();
   }
-  const [values] = await knex("found_journeys").insert({ passengerJourneyId, companionJourneyId, status }).returning("*");
+  const [values] = await knex("found_journeys").insert({ passengerJourneyId, companionJourneyId, passengerStatus, companionStatus }).returning("*");
   return values;
 }
 

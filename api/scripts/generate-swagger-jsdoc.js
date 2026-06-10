@@ -65,7 +65,9 @@ function extractDocumentedEndpoints(fileContent) {
       const method = methodMatch[1].toLowerCase();
 
       if (HTTP_METHODS.includes(method)) {
-        documentedEndpoints.add(`${method} ${endpointPath}`);
+        documentedEndpoints.add(
+          `${method} ${_normalizePath(endpointPath)}`,
+        );
       }
     }
   }
@@ -170,6 +172,19 @@ async function writeTemplateFiles(missingRoutes) {
   await fs.writeFile(filePath, content, "utf8");
 }
 
+
+/**
+ * Normalizes route paths by converting Express-style parameters to Swagger format and removing extra slashes.
+ * @param {string} path - The original route path.
+ * @returns {*} - Normalized route path.
+ * @private
+ */
+function _normalizePath(path) {
+  return path
+    .replace(/:([A-Za-z0-9_]+)/g, "{$1}")
+    .replace(/\/+/g, "/");
+}
+
 /**
  * Generate swagger templates for undocumented routes.
  * @returns {Promise<void>} Resolves when complete.
@@ -185,7 +200,8 @@ async function main() {
     const relativeFilePath = path.relative(ROOT_DIRECTORY, routeFile);
 
     for (const route of declaredRoutes) {
-      const endpointKey = `${route.method} ${route.path}`;
+      const endpointKey =
+        `${route.method} ${_normalizePath(route.path)}`;
 
       if (!documentedEndpoints.has(endpointKey)) {
         missingRoutes.push({
