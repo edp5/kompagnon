@@ -96,7 +96,7 @@ describe("Unit | Journey | Api | Controller | Get journey controller", () => {
       await getJourneyController(req, res, next, getPassengerJourney, getCompanionJourney, findUserRepository);
 
       // then
-      expect(next).toHaveBeenCalledWith(new BlablaError());
+      expect(next).toHaveBeenCalledWith(thrownError);
       expect(getPassengerJourney).not.toHaveBeenCalled();
       expect(getCompanionJourney).not.toHaveBeenCalled();
     });
