@@ -1,6 +1,6 @@
 import express from "express";
 
-import { activateUserController } from "../controllers/activate-user-controller.js";
+import { activateUserController, activateUserSchema } from "../controllers/activate-user-controller.js";
 import { authenticateUserController, authenticateUserSchema } from "../controllers/authenticate-user-controller.js";
 import { registerUserController, registerUserSchema } from "../controllers/register-user-controller.js";
 
@@ -100,13 +100,8 @@ authenticationRoutes.post("/api/authentication/authenticate", authenticateUserSc
  *   get:
  *     summary: Activate a user account
  *     description: Activates a user account using the token sent by email
- *     parameters:
- *       - in: query
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: Activation token sent by email
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       201:
  *         description: User activated successfully
@@ -149,6 +144,6 @@ authenticationRoutes.post("/api/authentication/authenticate", authenticateUserSc
  *                   type: string
  *                   example: Internal server error
  */
-authenticationRoutes.get("/api/authentication/activate", activateUserController);
+authenticationRoutes.get("/api/authentication/activate", activateUserSchema, activateUserController);
 
 export default authenticationRoutes;

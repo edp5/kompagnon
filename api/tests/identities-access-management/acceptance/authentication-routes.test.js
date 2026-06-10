@@ -76,7 +76,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       const token = encodedToken({ userId: user.id });
 
       // when
-      const response = await request(server).get(`/api/authentication/activate?token=${token}`);
+      const response = await request(server).get("/api/authentication/activate").set("authorization", `Bearer ${token}`);
 
       // then
       expect(response.status).toBe(201);
@@ -89,7 +89,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
 
       // then
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({ error: "Token is required" });
+      expect(response.body.message).toEqual("Validation failed");
     });
 
     it("should return 401 when user does not exist", async () => {
@@ -97,7 +97,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       const token = encodedToken({ userId: 999999 });
 
       // when
-      const response = await request(server).get(`/api/authentication/activate?token=${token}`);
+      const response = await request(server).get("/api/authentication/activate").set("authorization", `Bearer ${token}`);
 
       // then
       expect(response.status).toBe(401);
@@ -113,7 +113,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       const token = encodedToken({ userId: user.id });
 
       // when
-      const response = await request(server).get(`/api/authentication/activate?token=${token}`);
+      const response = await request(server).get("/api/authentication/activate").set("authorization", `Bearer ${token}`);
 
       // then
       expect(response.status).toBe(401);
