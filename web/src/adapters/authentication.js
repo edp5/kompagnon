@@ -70,8 +70,11 @@ async function loginUser({ email, password }) {
 
 async function activateAccount({ token }) {
   try {
-    const response = await fetch(`${AUTHENTICATION_URL}activate?token=${encodeURIComponent(token)}`, {
+    const response = await fetch(`${AUTHENTICATION_URL}activate`, {
       method: "GET",
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
     });
 
     switch (response.status) {

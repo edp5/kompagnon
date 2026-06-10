@@ -10,7 +10,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
     activateUserByIdRepository = vi.fn();
     decodedTokenService = vi.fn();
     req = {
-      query: {},
+      headers: {},
     };
     res = {
       status: vi.fn().mockReturnThis(),
@@ -22,7 +22,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
   describe("success cases", () => {
     it("should activate user and return 201 when token is valid and user is inactive", async () => {
       // given
-      req.query.token = "valid-token";
+      req.headers.authorization = "Bearer valid-token";
       const decodedData = { userId: 123 };
       const user = { id: 123, isActive: false };
 
@@ -43,24 +43,9 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
   });
 
   describe("error cases", () => {
-    it("should return 400 when token is missing", async () => {
-      // given
-      req.query.token = undefined;
-
-      // when
-      await activateUserController(req, res, next, findUserByIdRepository, activateUserByIdRepository, decodedTokenService);
-
-      // then
-      expect(decodedTokenService).not.toHaveBeenCalled();
-      expect(findUserByIdRepository).not.toHaveBeenCalled();
-      expect(activateUserByIdRepository).not.toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: "Token is required" });
-    });
-
     it("should return 401 when user does not exist", async () => {
       // given
-      req.query.token = "valid-token";
+      req.headers.authorization = "Bearer valid-token";
       const decodedData = { userId: 999 };
 
       decodedTokenService.mockReturnValue(decodedData);
@@ -79,7 +64,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
 
     it("should return 401 when user is already active", async () => {
       // given
-      req.query.token = "valid-token";
+      req.headers.authorization = "Bearer valid-token";
       const decodedData = { userId: 123 };
       const user = { id: 123, isActive: true };
 
@@ -99,7 +84,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
 
     it("should return 500 when an unexpected error occurs", async () => {
       // given
-      req.query.token = "valid-token";
+      req.headers.authorization = "Bearer valid-token";
       const decodedData = { userId: 123 };
 
       decodedTokenService.mockReturnValue(decodedData);

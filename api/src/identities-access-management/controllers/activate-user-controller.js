@@ -1,7 +1,15 @@
+import { celebrate, Joi, Segments } from "celebrate";
+
 import { logger } from "../../../logger.js";
 import ERRORS, { MESSAGE } from "../errors.js";
 import { activateUserById, findUserById } from "../repositories/user-repository.js";
 import { decodedToken } from "../services/token-service.js";
+
+const activateUserSchema = celebrate({
+  [Segments.HEADERS]: Joi.object({
+    authorization: Joi.string().pattern(/^Bearer .+$/).required(),
+  }).unknown(),
+});
 
 /**
  * Activate User Controller
@@ -22,12 +30,7 @@ async function activateUserController(
   decodedTokenService = decodedToken,
 ) {
   try {
-    const { token } = req.query;
-
-    if (!token) {
-      logger.warn("Activation attempt without token");
-      return res.status(400).json({ error: ERRORS.TOKEN.REQUIRED });
-    }
+    const token = req.headers.authorization.split(" ")[1];
 
     const decodedData = decodedTokenService(token);
     const userId = decodedData.userId;
@@ -48,10 +51,10 @@ async function activateUserController(
 
     return res.status(201).json({ message: MESSAGE.USER_ACTIVATED_SUCCESSFULLY });
   } catch (error) {
-    logger.error(`Error during user activation ${error}`);
+    logger.error({ err: error }, "Error during user activation");
     return res.status(500).json({ error: ERRORS.INTERNAL_SERVER_ERROR });
   }
 }
 
-export { activateUserController };
+export { activateUserController, activateUserSchema };
 
