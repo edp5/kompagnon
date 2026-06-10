@@ -51,7 +51,7 @@ async function activateUserController(
 
     return res.status(201).json({ message: MESSAGE.USER_ACTIVATED_SUCCESSFULLY });
   } catch (error) {
-    logger.error(`Error during user activation ${error}`);
+    logger.error({ err: error }, "Error during user activation");
     return res.status(500).json({ error: ERRORS.INTERNAL_SERVER_ERROR });
   }
 }
