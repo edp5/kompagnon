@@ -54,4 +54,22 @@ class UserHasNoRole extends DomainError {
   }
 }
 
-export { AlreadyAccepted, AlreadyCancelled, AlreadyRejected, JourneyIsNotOfThisUser, JourneyNotFound, UserHasNoRole };
+/**
+ * Throw when the matching algorithm url is not configured
+ */
+class MatchingAlgorithmNotConfigured extends DomainError {
+  constructor() {
+    super("Matching algorithm api url is not configured", 500);
+  }
+}
+
+/**
+ * Throw when the matching algorithm answers with a non-ok status
+ */
+class MatchingAlgorithmRequestFailed extends DomainError {
+  constructor(status) {
+    super(`Matching algorithm request failed with status ${status}`, 502);
+  }
+}
+
+export { AlreadyAccepted, AlreadyCancelled, AlreadyRejected, JourneyIsNotOfThisUser, JourneyNotFound, MatchingAlgorithmNotConfigured, MatchingAlgorithmRequestFailed, UserHasNoRole };
