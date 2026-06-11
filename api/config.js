@@ -51,6 +51,10 @@ const configuration = (function() {
       },
     },
     baseUrl: process.env.BASE_URL,
+    algorithm: {
+      enabled: process.env.ALGORITHM_ENABLED !== "false",
+      apiUrl: process.env.ALGORITHM_API_URL || "http://localhost:8000",
+    },
     swagger: {
       definition: {
         openapi: "3.0.0",
@@ -77,6 +81,8 @@ const configuration = (function() {
     config.email.enabled = false;
     config.email.testAccount = false;
     config.baseUrl = "http://localhost/#/";
+    config.algorithm.enabled = false;
+    config.algorithm.apiUrl = "http://localhost:8000";
   }
   return config;
 })();
