@@ -6,6 +6,8 @@ import ActivateAccountView from "@/views/authentication/ActivateAccountView.vue"
 import LoginView from "@/views/authentication/LoginView.vue";
 import RegisterView from "@/views/authentication/RegisterView.vue";
 import HomeView from "@/views/HomeView.vue";
+import JourneysView from "@/views/JourneysView.vue";
+import JourneyView from "@/views/JourneyView.vue";
 import MapView from "@/views/MapView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import PrivacyView from "@/views/PrivacyView.vue";
@@ -62,7 +64,13 @@ const router = createRouter({
       ...withAppLayout("/map", "map", MapView),
     },
     {
+      ...withAppLayout("/journeys", "journeys", JourneysView),
+    },
+    {
       ...withAppLayout("/journeys/new", "record-journey", RecordJourneyView),
+    },
+    {
+      ...withAppLayout("/journeys/:journeyId", "journey", JourneyView),
     },
     {
       ...withAppLayout("/profile", "profile", ProfileView),

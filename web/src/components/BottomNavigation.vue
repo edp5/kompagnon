@@ -11,7 +11,7 @@ defineEmits(["open-menu"]);
 const items = [
   { name: "home", label: "Accueil", icon: "home" },
   { name: "map", label: "Carte", icon: "map" },
-  { name: "record-journey", label: "Trajet", icon: "plus" },
+  { name: "journeys", label: "Trajets", icon: "route" },
   { name: "notifications", label: "Alertes", icon: "notifications" },
   { name: "profile", label: "Profil", icon: "profile" },
 ];
