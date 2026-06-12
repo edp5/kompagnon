@@ -3,7 +3,7 @@ import { DEFAULT_USER_TYPE } from "../../../src/shared/constants.js";
 import { knex } from "../../knex-database-connection.js";
 async function buildUser({ firstname = "John", lastname = "Doe", email = `john.doe+${crypto.randomUUID()}@example.net`, birthday = "01/01/1970", created_at = new Date(), updated_at = new Date(), isActive = true, isChecked = true, hashedPassword = null, userType = DEFAULT_USER_TYPE, lastLoggedAt = null, role = null, genre = null, disabilities = null } = {}) {
   if (!hashedPassword) {
-    hashedPassword = await generatePassword("password");
+    hashedPassword = await generatePassword("kompagnon123");
   }
   const [values] = await knex("users").insert({
     firstname,
