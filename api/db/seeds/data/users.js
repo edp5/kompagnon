@@ -1,7 +1,6 @@
-import { generatePassword } from "../../../src/identities-access-management/services/password-service.js";
 import { USER_DISABILITIES, USER_GENRES, USER_ROLE } from "../../../src/shared/constants.js";
 async function users(databaseBuilder) {
-  const hashedPassword = await generatePassword("kompagnon123");
+
   const users = [
     // User valid, compagnon
     {
@@ -10,16 +9,14 @@ async function users(databaseBuilder) {
       email: "albert.berlat@example.net",
       role: USER_ROLE.VALID,
       genre: USER_GENRES.M,
-      hashedPassword,
     },
     // Invalid user with blind disability
     {
       firstname: "Andrea",
       lastname: "Marceti",
-      email: "a.marceti@examle.net",
+      email: "a.marceti@example.net",
       role: USER_ROLE.INVALID,
       disabilities: [USER_DISABILITIES.BLIND],
-      hashedPassword,
     },
     // Add other users here
   ];
