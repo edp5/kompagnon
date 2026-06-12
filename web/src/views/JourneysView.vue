@@ -209,7 +209,7 @@ onMounted(async () => {
               {{ activeTab === 'planned' ? 'Aucun trajet planifié' : activeTab === 'ongoing' ? 'Aucun trajet en cours' : 'Aucun trajet passé' }}
             </p>
             <p class="journeys-view__empty-sub">
-              {{ activeTab === 'planned' ? 'Enregistrez votre prochain déplacement pour qu\'il apparaisse ici.' : 'Vos trajets terminés apparaîtront dans cet onglet.' }}
+              {{ activeTab === 'planned' ? 'Enregistrez votre prochain déplacement pour qu\'il apparaisse ici.' : activeTab === 'ongoing' ? 'Vos trajets appariés et en cours apparaîtront dans cet onglet.' : 'Vos trajets terminés apparaîtront dans cet onglet.' }}
             </p>
             <RouterLink
               v-if="activeTab === 'planned'"
@@ -451,7 +451,7 @@ onMounted(async () => {
 }
 
 .journeys-view__tab--active {
-  background: #fff;
+  background: var(--c-surface);
   color: var(--c-navy);
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.1);
 }
