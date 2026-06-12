@@ -199,14 +199,14 @@ async function acceptedJourney(databasebuilder) {
   const user1 = await databasebuilder.factory.buildUser({
     firstname: "Franc",
     lastname: "Dupuis",
-    email: "fdupis  @example.net",
+    email: "fdupuis@example.net",
     role: USER_ROLE.INVALID,
   });
 
   const user2 = await databasebuilder.factory.buildUser({
     firstname: "Gina",
     lastname: "Morel",
-    email: "g.morel@example.net ",
+    email: "g.morel@example.net",
     role: USER_ROLE.VALID,
   });
 
@@ -242,7 +242,7 @@ async function journeys(databasebuilder) {
   await pastJourneys(databasebuilder);
   await unmatchedJourneys(databasebuilder);
   await additionalVariedJourneys(databasebuilder);
-  acceptedJourney(databasebuilder);
+  await acceptedJourney(databasebuilder);
 }
 
 export { journeys };

@@ -1,4 +1,4 @@
-name: check-migrations
+name: check-seeds
 
 permissions:
   contents: read
@@ -8,8 +8,8 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/check-migrations.yml
-      - api/db/migrations/**
+      - .github/workflows/check-seeds.yml
+      - api/db/seeds/**
     types:
       - opened
       - synchronize
@@ -17,7 +17,7 @@ on:
       - ready_for_review
 
 jobs:
-  migration-check:
+  seed-check:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
@@ -49,14 +49,6 @@ jobs:
         run: npm run db:migrate
         working-directory: ./api
 
-      - name: Get file number in migration directory
-        id: get_migration_files
-        run: echo "migration_files=$(ls *.js | wc -l)" >> $GITHUB_OUTPUT
-        working-directory: ./api/db/migrations
-
-      - name: Rollback all migrations
-        run: |
-          for i in $(seq 1 ${{ steps.get_migration_files.outputs.migration_files }}); do
-            npm run db:rollback:latest
-            done
+      - name: Run seeds
+        run: npm run db:seed
         working-directory: ./api

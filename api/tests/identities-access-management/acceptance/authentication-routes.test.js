@@ -43,7 +43,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
     it("should return 200 http status code", async () => {
       // given
       const createdUser = await databaseBuilder.factory.buildUser({ email: "test@example.net", isActive: true });
-      const body = { email: "test@example.net", password: "password" };
+      const body = { email: "test@example.net", password: "kompagnon123" };
 
       // when
       const response = await request(server).post("/api/authentication/authenticate").send(body);
