@@ -1,7 +1,6 @@
 name: check-migrations
 
 permissions:
-  pull-requests: write
   contents: read
 
 on:
@@ -61,19 +60,3 @@ jobs:
             npm run db:rollback:latest
             done
         working-directory: ./api
-
-      - name: Comment on pull request if an error occured
-        if: failure()
-        run: |
-          echo "Migrations failed. Please check the migration files for errors." > comment.txt
-          gh pr review ${{ github.event.pull_request.number }} --request-changes --body-file comment.txt
-          exit 1
-        env:
-          GITHUB_TOKEN: ${{ secrets.SERVICE_TOKEN }}
-
-      - name: Approve pull request if migrations are successful
-        if: success()
-        run: |
-          gh pr review ${{ github.event.pull_request.number }} --approve --body "Migrations are successful. Approving the pull request."
-        env:
-          GITHUB_TOKEN: ${{ secrets.SERVICE_TOKEN }}
