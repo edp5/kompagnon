@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { config } from "../../../../config.js";
-import { callMatchingAlgorithmUsecase } from "../../../../src/journeys/usecases/call-matching-algorithm-usecase.js";
+import { callMatchingAlgorithmService } from "../../../../src/journeys/services/call-matching-algorithm-service.js";
 
-describe("Integration | Journeys | Usecases | Call matching algorithm", () => {
+describe("Integration | Journeys | Services | Call matching algorithm", () => {
   beforeEach(() => {
     config.algorithm.enabled = true;
   });
@@ -22,7 +22,7 @@ describe("Integration | Journeys | Usecases | Call matching algorithm", () => {
     });
 
     // when
-    const result = await callMatchingAlgorithmUsecase({ journeyId: 7, role: "passenger" });
+    const result = await callMatchingAlgorithmService({ journeyId: 7, role: "passenger" });
 
     // then
     expect(fetchSpy).toHaveBeenCalledWith("http://localhost:8000/api/match", expect.objectContaining({
@@ -38,7 +38,7 @@ describe("Integration | Journeys | Usecases | Call matching algorithm", () => {
     const fetchSpy = vi.spyOn(global, "fetch");
 
     // when
-    const result = await callMatchingAlgorithmUsecase({ journeyId: 7, role: "passenger" });
+    const result = await callMatchingAlgorithmService({ journeyId: 7, role: "passenger" });
 
     // then
     expect(fetchSpy).not.toHaveBeenCalled();
@@ -50,7 +50,7 @@ describe("Integration | Journeys | Usecases | Call matching algorithm", () => {
     vi.spyOn(global, "fetch").mockResolvedValue({ ok: false, status: 502 });
 
     // when
-    const result = await callMatchingAlgorithmUsecase({ journeyId: 7, role: "companion" });
+    const result = await callMatchingAlgorithmService({ journeyId: 7, role: "companion" });
 
     // then
     expect(result).toBeUndefined();
