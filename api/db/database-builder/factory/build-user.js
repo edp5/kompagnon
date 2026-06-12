@@ -8,7 +8,7 @@ async function buildUser({ firstname = "John", lastname = "Doe", email = `john.d
   const [values] = await knex("users").insert({
     firstname,
     lastname,
-    email,
+    email: email.replaceAll(" ", ""),
     birthday,
     created_at,
     updated_at,
