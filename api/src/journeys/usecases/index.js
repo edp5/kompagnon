@@ -1,6 +1,6 @@
+import { callMatchingAlgorithmService } from "../services/call-matching-algorithm-service.js";
 import { acceptFoundJourneyCompanionStatusUsecase } from "./accept-found-journey-companion-status-usecase.js";
 import { acceptFoundJourneyPassengerStatusUsecase } from "./accept-found-journey-passenger-status-usecase.js";
-import { callMatchingAlgorithmUsecase } from "./call-matching-algorithm-usecase.js";
 import { cancelFoundJourneyCompanionStatusUsecase } from "./cancel-found-journey-companion-status-usecase.js";
 import { cancelFoundJourneyPassengerStatusUsecase } from "./cancel-found-journey-passenger-status-usecase.js";
 import { getCompanionJourneyUsecase } from "./get-companion-journey-usecase.js";
@@ -15,7 +15,7 @@ import { rejectFoundJourneyPassengerStatusUsecase } from "./reject-found-journey
 const usecases = {
   acceptFoundJourneyCompanionStatusUsecase,
   acceptFoundJourneyPassengerStatusUsecase,
-  callMatchingAlgorithmUsecase,
+  callMatchingAlgorithmUsecase: callMatchingAlgorithmService,
   cancelFoundJourneyCompanionStatusUsecase,
   cancelFoundJourneyPassengerStatusUsecase,
   getCompanionJourneyUsecase,

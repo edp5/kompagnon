@@ -13,7 +13,7 @@ import { requestJourneyMatch } from "../infrastructure/matching-algorithm-api.js
  * @param {Function} matchRequester - The matching API client, injected for testing.
  * @returns {Promise<object|undefined>} The match response, or undefined when skipped or failed.
  */
-async function callMatchingAlgorithmUsecase({ journeyId, role }, matchRequester = requestJourneyMatch) {
+async function callMatchingAlgorithmService({ journeyId, role }, matchRequester = requestJourneyMatch) {
   if (!config.algorithm.enabled) {
     return undefined;
   }
@@ -26,4 +26,4 @@ async function callMatchingAlgorithmUsecase({ journeyId, role }, matchRequester 
   }
 }
 
-export { callMatchingAlgorithmUsecase };
+export { callMatchingAlgorithmService };
