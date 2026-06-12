@@ -1,0 +1,54 @@
+name: check-seeds
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/check-seeds.yml
+      - api/db/seeds/**
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  seed-check:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: configure project
+        run: |
+          npm ci
+          cp sample.env .env
+        working-directory: ./api
+
+      - name: Setup docker compose
+        uses: edp5/edp5-actions/setup-docker-compose@v1.5.1
+        with:
+          waitTime: '2'
+
+      - name: Create database
+        run: npm run db:create
+        working-directory: ./api
+
+      - name: run migrations
+        run: npm run db:migrate
+        working-directory: ./api
+
+      - name: Run seeds
+        run: npm run db:seed
+        working-directory: ./api
