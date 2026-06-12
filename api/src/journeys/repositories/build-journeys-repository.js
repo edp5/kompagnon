@@ -41,16 +41,6 @@ function buildJourneysRepository(tableName) {
   }
 
   /**
-   * Finds all journeys associated with a specific user ID.
-   * @param {number} userId - ID of the user whose journeys to find
-   * @returns {Promise<*>} - An array of journey records associated with the user ID
-   */
-  async function findJourneysByUserId(userId) {
-    const journeys = await knex(tableName).where({ userId });
-    return journeys;
-  }
-
-  /**
    * Removes a journey by its ID.
    * @param {number} journeyId - ID of the journey to remove
    * @returns {Promise<*>} - The number of records deleted (should be 1 if successful, 0 if no record found)
@@ -59,7 +49,7 @@ function buildJourneysRepository(tableName) {
     return await knex(tableName).where({ id: journeyId }).del();
   }
 
-  return { findJourneyById, findJourneysByUserId, removeJourneyByJourneyId, saveJourney };
+  return { findJourneyById, removeJourneyByJourneyId, saveJourney };
 }
 
 export { buildJourneysRepository };

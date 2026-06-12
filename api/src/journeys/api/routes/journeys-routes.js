@@ -2,6 +2,7 @@ import express from "express";
 
 import { authMiddleware } from "../../../shared/infrastructure/middlewares/auth-middleware.js";
 import { getJourneyController, getJourneyControllerSchema } from "../controllers/get-journey-controller.js";
+import { getJourneysController, getJourneysControllerSchema } from "../controllers/get-journeys-controller.js";
 import { recordJourneyController, recordJourneyControllerSchema } from "../controllers/record-journey-controller.js";
 import {
   updateFoundJourneyStatusController,
@@ -82,6 +83,50 @@ const journeysRoutes = express.Router();
  *         description: Internal server error
  */
 journeysRoutes.post("/api/journeys", authMiddleware, recordJourneyControllerSchema, recordJourneyController);
+
+/**
+ * @swagger
+ * /api/journeys:
+ *   get:
+ *     summary: List all journeys of the authenticated user
+ *     description: Returns all journeys (passenger or companion) belonging to the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of journeys
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       departureAddress:
+ *                         type: string
+ *                       arrivalAddress:
+ *                         type: string
+ *                       departureTime:
+ *                         type: string
+ *                         format: date-time
+ *                       arrivalTime:
+ *                         type: string
+ *                         format: date-time
+ *                       isMatched:
+ *                         type: boolean
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - User has no role
+ *       500:
+ *         description: Internal server error
+ */
+journeysRoutes.get("/api/journeys", authMiddleware, getJourneysControllerSchema, getJourneysController);
 
 /**
  * @swagger

@@ -1,25 +1,40 @@
 <script setup>
 import { computed, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import { recordJourney } from "@/adapters/journeys.js";
 import AddressAutocomplete from "@/components/AddressAutocomplete.vue";
 import { useAuthStore } from "@/stores/auth.js";
 
 const authStore = useAuthStore();
+const router = useRouter();
+
+/**
+ * Formate une date en chaîne compatible avec l'input datetime-local ("YYYY-MM-DDTHH:MM").
+ * @param {Date} date
+ * @returns {string}
+ */
+function toLocalDatetimeInput(date) {
+  function pad(n) {
+    return String(n).padStart(2, "0");
+  }
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
 
 function initialFormState() {
+  const now = new Date();
+  const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
   return {
     departure: null,
     arrival: null,
-    departureTime: "",
-    arrivalTime: "",
+    departureTime: toLocalDatetimeInput(now),
+    arrivalTime: toLocalDatetimeInput(oneHourLater),
   };
 }
 
 const form = reactive(initialFormState());
 
 const isSubmitting = ref(false);
-const successMessage = ref("");
 const errorMessage = ref("");
 
 const canSubmit = computed(() => {
@@ -32,12 +47,7 @@ const canSubmit = computed(() => {
 });
 
 function resetFeedback() {
-  successMessage.value = "";
   errorMessage.value = "";
-}
-
-function resetForm() {
-  Object.assign(form, initialFormState());
 }
 
 async function handleSubmit() {
@@ -69,9 +79,8 @@ async function handleSubmit() {
 
   isSubmitting.value = false;
 
-  if (result.success) {
-    successMessage.value = "Vos informations de trajet ont bien été enregistrées.";
-    resetForm();
+  if (result.success && result.journeyId) {
+    await router.push({ name: "journey", params: { journeyId: result.journeyId } });
   } else {
     errorMessage.value = result.message ?? "Une erreur est survenue. Veuillez réessayer.";
   }
@@ -156,14 +165,7 @@ async function handleSubmit() {
           {{ errorMessage }}
         </p>
 
-        <p
-          v-if="successMessage"
-          class="feedback success feedback--success record-journey__feedback"
-          role="alert"
-          aria-live="assertive"
-        >
-          {{ successMessage }}
-        </p>
+
 
         <button
           type="submit"

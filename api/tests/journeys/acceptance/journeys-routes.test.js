@@ -365,4 +365,58 @@ describe("Acceptance | Journeys | Journey routes", () => {
       });
     });
   });
+
+  describe("GET /journeys", () => {
+    it("should return 200 and the list of passenger journeys for passenger user", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+      const journey = await databaseBuilder.factory.buildPassengerJourney({ userId: user.id });
+      const auth = generateAuthenticatedUser(user.id, user.userType);
+
+      // when
+      const response = await request(server).get("/api/journeys").set("Authorization", auth);
+
+      // then
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(Number(response.body.data[0].id)).toBe(Number(journey.id));
+      expect(response.body.data[0].isMatched).toBe(false);
+    });
+
+    it("should return 200 and the list of companion journeys for companion user", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+      const journey = await databaseBuilder.factory.buildCompanionJourney({ userId: user.id });
+      const auth = generateAuthenticatedUser(user.id, user.userType);
+
+      // when
+      const response = await request(server).get("/api/journeys").set("Authorization", auth);
+
+      // then
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(Number(response.body.data[0].id)).toBe(Number(journey.id));
+      expect(response.body.data[0].isMatched).toBe(false);
+    });
+
+    it("should return 403 if user has no role", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser();
+      const auth = generateAuthenticatedUser(user.id, user.userType);
+
+      // when
+      const response = await request(server).get("/api/journeys").set("Authorization", auth);
+
+      // then
+      expect(response.status).toBe(403);
+    });
+
+    it("should return 401 without authentication", async () => {
+      // when
+      const response = await request(server).get("/api/journeys");
+
+      // then
+      expect(response.status).toBe(401);
+    });
+  });
 });

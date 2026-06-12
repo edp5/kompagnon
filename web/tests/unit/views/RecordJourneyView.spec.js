@@ -10,6 +10,12 @@ vi.mock("@/adapters/journeys.js", () => ({
   recordJourney: vi.fn(),
 }));
 
+const mockPush = vi.fn();
+
+vi.mock("vue-router", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
 const AddressStub = {
   name: "AddressAutocomplete",
   props: ["id", "modelValue"],
@@ -44,7 +50,27 @@ describe("Unit | Views | RecordJourneyView", () => {
     vi.clearAllMocks();
   });
 
-  it("should record the journey with the resolved addresses and ISO times", async () => {
+  it("should pre-fill departure time with the current date and time", () => {
+    // given
+    const before = new Date();
+
+    // when
+    const wrapper = mountView();
+    const after = new Date();
+
+    // then
+    const depValue = wrapper.get("input[name=\"departureTime\"]").element.value;
+    const arrValue = wrapper.get("input[name=\"arrivalTime\"]").element.value;
+
+    const depDate = new Date(depValue);
+    const arrDate = new Date(arrValue);
+
+    expect(depDate.getTime()).toBeGreaterThanOrEqual(before.getTime() - 60000);
+    expect(depDate.getTime()).toBeLessThanOrEqual(after.getTime() + 60000);
+    expect(arrDate.getTime() - depDate.getTime()).toBeCloseTo(60 * 60 * 1000, -4);
+  });
+
+  it("should redirect to the journey page after a successful submission", async () => {
     // given
     recordJourney.mockResolvedValue({ success: true, journeyId: "journey-1" });
 
@@ -66,24 +92,7 @@ describe("Unit | Views | RecordJourneyView", () => {
       departureTime: new Date("2026-05-16T08:30").toISOString(),
       arrivalTime: new Date("2026-05-16T09:00").toISOString(),
     });
-    expect(wrapper.text()).toContain("Vos informations de trajet ont bien été enregistrées.");
-  });
-
-  it("should reset the form after a successful submission", async () => {
-    // given
-    recordJourney.mockResolvedValue({ success: true, journeyId: "journey-1" });
-
-    // when
-    const wrapper = mountView();
-    await fillForm(wrapper);
-    await wrapper.find("form").trigger("submit");
-    await flushPromises();
-
-    // then
-    expect(wrapper.get("[data-value=\"departure\"]").text()).toBe("");
-    expect(wrapper.get("[data-value=\"arrival\"]").text()).toBe("");
-    expect(wrapper.get("input[name=\"departureTime\"]").element.value).toBe("");
-    expect(wrapper.get("input[name=\"arrivalTime\"]").element.value).toBe("");
+    expect(mockPush).toHaveBeenCalledWith({ name: "journey", params: { journeyId: "journey-1" } });
   });
 
   it("should block submission and warn when required fields are missing", async () => {

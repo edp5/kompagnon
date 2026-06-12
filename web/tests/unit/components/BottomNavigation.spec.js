@@ -11,7 +11,7 @@ describe("Unit | Components | BottomNavigation", () => {
       routes: [
         { path: "/", name: "home", component: { template: "<div />" } },
         { path: "/map", name: "map", component: { template: "<div />" } },
-        { path: "/journeys/new", name: "record-journey", component: { template: "<div />" } },
+        { path: "/journeys", name: "journeys", component: { template: "<div />" } },
         { path: "/notifications", name: "notifications", component: { template: "<div />" } },
         { path: "/profile", name: "profile", component: { template: "<div />" } },
         { path: "/privacy", name: "privacy", component: { template: "<div />" } },
@@ -47,9 +47,9 @@ describe("Unit | Components | BottomNavigation", () => {
     expect(wrapper.text()).toContain("Accueil");
   });
 
-  it("should render record-journey item", () => {
+  it("should render journeys item", () => {
     const wrapper = createWrapper();
-    expect(wrapper.text()).toContain("Trajet");
+    expect(wrapper.text()).toContain("Trajets");
   });
 
 
