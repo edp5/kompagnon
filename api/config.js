@@ -1,4 +1,6 @@
 import "dotenv/config";
+
+import pkg from "./package.json" with { type: "json"};
 /**
  * Parses a string to a number with a default fallback
  * @param {string} numberAsString - The string to parse as a number
@@ -60,7 +62,7 @@ const configuration = (function() {
         openapi: "3.0.0",
         info: {
           title: "Api Kompagnon",
-          version: "0.0.0",
+          version: pkg.version,
           description: "The api for Kompagnon platform",
         },
         servers: [
