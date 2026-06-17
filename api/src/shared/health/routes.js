@@ -8,6 +8,8 @@ const health = express.Router();
  * @swagger
  * /api/health:
  *   get:
+ *     tags:
+ *       - Api
  *     summary: Check the health of the API
  *     description: Returns "api is ok!" if the API is healthy
  *     responses:
