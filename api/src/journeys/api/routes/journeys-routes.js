@@ -15,6 +15,8 @@ const journeysRoutes = express.Router();
  * @swagger
  * /api/journeys:
  *   post:
+ *     tags:
+ *       - Journeys
  *     summary: Record a new journey
  *     description: Records a journey for the authenticated user as a passenger or companion depending on the user role.
  *     security:
@@ -88,6 +90,8 @@ journeysRoutes.post("/api/journeys", authMiddleware, recordJourneyControllerSche
  * @swagger
  * /api/journeys:
  *   get:
+ *     tags:
+ *       - Journeys
  *     summary: List all journeys of the authenticated user
  *     description: Returns all journeys (passenger or companion) belonging to the authenticated user.
  *     security:
@@ -132,6 +136,8 @@ journeysRoutes.get("/api/journeys", authMiddleware, getJourneysControllerSchema,
  * @swagger
  * /api/journeys/{journeyId}:
  *   get:
+ *     tags:
+ *       - Journeys
  *     summary: Get a journey's information
  *     description: Returns the information of a journey belonging to the authenticated user. The journey is read from the passenger or companion table depending on the user role.
  *     security:
@@ -212,6 +218,8 @@ journeysRoutes.get(
  * @swagger
  * /api/journeys/found/{foundJourneyId}:
  *   put:
+ *     tags:
+ *       - Journeys
  *     summary: Update found journey status
  *     description: Updates the status of a found journey for the authenticated user.
  *     security:

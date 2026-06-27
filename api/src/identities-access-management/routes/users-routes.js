@@ -9,6 +9,8 @@ const usersRoutes = express.Router();
  * @swagger
  * /api/users/profile:
  *   get:
+ *     tags:
+ *       - Users
  *     summary: Get authenticated user profile
  *     description: Returns profile information for the authenticated user.
  *     security:

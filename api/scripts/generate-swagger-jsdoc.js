@@ -123,6 +123,8 @@ function buildSwaggerTemplate(route) {
     " * @swagger",
     ` * ${route.path}:`,
     ` *   ${route.method}:`,
+    " *     tags:",
+    " *       - TODO",
     " *     summary: TODO - Add endpoint summary",
     " *     description: TODO - Describe the endpoint behavior",
     " *     responses:",
