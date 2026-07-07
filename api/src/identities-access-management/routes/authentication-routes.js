@@ -10,6 +10,8 @@ const authenticationRoutes = express.Router();
  * @swagger
  * /api/authentication/register:
  *   post:
+ *     tags:
+ *       - Authentication
  *     summary: Register a new user
  *     description: Register a new user with email, firstname, lastname, password, birthday, and userType.
  *     requestBody:
@@ -52,6 +54,8 @@ authenticationRoutes.post("/api/authentication/register", registerUserSchema, re
  * @swagger
  * /api/authentication/authenticate:
  *   post:
+ *     tags:
+ *       - Authentication
  *     summary: Authenticate a user
  *     description: Authenticate a user with email and password, returning userId and JWT token upon success.
  *     requestBody:
@@ -98,6 +102,8 @@ authenticationRoutes.post("/api/authentication/authenticate", authenticateUserSc
  * @swagger
  * /api/authentication/activate:
  *   get:
+ *     tags:
+ *       - Authentication
  *     summary: Activate a user account
  *     description: Activates a user account using the token sent by email
  *     security:
