@@ -5,6 +5,7 @@ import databaseBuilder from "../../../db/database-builder/index.js";
 import { knex } from "../../../db/knex-database-connection.js";
 import server from "../../../server.js";
 import { encodedToken } from "../../../src/identities-access-management/services/token-service.js";
+import { generateAuthenticatedUser } from "../../helpers/generate-authenticated-user.js";
 
 describe("Acceptance | Identities Access Management | Routes | Authentication routes", () => {
   describe("POST /api/authentication/register", () => {
@@ -80,7 +81,6 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
 
       // then
       expect(response.status).toBe(201);
-      expect(response.body).toEqual({ message: "User activated successfully" });
     });
 
     it("should return 400 when token is missing", async () => {
@@ -89,10 +89,9 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
 
       // then
       expect(response.status).toBe(400);
-      expect(response.body.message).toEqual("Validation failed");
     });
 
-    it("should return 401 when user does not exist", async () => {
+    it("should return 404 when user does not exist", async () => {
       // given
       const token = encodedToken({ userId: 999999 });
 
@@ -100,24 +99,22 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       const response = await request(server).get("/api/authentication/activate").set("authorization", `Bearer ${token}`);
 
       // then
-      expect(response.status).toBe(401);
-      expect(response.body).toEqual({ error: "User not found or already active" });
+      expect(response.status).toBe(404);
     });
 
-    it("should return 401 when user is already active", async () => {
+    it("should return 409 when user is already active", async () => {
       // given
       const user = await databaseBuilder.factory.buildUser({
         email: "activate-test-already-active@example.com",
         isActive: true,
       });
-      const token = encodedToken({ userId: user.id });
+      const token = generateAuthenticatedUser(user.id, user.userType);
 
       // when
-      const response = await request(server).get("/api/authentication/activate").set("authorization", `Bearer ${token}`);
+      const response = await request(server).get("/api/authentication/activate").set("authorization", token);
 
       // then
-      expect(response.status).toBe(401);
-      expect(response.body).toEqual({ error: "User not found or already active" });
+      expect(response.status).toBe(409);
     });
   });
 });

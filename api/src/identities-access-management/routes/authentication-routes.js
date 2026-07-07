@@ -111,34 +111,10 @@ authenticationRoutes.post("/api/authentication/authenticate", authenticateUserSc
  *     responses:
  *       201:
  *         description: User activated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User activated successfully
- *       400:
- *         description: Invalid or missing token
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Invalid or expired token
- *       401:
- *         description: User not found or already active
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: User not found or already active
+ *       404:
+ *         description: User not found
+ *       409:
+ *         description: User is already active
  *       500:
  *         description: Internal server error
  *         content:
