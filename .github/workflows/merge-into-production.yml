@@ -28,7 +28,7 @@ jobs:
         run: |
           git fetch origin main production
           git checkout -B production origin/production
-          git merge --no-edit origin/main
+          git pull origin main --no-edit
 
       - name: Push changes
         run: |
