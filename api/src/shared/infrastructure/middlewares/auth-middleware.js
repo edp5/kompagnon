@@ -27,8 +27,8 @@ export async function authMiddleware(req, res, next) {
     try {
       decoded = decodedToken(token);
     } catch (error) {
-      // The decodedToken service already throws an error with proper messaging
-      return res.status(401).json({ message: error.message });
+      logger.warn({ err: error }, "Token verification failed");
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
 
     if (!decoded || !decoded.userId) {

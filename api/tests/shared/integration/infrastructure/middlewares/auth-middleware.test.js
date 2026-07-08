@@ -73,6 +73,7 @@ describe("Integration | Shared | Infrastructure | Middlewares | Auth Middleware"
 
       // then
       expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith({ message: "Invalid or expired token" });
       expect(next).not.toHaveBeenCalled();
     });
   });

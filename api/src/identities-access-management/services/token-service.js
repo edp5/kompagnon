@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 
 import { config } from "../../../config.js";
 import { logger } from "../../../logger.js";
-import ERRORS from "../errors.js";
 
 const secret = config.jwt.tokenSecret;
 const expirationTime = config.jwt.expirationTime || "1h";
@@ -13,8 +12,8 @@ function encodedToken(data) {
       expiresIn: expirationTime,
     });
   } catch (error) {
-    logger.error(`Token encoding failed ${error}`);
-    throw new Error("Token encoding failed", { cause: error });
+    logger.error({ err: error }, "Token encoding failed");
+    throw error;
   }
 }
 
@@ -22,14 +21,8 @@ function decodedToken(token) {
   try {
     return jwt.verify(token, secret);
   } catch (error) {
-    logger.error(`Token decoding failed ${error}`);
-    if (error.name === "TokenExpiredError") {
-      throw new Error(ERRORS.TOKEN.EXPIRED_TOKEN, { cause: error });
-    } else if (error.name === "JsonWebTokenError") {
-      throw new Error(ERRORS.TOKEN.INVALID_TOKEN, { cause: error });
-    } else {
-      throw new Error(ERRORS.TOKEN.VERIFICATION_FAILED, { cause: error });
-    }
+    logger.error({ err: error }, "Token decoding failed");
+    throw error;
   }
 }
 
