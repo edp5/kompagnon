@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import { describe, expect, it, vi } from "vitest";
 
-import ERRORS from "../../../../src/identities-access-management/errors.js";
 import { decodedToken, encodedToken } from "../../../../src/identities-access-management/services/token-service.js";
 
 describe("Unit | Identiites Access Management | Services | Token service", () => {
@@ -10,12 +9,12 @@ describe("Unit | Identiites Access Management | Services | Token service", () =>
       // given
       vi.spyOn(jwt, "sign").mockImplementation(() => { throw new Error("Signing error"); });
       // when & then
-      expect(() => encodedToken({ userId: 1 })).toThrow("Token encoding failed", { cause: "Signing error" });
+      expect(() => encodedToken({ userId: 1 })).toThrow("Signing error");
     });
   });
 
   describe("#decodedToken", () => {
-    it(`should throw an ${ERRORS.TOKEN.VERIFICATION_FAILED} for generic error`, () => {
+    it("should throw an error for a generic verification failure", () => {
       // given
       vi.spyOn(jwt, "verify").mockImplementation(() => {
         const error = new Error("Generic error");
@@ -24,7 +23,7 @@ describe("Unit | Identiites Access Management | Services | Token service", () =>
       });
 
       // when & then
-      expect(() => decodedToken("any-token")).toThrow(ERRORS.TOKEN.VERIFICATION_FAILED, { cause: "Generic error" });
+      expect(() => decodedToken("any-token")).toThrow("Generic error");
     });
   });
 });

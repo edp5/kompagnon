@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import { describe, expect, it } from "vitest";
 
 import { config } from "../../../../config.js";
-import ERRORS from "../../../../src/identities-access-management/errors.js";
 import { decodedToken, encodedToken } from "../../../../src/identities-access-management/services/token-service.js";
 
 describe("Integration | Identities Access Management | Services | Token service", () => {
@@ -90,54 +89,55 @@ describe("Integration | Identities Access Management | Services | Token service"
     });
 
     describe("error cases", () => {
-      it(`should throw an ${ERRORS.TOKEN.EXPIRED_TOKEN}`, () => {
+      function expectDecodedTokenError(token, errorName) {
+        try {
+          decodedToken(token);
+          throw new Error("Expected decodedToken to throw");
+        } catch (error) {
+          expect(error.name).toBe(errorName);
+        }
+      }
+
+      it("should throw a TokenExpiredError for an expired token", () => {
         // given
         const data = { userId: 1, birthday: "01/01/1970", firstname: "firstname" };
         const expiredTimestamp = Math.floor(Date.now() / 1000) - 1;
         const token = jwt.sign({ ...data, exp: expiredTimestamp }, config.jwt.tokenSecret);
 
         // when & then
-        expect(() => decodedToken(token)).toThrow(ERRORS.TOKEN.EXPIRED_TOKEN, { cause: expect.objectContaining({ name: "TokenExpiredError" }) });
+        expectDecodedTokenError(token, "TokenExpiredError");
       });
 
-      it(`should throw an ${ERRORS.TOKEN.INVALID_TOKEN}`, () => {
+      it("should throw a JsonWebTokenError for malformed token", () => {
         // given
         const invalidToken = "invalid.token.here";
 
         // when & then
-        expect(() => decodedToken(invalidToken)).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
+        expectDecodedTokenError(invalidToken, "JsonWebTokenError");
       });
 
-      it(`should throw an ${ERRORS.TOKEN.INVALID_TOKEN} for malformed token`, () => {
+      it("should throw a JsonWebTokenError for token signed with another secret", () => {
         // given
-        const malformedToken = "malformed-token-without-dots";
+        const data = { userId: 1, birthday: "01/01/1970", firstname: "firstname" };
+        const invalidSignatureToken = jwt.sign(data, "another-secret", { expiresIn: config.jwt.expirationTime });
 
         // when & then
-        expect(() => decodedToken(malformedToken)).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
+        expectDecodedTokenError(invalidSignatureToken, "JsonWebTokenError");
       });
 
-      it(`should throw an ${ERRORS.TOKEN.INVALID_TOKEN} for token with wrong signature`, () => {
-        // given
-        const data = { userId: 1, firstname: "test" };
-        const tokenWithWrongSecret = jwt.sign(data, "wrong-secret", { expiresIn: "1h" });
-
+      it("should throw a JsonWebTokenError when token is empty", () => {
         // when & then
-        expect(() => decodedToken(tokenWithWrongSecret)).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
+        expectDecodedTokenError("", "JsonWebTokenError");
       });
 
-      it("should handle null token in decodedToken", () => {
+      it("should throw a JsonWebTokenError when token is null", () => {
         // when & then
-        expect(() => decodedToken(null)).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
+        expectDecodedTokenError(null, "JsonWebTokenError");
       });
 
-      it("should handle undefined token in decodedToken", () => {
+      it("should throw a JsonWebTokenError when token is undefined", () => {
         // when & then
-        expect(() => decodedToken(undefined)).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
-      });
-
-      it("should handle empty string token in decodedToken", () => {
-        // when & then
-        expect(() => decodedToken("")).toThrow(ERRORS.TOKEN.INVALID_TOKEN, { cause: expect.objectContaining({ name: "JsonWebTokenError" }) });
+        expectDecodedTokenError(undefined, "JsonWebTokenError");
       });
     });
   });
