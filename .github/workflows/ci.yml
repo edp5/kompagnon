@@ -74,7 +74,7 @@ jobs:
         working-directory: ./api
 
       - name: Setup docker compose
-        uses: edp5/edp5-actions/setup-docker-compose@v1.6.0
+        uses: edp5/edp5-actions/setup-docker-compose@v1.6.2
         with:
           waitTime: '2'
 
