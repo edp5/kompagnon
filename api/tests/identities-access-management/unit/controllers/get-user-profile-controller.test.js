@@ -1,13 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getUserProfileController } from "../../../../src/identities-access-management/controllers/get-user-profile-controller.js";
-import ERRORS from "../../../../src/identities-access-management/errors.js";
 
 describe("Unit | Identities Access Management | Controller | Get user profile controller", () => {
-  let res, findUserProfileByIdRepository, next;
+  let res, getUserDataUsecase, next;
 
   beforeEach(() => {
-    findUserProfileByIdRepository = vi.fn();
+    getUserDataUsecase = vi.fn();
     res = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),
@@ -22,8 +21,8 @@ describe("Unit | Identities Access Management | Controller | Get user profile co
         userId: 42,
       },
     };
-    findUserProfileByIdRepository.mockResolvedValue({
-      id: 42,
+    const userData = {
+      userId: 42,
       firstname: "Jane",
       lastname: "Doe",
       email: "jane.doe@example.com",
@@ -31,74 +30,32 @@ describe("Unit | Identities Access Management | Controller | Get user profile co
       genre: "nb",
       role: "ttt",
       disabilities: ["a", "b"],
-    });
+    };
+    getUserDataUsecase.mockResolvedValue(userData);
 
     // when
-    await getUserProfileController(req, res, next, findUserProfileByIdRepository);
+    await getUserProfileController(req, res, next, getUserDataUsecase);
 
     // then
-    expect(findUserProfileByIdRepository).toHaveBeenCalledWith(42);
+    expect(getUserDataUsecase).toHaveBeenCalledWith(42);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
-      data: {
-        userId: 42,
-        firstname: "Jane",
-        lastname: "Doe",
-        email: "jane.doe@example.com",
-        birthday: "1990-05-15",
-        genre: "nb",
-        role: "ttt",
-        disabilities: ["a", "b"],
-      },
+      data: userData,
     });
   });
 
-  it("should return 401 when authenticated user is not found", async () => {
+  it("should call next when an error occurred", async () => {
     // given
-    const req = {
-      auth: {
-        userId: 42,
-      },
-    };
-    findUserProfileByIdRepository.mockResolvedValue(null);
+    getUserDataUsecase.mockRejectedValue(new Error("error"));
+    const req = { auth: { userId: 42 } };
 
     // when
-    await getUserProfileController(req, res, next, findUserProfileByIdRepository);
+    await getUserProfileController(req, res, next, getUserDataUsecase);
 
     // then
-    expect(findUserProfileByIdRepository).toHaveBeenCalledWith(42);
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ message: "User not found" });
-  });
-
-  it("should return 500 when req.auth is missing", async () => {
-    // given
-    const req = {};
-
-    // when
-    await getUserProfileController(req, res, next, findUserProfileByIdRepository);
-
-    // then
-    expect(findUserProfileByIdRepository).not.toHaveBeenCalled();
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ message: ERRORS.INTERNAL_SERVER_ERROR });
-  });
-
-  it("should return 500 when the repository fails", async () => {
-    // given
-    const req = {
-      auth: {
-        userId: 42,
-      },
-    };
-    findUserProfileByIdRepository.mockRejectedValue(new Error("Database down"));
-
-    // when
-    await getUserProfileController(req, res, next, findUserProfileByIdRepository);
-
-    // then
-    expect(findUserProfileByIdRepository).toHaveBeenCalledWith(42);
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ message: ERRORS.INTERNAL_SERVER_ERROR });
+    expect(getUserDataUsecase).toHaveBeenCalledWith(42);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(new Error("error"));
   });
 });
