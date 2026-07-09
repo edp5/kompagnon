@@ -1,14 +1,7 @@
 import { DomainError } from "../shared/domain/models/domain-error.js";
 
 const ERRORS = {
-  USER: {
-    NOT_FOUND_OR_ALREADY_ACTIVE: "User not found or already active",
-  },
   INTERNAL_SERVER_ERROR: "Internal server error",
-};
-
-const MESSAGE = {
-  USER_ACTIVATED_SUCCESSFULLY: "User activated successfully",
 };
 
 /**
@@ -39,4 +32,4 @@ class InvalidCredentialsError extends DomainError {
 }
 
 export default ERRORS;
-export { InvalidCredentialsError, MESSAGE, UserIsAlreadyActive, UserNotFoundError };
+export { InvalidCredentialsError, UserIsAlreadyActive, UserNotFoundError };
