@@ -32,5 +32,14 @@ class UserIsAlreadyActive extends DomainError {
   }
 }
 
+/**
+ * Throw when invalid credentials
+ */
+class InvalidCredentialsError extends DomainError {
+  constructor() {
+    super("Invalid credentials", 401);
+  }
+}
+
 export default ERRORS;
-export { MESSAGE, UserIsAlreadyActive, UserNotFoundError };
+export { InvalidCredentialsError, MESSAGE, UserIsAlreadyActive, UserNotFoundError };
