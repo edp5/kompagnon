@@ -43,7 +43,7 @@ const usersRoutes = express.Router();
  *                       type: string
  *                       format: date
  *                       example: 1990-05-15
- *       401:
+ *       404:
  *         description: Unauthorized
  *       500:
  *         description: Internal server error
