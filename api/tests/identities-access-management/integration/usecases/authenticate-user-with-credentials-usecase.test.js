@@ -34,7 +34,7 @@ describe("Integration | Identities Access Management | Usecases | Authenticate u
 
     it("should throw an error if password is invalid", async () => {
       // given
-      const user = await databaseBuilder.factory.buildUser({ email: "t@example.net", password: "toto" });
+      await databaseBuilder.factory.buildUser({ email: "t@example.net", password: "toto" });
 
       // when
       const result = usecases.authenticateUserWithCredentialsUsecase({ email: "t@example.net", password: "tata" });
