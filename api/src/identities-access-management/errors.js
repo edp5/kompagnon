@@ -1,9 +1,6 @@
 import { DomainError } from "../shared/domain/models/domain-error.js";
 
 const ERRORS = {
-  AUTHENTICATION: {
-    INVALID_CREDENTIALS: "Invalid credentials",
-  },
   USER: {
     NOT_FOUND_OR_ALREADY_ACTIVE: "User not found or already active",
   },
@@ -32,5 +29,14 @@ class UserIsAlreadyActive extends DomainError {
   }
 }
 
+/**
+ * Throw when invalid credentials
+ */
+class InvalidCredentialsError extends DomainError {
+  constructor() {
+    super("Invalid credentials", 401);
+  }
+}
+
 export default ERRORS;
-export { MESSAGE, UserIsAlreadyActive, UserNotFoundError };
+export { InvalidCredentialsError, MESSAGE, UserIsAlreadyActive, UserNotFoundError };

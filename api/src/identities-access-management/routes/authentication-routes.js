@@ -91,8 +91,6 @@ authenticationRoutes.post("/api/authentication/register", registerUserSchema, re
  *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       401:
  *         description: Invalid credentials
- *       404:
- *         description: Not active user
  *       500:
  *         description: Internal server error
  */

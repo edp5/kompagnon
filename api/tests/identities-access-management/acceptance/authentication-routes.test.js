@@ -65,6 +65,31 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       // then
       expect(response.status).toBe(400);
     });
+
+    it("should return 401 http status code for invalid email", async () => {
+      // given
+      const body = { email: "test@example.net", password: "kompagnon123" };
+
+      // when
+      const response = await request(server).post("/api/authentication/authenticate").send(body);
+
+      // then
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ status: "error", message: "Invalid credentials" });
+    });
+
+    it("should return 401 http status code for invalid password", async () => {
+      // given
+      await databaseBuilder.factory.buildUser({ email: "t@example.net", password: "toto" });
+      const body = { email: "t@example.net", password: "kompagnon123" };
+
+      // when
+      const response = await request(server).post("/api/authentication/authenticate").send(body);
+
+      // then
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ status: "error", message: "Invalid credentials" });
+    });
   });
 
   describe("GET /api/authentication/activate", () => {

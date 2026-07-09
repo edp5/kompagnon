@@ -1,9 +1,11 @@
 import { generatePassword } from "../../../src/identities-access-management/services/password-service.js";
 import { DEFAULT_USER_TYPE } from "../../../src/shared/constants.js";
 import { knex } from "../../knex-database-connection.js";
-async function buildUser({ firstname = "John", lastname = "Doe", email = `john.doe+${crypto.randomUUID()}@example.net`, birthday = "01/01/1970", created_at = new Date(), updated_at = new Date(), isActive = true, isChecked = true, hashedPassword = null, userType = DEFAULT_USER_TYPE, lastLoggedAt = null, role = null, genre = null, disabilities = null } = {}) {
-  if (!hashedPassword) {
+async function buildUser({ firstname = "John", lastname = "Doe", email = `john.doe+${crypto.randomUUID()}@example.net`, birthday = "01/01/1970", created_at = new Date(), updated_at = new Date(), isActive = true, isChecked = true, password = null, hashedPassword = null, userType = DEFAULT_USER_TYPE, lastLoggedAt = null, role = null, genre = null, disabilities = null } = {}) {
+  if (!hashedPassword && !password) {
     hashedPassword = await generatePassword("kompagnon123");
+  } else if (!hashedPassword && password) {
+    hashedPassword = await generatePassword(password);
   }
   const [values] = await knex("users").insert({
     firstname,
