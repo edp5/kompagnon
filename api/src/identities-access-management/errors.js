@@ -1,9 +1,5 @@
 import { DomainError } from "../shared/domain/models/domain-error.js";
 
-const ERRORS = {
-  INTERNAL_SERVER_ERROR: "Internal server error",
-};
-
 /**
  *  Throw when the user is not found in the database
  */
@@ -31,5 +27,4 @@ class InvalidCredentialsError extends DomainError {
   }
 }
 
-export default ERRORS;
 export { InvalidCredentialsError, UserIsAlreadyActive, UserNotFoundError };
