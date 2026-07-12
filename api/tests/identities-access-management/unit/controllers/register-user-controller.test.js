@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   registerUserController,
 } from "../../../../src/identities-access-management/controllers/register-user-controller.js";
-import ERRORS from "../../../../src/identities-access-management/errors.js";
 
 describe("Unit | Identities Access Management | Controller | Register new user", () => {
   let createUserRepository, sendMailActivationService, generatePasswordService, encodedTokenService, res, next;
@@ -52,7 +51,7 @@ describe("Unit | Identities Access Management | Controller | Register new user",
   });
 
   describe("error cases", () => {
-    it("should call 500 when an error occurred", async () => {
+    it("should call next when an error occurred", async () => {
       // given
       const req = {
         body: {
@@ -70,10 +69,7 @@ describe("Unit | Identities Access Management | Controller | Register new user",
 
       // then
       expect(encodedTokenService).not.toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        message: ERRORS.INTERNAL_SERVER_ERROR,
-      });
+      expect(next).toHaveBeenCalledWith(error);
     });
   });
 });

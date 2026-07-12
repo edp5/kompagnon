@@ -1,7 +1,6 @@
 import { celebrate, Joi, Segments } from "celebrate";
 
 import { logger } from "../../../logger.js";
-import ERRORS from "../errors.js";
 import { createNewUser } from "../repositories/user-repository.js";
 import { generatePassword } from "../services/password-service.js";
 import { sendMailToActivateUserService } from "../services/send-mail-to-activate-account-service.js";
@@ -44,8 +43,8 @@ async function registerUserController(
     await sendMailActivationService({ firstname, lastname, token: encodedTokenService({ userId }), email });
     return res.status(201).send();
   } catch (error) {
-    logger.error(`User registration failed: ${error}`);
-    return res.status(500).json({ message: ERRORS.INTERNAL_SERVER_ERROR });
+    logger.error({ err: error }, "User registration failed");
+    next(error);
   }
 }
 
