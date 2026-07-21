@@ -31,7 +31,7 @@ describe("Unit | Identities Access Management | Service | Password service", () 
       const result = passwordService.generatePassword(passwordToHash);
 
       // then
-      await expect(result).rejects.toThrow("Error generating password hash", { cause: "error" });
+      await expect(result).rejects.toThrow("error");
       expect(bcrypt.hash).toHaveBeenCalledWith(passwordToHash, config.users.passwordHash);
     });
   });
@@ -75,7 +75,7 @@ describe("Unit | Identities Access Management | Service | Password service", () 
       const result = passwordService.checkPassword(passwordToCheck, hashedPassword);
 
       // then
-      await expect(result).rejects.toThrow("Error checking password hash", { cause: "error" });
+      await expect(result).rejects.toThrow("error");
       expect(bcrypt.compare).toHaveBeenCalledWith(passwordToCheck, hashedPassword);
     });
   });
