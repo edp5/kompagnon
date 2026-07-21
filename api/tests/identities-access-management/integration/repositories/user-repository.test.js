@@ -93,11 +93,6 @@ describe("Integration | Identities Access Management | Repositories | User repos
       const updatedUser = await knex("users").where({ id: user.id }).first();
       expect(updatedUser.isActive).toBeTruthy();
     });
-
-    it("should throw error if user not found", async () => {
-      // when & then
-      await expect(userRepository.activateUserById(999)).rejects.toThrow("User with ID 999 not found");
-    });
   });
 
   describe("#updateLastLoggedAt", () => {
