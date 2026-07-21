@@ -43,7 +43,7 @@ describe("Acceptance | Routes | Users routes", () => {
 
       // then
       expect(response.status).toBe(401);
-      expect(response.body).toEqual({ message: "Authentication required" });
+      expect(response.body).toEqual({ status: "error", message: "Authentication is required" });
     });
   });
 });
