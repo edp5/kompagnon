@@ -55,4 +55,28 @@ describe("Integration | Journeys | Services | Call matching algorithm", () => {
     // then
     expect(result).toBeUndefined();
   });
+
+  it("should notify the matches when the algorithm returns found journeys", async () => {
+    // given
+    const matchRequester = vi.fn().mockResolvedValue({ found_journey_ids: [3, 4], message: "ok" });
+    const notifyMatches = vi.fn().mockResolvedValue();
+
+    // when
+    await callMatchingAlgorithmService({ journeyId: 7, role: "passenger" }, matchRequester, notifyMatches);
+
+    // then
+    expect(notifyMatches).toHaveBeenCalledWith({ foundJourneyIds: [3, 4] });
+  });
+
+  it("should not notify when the algorithm returns no match", async () => {
+    // given
+    const matchRequester = vi.fn().mockResolvedValue({ found_journey_ids: [], message: "no match" });
+    const notifyMatches = vi.fn();
+
+    // when
+    await callMatchingAlgorithmService({ journeyId: 7, role: "passenger" }, matchRequester, notifyMatches);
+
+    // then
+    expect(notifyMatches).not.toHaveBeenCalled();
+  });
 });
