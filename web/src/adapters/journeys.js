@@ -156,4 +156,57 @@ async function getJourney({ token, journeyId }) {
   }
 }
 
-export { getJourney, getJourneys, recordJourney };
+async function getJourneyMatches({ token, journeyId }) {
+  try {
+    const response = await fetch(`${JOURNEYS_URL}/${journeyId}/matches`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: "Impossible de récupérer les correspondances.",
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, matches: data?.data ?? [] };
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de joindre le serveur. Veuillez réessayer plus tard.",
+    };
+  }
+}
+
+async function updateFoundJourneyStatus({ token, foundJourneyId, accept }) {
+  try {
+    const response = await fetch(`${JOURNEYS_URL}/found/${foundJourneyId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ updatedStatus: accept }),
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: "Impossible de mettre à jour le trajet. Veuillez réessayer.",
+      };
+    }
+
+    return { success: true };
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de joindre le serveur. Veuillez réessayer plus tard.",
+    };
+  }
+}
+
+export { getJourney, getJourneyMatches, getJourneys, recordJourney, updateFoundJourneyStatus };

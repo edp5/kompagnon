@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getJourney, getJourneys, recordJourney } from "@/adapters/journeys.js";
+import { getJourney, getJourneyMatches, getJourneys, recordJourney, updateFoundJourneyStatus } from "@/adapters/journeys.js";
 
 describe("Unit | Adapters | Journeys", () => {
   const payload = {
@@ -246,6 +246,68 @@ describe("Unit | Adapters | Journeys", () => {
       // then
       expect(result.success).toBe(false);
       expect(result.message).toBe("Impossible de joindre le serveur. Veuillez réessayer plus tard.");
+    });
+  });
+
+  describe("#getJourneyMatches", () => {
+    it("should GET the matches and return them", async () => {
+      // given
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ data: [{ foundJourneyId: 3 }] }),
+      });
+
+      // when
+      const result = await getJourneyMatches({ token: "jwt-token", journeyId: 42 });
+
+      // then
+      expect(fetchSpy).toHaveBeenCalledWith("/api/journeys/42/matches", {
+        method: "GET",
+        headers: { Authorization: "Bearer jwt-token" },
+      });
+      expect(result).toEqual({ success: true, matches: [{ foundJourneyId: 3 }] });
+    });
+
+    it("should return a failure message when the response is not ok", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false, status: 500 });
+
+      // when
+      const result = await getJourneyMatches({ token: "jwt-token", journeyId: 42 });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de récupérer les correspondances.");
+    });
+  });
+
+  describe("#updateFoundJourneyStatus", () => {
+    it("should PUT the updated status with the bearer token", async () => {
+      // given
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({ ok: true });
+
+      // when
+      const result = await updateFoundJourneyStatus({ token: "jwt-token", foundJourneyId: 3, accept: true });
+
+      // then
+      expect(fetchSpy).toHaveBeenCalledWith("/api/journeys/found/3", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer jwt-token" },
+        body: JSON.stringify({ updatedStatus: true }),
+      });
+      expect(result).toEqual({ success: true });
+    });
+
+    it("should return a failure message when the response is not ok", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false, status: 500 });
+
+      // when
+      const result = await updateFoundJourneyStatus({ token: "jwt-token", foundJourneyId: 3, accept: false });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de mettre à jour le trajet. Veuillez réessayer.");
     });
   });
 });

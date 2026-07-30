@@ -2,8 +2,10 @@
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { getJourney } from "@/adapters/journeys.js";
+import { getJourney, getJourneyMatches, updateFoundJourneyStatus } from "@/adapters/journeys.js";
 import { useAuthStore } from "@/stores/auth.js";
+
+const STATUS = { WAITING: "waiting", ACCEPTED: "accepted" };
 
 const authStore = useAuthStore();
 const route = useRoute();
@@ -12,6 +14,39 @@ const router = useRouter();
 const journey = ref(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
+const matches = ref([]);
+const matchActionId = ref(null);
+
+/**
+ * Describes the state of a match for display.
+ * @param {object} match - The match with myStatus and otherStatus.
+ * @returns {{ actionable: boolean, message: string }}
+ */
+function matchState(match) {
+  if (match.myStatus === STATUS.WAITING) {
+    return { actionable: true, message: "" };
+  }
+  if (match.myStatus === STATUS.ACCEPTED && match.otherStatus === STATUS.ACCEPTED) {
+    return { actionable: false, message: "Trajet confirmé, vous êtes bien en binôme." };
+  }
+  return { actionable: false, message: "Vous avez accepté. En attente de la réponse de l'autre personne." };
+}
+
+async function loadMatches(journeyId) {
+  const result = await getJourneyMatches({ token: authStore.token, journeyId });
+  if (result.success) {
+    matches.value = result.matches;
+  }
+}
+
+async function respondToMatch(foundJourneyId, accept) {
+  matchActionId.value = foundJourneyId;
+  const result = await updateFoundJourneyStatus({ token: authStore.token, foundJourneyId, accept });
+  matchActionId.value = null;
+  if (result.success) {
+    await loadMatches(route.params.journeyId);
+  }
+}
 
 const durationEstimate = computed(() => {
   if (!journey.value) return null;
@@ -94,6 +129,7 @@ onMounted(async () => {
 
   if (result.success) {
     journey.value = result.journey;
+    await loadMatches(journeyId);
   } else {
     errorMessage.value = result.message ?? "Une erreur est survenue.";
   }
@@ -211,6 +247,76 @@ onMounted(async () => {
             </div>
           </div>
         </div>
+
+        <!-- Matches -->
+        <section
+          v-if="matches.length"
+          class="journey-view__matches"
+          aria-label="Correspondances de trajet"
+        >
+          <h2 class="journey-view__matches-title">
+            {{ matches.length > 1 ? "Correspondances trouvées" : "Correspondance trouvée" }}
+          </h2>
+
+          <article
+            v-for="match in matches"
+            :key="match.foundJourneyId"
+            class="journey-view__match-card"
+          >
+            <div class="journey-view__match-head">
+              <span
+                class="journey-view__match-avatar"
+                aria-hidden="true"
+              >{{ (match.user.firstname?.[0] || "") + (match.user.lastname?.[0] || "") }}</span>
+              <div class="journey-view__match-identity">
+                <strong class="journey-view__match-name">
+                  {{ match.user.firstname }} {{ match.user.lastname }}
+                </strong>
+                <span class="journey-view__match-sub">a enregistré un trajet similaire</span>
+              </div>
+            </div>
+
+            <dl class="journey-view__match-journey">
+              <div class="journey-view__match-row">
+                <dt>Départ</dt>
+                <dd>{{ match.journey.departureAddress }} · {{ formatDate(match.journey.departureTime) }}</dd>
+              </div>
+              <div class="journey-view__match-row">
+                <dt>Arrivée</dt>
+                <dd>{{ match.journey.arrivalAddress }} · {{ formatDate(match.journey.arrivalTime) }}</dd>
+              </div>
+            </dl>
+
+            <div
+              v-if="matchState(match).actionable"
+              class="journey-view__match-actions"
+            >
+              <button
+                type="button"
+                class="journey-view__match-btn journey-view__match-btn--accept"
+                :disabled="matchActionId === match.foundJourneyId"
+                @click="respondToMatch(match.foundJourneyId, true)"
+              >
+                Accepter
+              </button>
+              <button
+                type="button"
+                class="journey-view__match-btn journey-view__match-btn--decline"
+                :disabled="matchActionId === match.foundJourneyId"
+                @click="respondToMatch(match.foundJourneyId, false)"
+              >
+                Refuser
+              </button>
+            </div>
+            <p
+              v-else
+              class="journey-view__match-status"
+              role="status"
+            >
+              {{ matchState(match).message }}
+            </p>
+          </article>
+        </section>
       </template>
     </div>
   </div>
@@ -421,5 +527,138 @@ onMounted(async () => {
 .journey-view__stop-time {
   font-size: 0.875rem;
   color: var(--c-text-medium);
+}
+
+/* Matches */
+.journey-view__matches {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.journey-view__matches-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--c-navy);
+}
+
+.journey-view__match-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  box-shadow: 0 10px 32px rgba(15, 23, 42, 0.05);
+}
+
+.journey-view__match-head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.journey-view__match-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-teal), #9ed4d9);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.journey-view__match-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.journey-view__match-name {
+  color: var(--c-navy);
+  font-size: 1rem;
+}
+
+.journey-view__match-sub {
+  color: var(--c-text-medium);
+  font-size: 0.82rem;
+}
+
+.journey-view__match-journey {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 0.875rem;
+  background: rgba(72, 175, 196, 0.06);
+}
+
+.journey-view__match-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.journey-view__match-row dt {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--c-text-light);
+}
+
+.journey-view__match-row dd {
+  margin: 0;
+  color: var(--c-text-medium);
+  font-size: 0.9rem;
+}
+
+.journey-view__match-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.journey-view__match-btn {
+  min-height: 3rem;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.journey-view__match-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.journey-view__match-btn--accept {
+  background: linear-gradient(135deg, var(--c-teal) 0%, #3093a8 100%);
+  color: #fff;
+}
+
+.journey-view__match-btn--decline {
+  background: transparent;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-medium);
+}
+
+.journey-view__match-status {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.875rem;
+  background: rgba(72, 175, 196, 0.08);
+  color: var(--c-teal-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 </style>
