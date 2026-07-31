@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import databaseBuilder from "../../../../db/database-builder/index.js";
-import usecases from "../../../../src/journeys/usecases/index.js";
+import { getCompanionJourneyMatchesUsecase } from "../../../../src/journeys/usecases/get-companion-journey-matches-usecase.js";
 import { JOURNEY_STATUS } from "../../../../src/shared/constants.js";
 
 describe("Integration | Journeys | Usecases | Get companion journey matches", () => {
@@ -23,7 +23,7 @@ describe("Integration | Journeys | Usecases | Get companion journey matches", ()
     });
 
     // when
-    const result = await usecases.getCompanionJourneyMatchesUsecase({ journeyId: Number(companionJourney.id), userId: companion.id });
+    const result = await getCompanionJourneyMatchesUsecase({ journeyId: Number(companionJourney.id), userId: companion.id });
 
     // then
     expect(result).toHaveLength(1);
@@ -43,7 +43,7 @@ describe("Integration | Journeys | Usecases | Get companion journey matches", ()
     const companionJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: owner.id });
 
     // when
-    const result = await usecases.getCompanionJourneyMatchesUsecase({ journeyId: Number(companionJourney.id), userId: otherUser.id });
+    const result = await getCompanionJourneyMatchesUsecase({ journeyId: Number(companionJourney.id), userId: otherUser.id });
 
     // then
     expect(result).toBeNull();

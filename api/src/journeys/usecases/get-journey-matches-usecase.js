@@ -1,44 +1,37 @@
-import { JOURNEY_STATUS } from "../../shared/constants.js";
-import { getJourneyUsecase } from "./get-journey-usecase.js";
+import { findUserById } from "../../identities-access-management/repositories/user-repository.js";
+import { USER_ROLE } from "../../shared/constants.js";
+import { JourneyNotFound, UserHasNoRole } from "../errors.js";
+import { getCompanionJourneyMatchesUsecase } from "./get-companion-journey-matches-usecase.js";
+import { getPassengerJourneyMatchesUsecase } from "./get-passenger-journey-matches-usecase.js";
 
 /**
- * Retrieve the matches of a journey owned by the user. Returns null when the
- * journey does not exist or is not owned by the user. Matches where either side
- * has declined are filtered out (the card must not be shown once declined).
- * @param {object} params - The lookup parameters and repositories.
- * @param {Function} params.findJourneyById - Finds the owned journey (ownership check).
- * @param {Function} params.findMatches - Finds the raw matches for the journey id.
- * @param {string} params.myStatusKey - Key of the requesting user's status (passengerStatus/companionStatus).
- * @param {string} params.otherStatusKey - Key of the other user's status.
+ * Retrieve the matches of a journey owned by the authenticated user. The user is
+ * resolved from the repository here (never in the controller): its role decides
+ * whether the journey is looked up on the passenger or companion side. Throws
+ * JourneyNotFound when the journey does not exist or is not the user's, and
+ * UserHasNoRole when the user has no passenger/companion role.
+ * @param {object} params - The lookup parameters.
+ * @param {number} params.userId - The id of the authenticated user.
  * @param {number} params.journeyId - The id of the journey.
- * @param {number} params.userId - The id of the requesting user.
- * @returns {Promise<object[]|null>} The matches, or null when the journey is not the user's.
+ * @returns {Promise<object[]>} The matches of the journey.
  */
-async function getJourneyMatchesUsecase({ findJourneyById, findMatches, myStatusKey, otherStatusKey, journeyId, userId }) {
-  const journey = await getJourneyUsecase(findJourneyById, { journeyId, userId });
-  if (!journey) {
-    return null;
+async function getJourneyMatchesUsecase({ userId, journeyId }) {
+  const user = await findUserById(userId);
+
+  let matches;
+  if (user.role === USER_ROLE.INVALID) {
+    matches = await getPassengerJourneyMatchesUsecase({ journeyId, userId });
+  } else if (user.role === USER_ROLE.VALID) {
+    matches = await getCompanionJourneyMatchesUsecase({ journeyId, userId });
+  } else {
+    throw new UserHasNoRole();
   }
 
-  const matches = await findMatches(journeyId);
+  if (matches === null) {
+    throw new JourneyNotFound();
+  }
 
-  return matches
-    .filter((match) => match[myStatusKey] !== JOURNEY_STATUS.REJECTED && match[otherStatusKey] !== JOURNEY_STATUS.REJECTED)
-    .map((match) => ({
-      foundJourneyId: match.foundJourneyId,
-      user: {
-        firstname: match.firstname,
-        lastname: match.lastname,
-      },
-      journey: {
-        departureAddress: match.departureAddress,
-        arrivalAddress: match.arrivalAddress,
-        departureTime: match.departureTime,
-        arrivalTime: match.arrivalTime,
-      },
-      myStatus: match[myStatusKey],
-      otherStatus: match[otherStatusKey],
-    }));
+  return matches;
 }
 
 export { getJourneyMatchesUsecase };

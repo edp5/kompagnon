@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import databaseBuilder from "../../../../db/database-builder/index.js";
-import usecases from "../../../../src/journeys/usecases/index.js";
+import { getPassengerJourneyMatchesUsecase } from "../../../../src/journeys/usecases/get-passenger-journey-matches-usecase.js";
 import { JOURNEY_STATUS } from "../../../../src/shared/constants.js";
 
 describe("Integration | Journeys | Usecases | Get passenger journey matches", () => {
@@ -23,7 +23,7 @@ describe("Integration | Journeys | Usecases | Get passenger journey matches", ()
     });
 
     // when
-    const result = await usecases.getPassengerJourneyMatchesUsecase({ journeyId: Number(passengerJourney.id), userId: passenger.id });
+    const result = await getPassengerJourneyMatchesUsecase({ journeyId: Number(passengerJourney.id), userId: passenger.id });
 
     // then
     expect(result).toHaveLength(1);
@@ -43,7 +43,7 @@ describe("Integration | Journeys | Usecases | Get passenger journey matches", ()
     const passengerJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: owner.id });
 
     // when
-    const result = await usecases.getPassengerJourneyMatchesUsecase({ journeyId: Number(passengerJourney.id), userId: otherUser.id });
+    const result = await getPassengerJourneyMatchesUsecase({ journeyId: Number(passengerJourney.id), userId: otherUser.id });
 
     // then
     expect(result).toBeNull();
@@ -62,7 +62,7 @@ describe("Integration | Journeys | Usecases | Get passenger journey matches", ()
     });
 
     // when
-    const result = await usecases.getPassengerJourneyMatchesUsecase({ journeyId: Number(passengerJourney.id), userId: passenger.id });
+    const result = await getPassengerJourneyMatchesUsecase({ journeyId: Number(passengerJourney.id), userId: passenger.id });
 
     // then
     expect(result).toEqual([]);

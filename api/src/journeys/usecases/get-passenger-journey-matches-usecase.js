@@ -1,6 +1,6 @@
 import { findMatchesByPassengerJourneyId } from "../repositories/found-journeys-repository.js";
 import { findJourneyById } from "../repositories/passenger-users-repository.js";
-import { getJourneyMatchesUsecase } from "./get-journey-matches-usecase.js";
+import { getJourneyMatchesForSideUsecase } from "./get-journey-matches-for-side-usecase.js";
 
 /**
  * Retrieve the matches of a passenger journey owned by the user.
@@ -10,7 +10,7 @@ import { getJourneyMatchesUsecase } from "./get-journey-matches-usecase.js";
  * @returns {Promise<object[]|null>} The matches, or null when the journey is not the user's.
  */
 async function getPassengerJourneyMatchesUsecase({ journeyId, userId }) {
-  return getJourneyMatchesUsecase({
+  return getJourneyMatchesForSideUsecase({
     findJourneyById,
     findMatches: findMatchesByPassengerJourneyId,
     myStatusKey: "passengerStatus",
