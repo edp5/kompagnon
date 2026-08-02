@@ -43,7 +43,6 @@ const configuration = (function() {
     },
     email: {
       enabled: toBoolean(process.env.MAILING_ENABLED),
-      testAccount: toBoolean(process.env.MAIL_TEST_ACCOUNT_ENABLED),
       host: process.env.MAILING_HOST,
       port: _getNumber(process.env.MAILING_PORT, 587),
       secure: toBoolean(process.env.MAILING_SECURE),
@@ -51,6 +50,12 @@ const configuration = (function() {
         user: process.env.MAILING_USER,
         pass: process.env.MAILING_PASSWORD,
       },
+    },
+    mailPit: {
+      enabled: toBoolean(process.env.MAILING_MAILPIT_ENABLED),
+      port: _getNumber(process.env.MAILING_MAILPIT_PORT, 1025),
+      secure: false,
+      host: "localhost",
     },
     baseUrl: process.env.BASE_URL,
     algorithm: {
@@ -81,10 +86,11 @@ const configuration = (function() {
     config.jwt.tokenSecret = "abcd";
     config.jwt.expirationTime = "1h";
     config.email.enabled = false;
-    config.email.testAccount = false;
     config.baseUrl = "http://localhost/#/";
     config.algorithm.enabled = false;
     config.algorithm.apiUrl = "http://localhost:8000";
+  } else if (config.mailPit.enabled) {
+    config.email = config.mailPit;
   }
   return config;
 })();
