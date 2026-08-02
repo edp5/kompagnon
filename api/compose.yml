@@ -4,8 +4,6 @@ services:
     container_name: kompagnon-postgres
     ports:
       - '${DATABASE_PORT:-5432}:5432'
-    env_file:
-      - ./api/.env
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
 
@@ -29,7 +27,7 @@ services:
       - pgadmin
     volumes:
       - pgadmin-data:/var/lib/pgadmin
-      - ./scripts/pgadmin/init-create-server.sh:/usr/local/bin/init-create-server.sh:ro
+      - ././scripts/pgadmin/init-create-server.sh:/usr/local/bin/init-create-server.sh:ro
     environment:
       PGADMIN_DEFAULT_EMAIL: '${PGADMIN_DEFAULT_EMAIL:-admin@kompagnon.dev}'
       PGADMIN_DEFAULT_PASSWORD: '${PGADMIN_DEFAULT_PASSWORD:-admin}'
@@ -39,6 +37,15 @@ services:
       PG_USER: postgres
     entrypoint: ["/bin/sh", "/usr/local/bin/init-create-server.sh"]
     restart: "no"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: kompagnon-mailpit
+    ports:
+      - "8025:8025" # Web UI
+      - '${MAILING_MAILPIT_PORT:-1025}:1025' # SMTP
+    restart: unless-stopped
+
 
 volumes:
   pgadmin-data: {}

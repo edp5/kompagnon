@@ -20,7 +20,7 @@ async function sendMailService(req) {
   }
 
   const mailOptions = {
-    from: email.auth.user,
+    from: email.auth?.user || "no-reply@example.com",
     to: req.to,
     subject: req.subject || "No Subject",
   };
@@ -34,42 +34,24 @@ async function sendMailService(req) {
   }
 
   if (!email.enabled) {
-    logger.info(`Email disabled. Mail not sent. Mail info: ${JSON.stringify(mailOptions)}`);
+    logger.info({ mailOptions }, "Email disabled. Mail not sent. Mail info");
     return {
       info: "Email sending disabled",
       data: mailOptions,
     };
   }
-  let transporter, testAccount;
 
-  if (email.testAccount) {
-    testAccount = await nodemailer.createTestAccount();
-    transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
-  } else {
-    transporter = nodemailer.createTransport({
-      host: email.host,
-      port: email.port,
-      secure: email.secure,
-      auth: email.auth,
-    });
-  }
-
+  const transporter = nodemailer.createTransport({
+    host: email.host,
+    port: email.port,
+    secure: email.secure,
+    ...(email.auth?.user && email.auth?.pass ? { auth: email.auth } : {}),
+  });
   try {
     const info = await transporter.sendMail(mailOptions);
-    if (email.testAccount) {
-      logger.info(`Email available on ${nodemailer.getTestMessageUrl(info)}`);
-    }
     return info;
   } catch (error) {
-    logger.error(`Error sending email: ${error}`);
+    logger.error({ err: error }, "Error sending email");
     throw error;
   }
 }

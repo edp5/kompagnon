@@ -16,11 +16,11 @@ cp ./api/sample.env ./api/.env || { echo "Error copying environment file"; exit 
 
 # docker
 echo "Starting Docker"
-docker compose up -d || { echo "Error starting Docker"; exit 1; }
+docker compose --file api/compose.yml up -d || { echo "Error starting Docker"; exit 1; }
 
 # database
 echo "Creating database..."
-cd ./api && npm run db:reset && cd ../ || { echo "Error resetting the database"; exit 1; }
+npm --prefix api run db:reset || { echo "Error resetting the database"; exit 1; }
 
 # web
 # copy the sample env to env
