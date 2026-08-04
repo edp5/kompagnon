@@ -1,0 +1,52 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { config } from "../../../../config.js";
+import { callMatchingAlgorithmService } from "../../../../src/journeys/services/call-matching-algorithm-service.js";
+
+describe("Unit | Journeys | Services | Call matching algorithm", () => {
+  beforeEach(() => {
+    config.algorithm.enabled = true;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    config.algorithm.enabled = false;
+  });
+
+  it("should call the algo match route and return its answer when enabled", async () => {
+    // given
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue();
+
+    // when
+    await callMatchingAlgorithmService({ journeyId: 7, role: "passenger" });
+
+    // then
+    expect(fetchSpy).toHaveBeenCalledWith("http://localhost:8000/api/match", expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({ journey_id: 7, role: "passenger" }),
+    }));
+  });
+
+  it("should skip the call when the algorithm is disabled", async () => {
+    // given
+    config.algorithm.enabled = false;
+    const fetchSpy = vi.spyOn(global, "fetch");
+
+    // when
+    await callMatchingAlgorithmService({ journeyId: 7, role: "passenger" });
+
+    // then
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("should throw and return null when the algorithm request fails", async () => {
+    // given
+    vi.spyOn(global, "fetch").mockResolvedValue({ ok: false, status: 502 });
+
+    // when
+    const result = await callMatchingAlgorithmService({ journeyId: 7, role: "companion" });
+
+    // then
+    expect(result).toBeNull();
+  });
+});
