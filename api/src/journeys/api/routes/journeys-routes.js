@@ -2,6 +2,7 @@ import express from "express";
 
 import { authMiddleware } from "../../../shared/infrastructure/middlewares/auth-middleware.js";
 import { getJourneyController, getJourneyControllerSchema } from "../controllers/get-journey-controller.js";
+import { getJourneyMatchesController, getJourneyMatchesControllerSchema } from "../controllers/get-journey-matches-controller.js";
 import { getJourneysController, getJourneysControllerSchema } from "../controllers/get-journeys-controller.js";
 import { recordJourneyController, recordJourneyControllerSchema } from "../controllers/record-journey-controller.js";
 import {
@@ -259,6 +260,81 @@ journeysRoutes.put(
   authMiddleware,
   updateFoundJourneyStatusSchema,
   updateFoundJourneyStatusController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/{journeyId}/matches:
+ *   get:
+ *     tags:
+ *       - Journeys
+ *     summary: Get the matches of a journey
+ *     description: Returns the matches of a journey owned by the authenticated user, with the other user's name, their journey and both statuses. Matches declined by either side are excluded.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: journeyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The id of the journey whose matches to retrieve.
+ *     responses:
+ *       200:
+ *         description: List of matches
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       foundJourneyId:
+ *                         type: integer
+ *                         example: 3
+ *                       user:
+ *                         type: object
+ *                         properties:
+ *                           firstname:
+ *                             type: string
+ *                             example: Adrien
+ *                           lastname:
+ *                             type: string
+ *                             example: Le Guen
+ *                       journey:
+ *                         type: object
+ *                         properties:
+ *                           departureAddress:
+ *                             type: string
+ *                           arrivalAddress:
+ *                             type: string
+ *                           departureTime:
+ *                             type: string
+ *                             format: date-time
+ *                           arrivalTime:
+ *                             type: string
+ *                             format: date-time
+ *                       myStatus:
+ *                         type: string
+ *                         example: waiting
+ *                       otherStatus:
+ *                         type: string
+ *                         example: accepted
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Journey not found or not owned by the user
+ *       500:
+ *         description: Internal server error
+ */
+journeysRoutes.get(
+  "/api/journeys/:journeyId/matches",
+  authMiddleware,
+  getJourneyMatchesControllerSchema,
+  getJourneyMatchesController,
 );
 
 export default journeysRoutes;

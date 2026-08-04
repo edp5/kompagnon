@@ -419,4 +419,53 @@ describe("Acceptance | Journeys | Journey routes", () => {
       expect(response.status).toBe(401);
     });
   });
+
+  describe("GET /journeys/:journeyId/matches", () => {
+    it("should return 200 and the matches of the owner's journey", async () => {
+      // given
+      const passenger = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+      const passengerJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: passenger.id });
+      const companion = await databaseBuilder.factory.buildUser({ firstname: "Adrien", lastname: "Le Guen" });
+      const companionJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: companion.id });
+      await databaseBuilder.factory.buildFoundJourney({
+        passengerJourneyId: passengerJourney.id,
+        companionJourneyId: companionJourney.id,
+        passengerStatus: JOURNEY_STATUS.WAITING,
+        companionStatus: JOURNEY_STATUS.ACCEPTED,
+      });
+      const auth = generateAuthenticatedUser(passenger.id, passenger.userType);
+
+      // when
+      const response = await request(server).get(`/api/journeys/${passengerJourney.id}/matches`).set("Authorization", auth);
+
+      // then
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0].user).toEqual({ firstname: "Adrien", lastname: "Le Guen" });
+      expect(response.body.data[0].myStatus).toBe(JOURNEY_STATUS.WAITING);
+      expect(response.body.data[0].otherStatus).toBe(JOURNEY_STATUS.ACCEPTED);
+    });
+
+    it("should return 404 when the journey is not the user's", async () => {
+      // given
+      const owner = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+      const otherUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+      const passengerJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: owner.id });
+      const auth = generateAuthenticatedUser(otherUser.id, otherUser.userType);
+
+      // when
+      const response = await request(server).get(`/api/journeys/${passengerJourney.id}/matches`).set("Authorization", auth);
+
+      // then
+      expect(response.status).toBe(404);
+    });
+
+    it("should return 401 without authentication", async () => {
+      // when
+      const response = await request(server).get("/api/journeys/1/matches");
+
+      // then
+      expect(response.status).toBe(401);
+    });
+  });
 });
