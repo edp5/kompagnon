@@ -1,4 +1,5 @@
 import { knex } from "../../../db/knex-database-connection.js";
+import { DomainTransaction } from "../../shared/infrastructure/DomainTransaction.js";
 
 /**
  * Creates a new user in the database
@@ -59,8 +60,23 @@ async function activateUserById(userId) {
     });
 }
 
+/**
+ * Update user informations
+ * @param {object} param0 - An object containing userId and data to update
+ * @param {number} param0.userId - The ID of the user to update
+ * @param {object} param0.data - An object containing the fields to update and their new values
+ */
+async function updateUserData({ userId, data }) {
+  const knexcon = DomainTransaction.getConnection();
+  await knexcon("users").where({ id: userId }).update({ ...data, updated_at: knex.fn.now() });
+}
+
+/**
+ * Update the last logged at timestamp for a user
+ * @param {number} userId - The ID of the user to update
+ */
 async function updateLastLoggedAt(userId) {
-  return await knex("users")
+  await knex("users")
     .where({ id: userId })
     .update({
       lastLoggedAt: knex.fn.now(),
@@ -78,4 +94,4 @@ async function findUserByEmail(email) {
   return foundUser || null;
 }
 
-export { activateUserById, createNewUser, findUserByEmail, findUserById, updateLastLoggedAt };
+export { activateUserById, createNewUser, findUserByEmail, findUserById, updateLastLoggedAt, updateUserData };
