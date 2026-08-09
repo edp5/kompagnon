@@ -26,6 +26,7 @@
     "db:empty": "node --env-file-if-exists=.env ./db/empty-database.js",
     "db:migrate": "knex --knexfile ./db/knexfile.js  migrate:latest",
     "db:rollback:latest": "knex --knexfile ./db/knexfile.js  migrate:down",
+    "db:rollback:all": "knex --knexfile ./db/knexfile.js  migrate:rollback",
     "db:prepare": "npm run db:delete && npm run db:create && npm run db:migrate",
     "db:seed": "knex --knexfile ./db/knexfile.js seed:run",
     "db:reset": "npm run db:prepare && npm run db:seed",
