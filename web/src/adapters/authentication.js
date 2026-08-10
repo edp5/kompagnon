@@ -68,13 +68,15 @@ async function loginUser({ email, password }) {
   }
 }
 
-async function activateAccount({ token }) {
+async function activateAccount({ token, phoneNumber }) {
   try {
     const response = await fetch(`${AUTHENTICATION_URL}activate`, {
-      method: "GET",
+      method: "POST",
       headers: {
+        "Content-Type": "application/json",
         authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify({ phoneNumber }),
     });
 
     switch (response.status) {
@@ -83,12 +85,17 @@ async function activateAccount({ token }) {
     case 400:
       return {
         success: false,
-        message: "Token invalide ou expiré.",
+        message: "Numéro de téléphone invalide ou lien d'activation expiré.",
       };
-    case 401:
+    case 404:
       return {
         success: false,
-        message: "Utilisateur non trouvé ou déjà actif.",
+        message: "Utilisateur introuvable.",
+      };
+    case 409:
+      return {
+        success: false,
+        message: "Ce compte est déjà activé.",
       };
     default:
       return {
