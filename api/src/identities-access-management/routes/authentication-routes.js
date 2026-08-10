@@ -99,16 +99,28 @@ authenticationRoutes.post("/api/authentication/authenticate", authenticateUserSc
 /**
  * @swagger
  * /api/authentication/activate:
- *   get:
+ *   post:
  *     tags:
  *       - Authentication
  *     summary: Activate a user account
- *     description: Activates a user account using the token sent by email
+ *     description: Activates a user account using the token sent by email and stores the phone number
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phoneNumber:
+ *                 type: string
+ *                 example: "0612345678"
  *     responses:
  *       201:
  *         description: User activated successfully
+ *       400:
+ *         description: Missing token or invalid phone number
  *       404:
  *         description: User not found
  *       409:
@@ -124,6 +136,6 @@ authenticationRoutes.post("/api/authentication/authenticate", authenticateUserSc
  *                   type: string
  *                   example: Internal server error
  */
-authenticationRoutes.get("/api/authentication/activate", activateUserSchema, activateUserController);
+authenticationRoutes.post("/api/authentication/activate", activateUserSchema, activateUserController);
 
 export default authenticationRoutes;

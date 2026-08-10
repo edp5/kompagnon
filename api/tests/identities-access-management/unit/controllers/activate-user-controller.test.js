@@ -10,6 +10,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
     decodedTokenService = vi.fn();
     req = {
       headers: {},
+      body: {},
     };
     res = {
       status: vi.fn().mockReturnThis(),
@@ -20,31 +21,29 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
   });
 
   describe("success cases", () => {
-    it("should activate user and return 201 when token is valid and user is inactive", async () => {
+    it("should activate user with the phone number and return 201 when token is valid and user is inactive", async () => {
       // given
       req.headers.authorization = "Bearer valid-token";
-      const decodedData = { userId: 123 };
-
-      decodedTokenService.mockReturnValue(decodedData);
+      req.body = { phoneNumber: "0612345678" };
+      decodedTokenService.mockReturnValue({ userId: 123 });
 
       // when
       await activateUserController(req, res, next, activateUserUsecase, decodedTokenService);
 
       // then
       expect(decodedTokenService).toHaveBeenCalledWith("valid-token");
-      expect(activateUserUsecase).toHaveBeenCalledWith(123);
+      expect(activateUserUsecase).toHaveBeenCalledWith(123, "0612345678");
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.send).toHaveBeenCalled();
     });
   });
 
   describe("error cases", () => {
-    it("should return an error if usecase failed", async () => {
+    it("should forward the error to next if usecase failed", async () => {
       // given
       req.headers.authorization = "Bearer valid-token";
-      const decodedData = { userId: 999 };
-
-      decodedTokenService.mockReturnValue(decodedData);
+      req.body = { phoneNumber: "0612345678" };
+      decodedTokenService.mockReturnValue({ userId: 999 });
       activateUserUsecase.mockRejectedValue("some error");
 
       // when
@@ -52,7 +51,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
 
       // then
       expect(decodedTokenService).toHaveBeenCalledWith("valid-token");
-      expect(activateUserUsecase).toHaveBeenCalledWith(999);
+      expect(activateUserUsecase).toHaveBeenCalledWith(999, "0612345678");
       expect(next).toHaveBeenCalledWith("some error");
     });
   });
