@@ -7,16 +7,17 @@ import usecases from "../../../src/identities-access-management/usecases/index.j
 
 describe("Integration | Usecases | Activate user usecase", () => {
   describe("success case", () => {
-    it("should Activate user", async () => {
+    it("should activate the user and store the phone number", async () => {
       // given
       const user = await databaseBuilder.factory.buildUser({ isActive: false });
 
       // when
-      await usecases.activateUserUsecase(user.id);
+      await usecases.activateUserUsecase(user.id, "0612345678");
 
       // then
       const updatedUser = await knex("users").where({ id: user.id }).first();
       expect(updatedUser.isActive).toBeTruthy();
+      expect(updatedUser.phoneNumber).toBe("0612345678");
     });
   });
 
@@ -26,7 +27,7 @@ describe("Integration | Usecases | Activate user usecase", () => {
       const nonExistentUserId = 999;
 
       // when
-      const result = usecases.activateUserUsecase(nonExistentUserId);
+      const result = usecases.activateUserUsecase(nonExistentUserId, "0612345678");
 
       // then
       await expect(result).rejects.toThrow(UserNotFoundError);
@@ -37,7 +38,7 @@ describe("Integration | Usecases | Activate user usecase", () => {
       const user = await databaseBuilder.factory.buildUser({ isActive: true });
 
       // when
-      const result = usecases.activateUserUsecase(user.id);
+      const result = usecases.activateUserUsecase(user.id, "0612345678");
 
       // then
       await expect(result).rejects.toThrow(UserIsAlreadyActive);

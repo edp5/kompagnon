@@ -92,8 +92,8 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
     });
   });
 
-  describe("GET /api/authentication/activate", () => {
-    it("should activate user and return 201 when token is valid and user is inactive", async () => {
+  describe("POST /api/authentication/activate", () => {
+    it("should activate user with the phone number and return 201 when token is valid and user is inactive", async () => {
       // given
       const user = await databaseBuilder.factory.buildUser({
         email: "activate-test-1@example.com",
@@ -102,15 +102,41 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       const token = encodedToken({ userId: user.id });
 
       // when
-      const response = await request(server).get("/api/authentication/activate").set("authorization", `Bearer ${token}`);
+      const response = await request(server)
+        .post("/api/authentication/activate")
+        .set("authorization", `Bearer ${token}`)
+        .send({ phoneNumber: "0612345678" });
 
       // then
       expect(response.status).toBe(201);
+      const updatedUser = await knex("users").where({ id: user.id }).first();
+      expect(updatedUser.isActive).toBeTruthy();
+      expect(updatedUser.phoneNumber).toBe("0612345678");
     });
 
     it("should return 400 when token is missing", async () => {
       // when
-      const response = await request(server).get("/api/authentication/activate");
+      const response = await request(server)
+        .post("/api/authentication/activate")
+        .send({ phoneNumber: "0612345678" });
+
+      // then
+      expect(response.status).toBe(400);
+    });
+
+    it("should return 400 when the phone number is invalid", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({
+        email: "activate-test-invalid-phone@example.com",
+        isActive: false,
+      });
+      const token = encodedToken({ userId: user.id });
+
+      // when
+      const response = await request(server)
+        .post("/api/authentication/activate")
+        .set("authorization", `Bearer ${token}`)
+        .send({ phoneNumber: "not-a-phone" });
 
       // then
       expect(response.status).toBe(400);
@@ -121,7 +147,10 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       const token = encodedToken({ userId: 999999 });
 
       // when
-      const response = await request(server).get("/api/authentication/activate").set("authorization", `Bearer ${token}`);
+      const response = await request(server)
+        .post("/api/authentication/activate")
+        .set("authorization", `Bearer ${token}`)
+        .send({ phoneNumber: "0612345678" });
 
       // then
       expect(response.status).toBe(404);
@@ -136,7 +165,10 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       const token = generateAuthenticatedUser(user.id, user.userType);
 
       // when
-      const response = await request(server).get("/api/authentication/activate").set("authorization", token);
+      const response = await request(server)
+        .post("/api/authentication/activate")
+        .set("authorization", token)
+        .send({ phoneNumber: "0612345678" });
 
       // then
       expect(response.status).toBe(409);
