@@ -45,18 +45,16 @@ async function findUserById(userId) {
 }
 
 /**
- * Activates a user by setting isActive to true and storing their phone number
+ * Activates a user by setting isActive to true
  * @param {number} userId - The ID of the user to activate
- * @param {string} phoneNumber - The phone number provided on activation
  * @returns {Promise<void>}
  * @throws {Error} If user is not found or activation fails
  */
-async function activateUserById(userId, phoneNumber) {
+async function activateUserById(userId) {
   await knex("users")
     .where({ id: userId })
     .update({
       isActive: true,
-      phoneNumber,
       updated_at: knex.fn.now(),
     });
 }

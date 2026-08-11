@@ -19,14 +19,14 @@ vi.mock("vue-router", () => ({
   },
 }));
 
-describe("Unit | Views | Authentication | ActivateAccountView", () => {
+describe("Unit | Views | Authentication | AuthenticationView", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRoute.query = {};
   });
 
   describe("when token is missing", () => {
-    it("should display an error message and a registration link, without a form", async () => {
+    it("should display an error message when no token is provided", async () => {
       // given
       mockRoute.query = {};
 
@@ -35,72 +35,83 @@ describe("Unit | Views | Authentication | ActivateAccountView", () => {
       await flushPromises();
 
       // then
-      expect(wrapper.text()).toContain("Token d'activation manquant.");
-      expect(wrapper.text()).toContain("Retour à l'inscription");
-      expect(wrapper.find("form").exists()).toBe(false);
       expect(activateAccount).not.toHaveBeenCalled();
+      expect(wrapper.text()).toContain("Token d'activation manquant.");
+    });
+
+    it("should show link to registration page when token is missing", async () => {
+      // given
+      mockRoute.query = {};
+
+      // when
+      const wrapper = mount(ActivateAccountView);
+      await flushPromises();
+
+      // then
+      expect(wrapper.text()).toContain("Retour à l'inscription");
     });
   });
 
   describe("when token is provided", () => {
-    it("should show the phone number form and not activate on mount", async () => {
+    it("should call activateAccount with the token from query params", async () => {
       // given
-      mockRoute.query = { token: "valid-token" };
+      const token = "valid-test-token";
+      mockRoute.query = { token };
+      activateAccount.mockResolvedValue({ success: true, message: "Compte activé avec succès !" });
 
       // when
       const wrapper = mount(ActivateAccountView);
       await flushPromises();
 
       // then
-      expect(wrapper.find("input#phoneNumber").exists()).toBe(true);
-      expect(activateAccount).not.toHaveBeenCalled();
+      expect(activateAccount).toHaveBeenCalledWith({ token });
+      expect(wrapper.text()).toContain("Compte activé avec succès !");
     });
 
-    it("should show a validation error and not call the adapter when the phone number is invalid", async () => {
+    it("should display loading state while activation is in progress", async () => {
       // given
-      mockRoute.query = { token: "valid-token" };
-      const wrapper = mount(ActivateAccountView);
+      mockRoute.query = { token: "test-token" };
+      let resolveActivation;
+      activateAccount.mockReturnValue(new Promise((resolve) => {
+        resolveActivation = resolve;
+      }));
 
       // when
-      await wrapper.find("input#phoneNumber").setValue("not-a-phone");
-      await wrapper.find("form").trigger("submit.prevent");
-      await flushPromises();
+      const wrapper = mount(ActivateAccountView);
 
       // then
-      expect(wrapper.text()).toContain("Veuillez saisir un numéro de téléphone français valide.");
-      expect(activateAccount).not.toHaveBeenCalled();
+      expect(wrapper.text()).toContain("Activation en cours...");
+
+      // cleanup
+      resolveActivation({ success: true, message: "Done" });
+      await flushPromises();
     });
 
-    it("should activate with the token and phone number, then show the login link on success", async () => {
+    it("should show link to login page on successful activation", async () => {
       // given
       mockRoute.query = { token: "valid-token" };
       activateAccount.mockResolvedValue({ success: true, message: "Compte activé avec succès !" });
-      const wrapper = mount(ActivateAccountView);
 
       // when
-      await wrapper.find("input#phoneNumber").setValue("0612345678");
-      await wrapper.find("form").trigger("submit.prevent");
+      const wrapper = mount(ActivateAccountView);
       await flushPromises();
 
       // then
-      expect(activateAccount).toHaveBeenCalledWith({ token: "valid-token", phoneNumber: "0612345678" });
-      expect(wrapper.text()).toContain("Compte activé avec succès !");
       expect(wrapper.text()).toContain("Aller à la connexion");
     });
 
-    it("should display the error message returned by the adapter on failure", async () => {
+    it("should show error message and registration link on activation failure", async () => {
       // given
-      mockRoute.query = { token: "valid-token" };
-      activateAccount.mockResolvedValue({ success: false, message: "Ce compte est déjà activé." });
-      const wrapper = mount(ActivateAccountView);
+      mockRoute.query = { token: "invalid-token" };
+      activateAccount.mockResolvedValue({ success: false, message: "Token invalide ou expiré." });
 
       // when
-      await wrapper.find("input#phoneNumber").setValue("0612345678");
-      await wrapper.find("form").trigger("submit.prevent");
+      const wrapper = mount(ActivateAccountView);
       await flushPromises();
 
       // then
-      expect(wrapper.text()).toContain("Ce compte est déjà activé.");
+      expect(wrapper.text()).toContain("Token invalide ou expiré.");
+      expect(wrapper.text()).toContain("Retour à l'inscription");
     });
   });
 });
