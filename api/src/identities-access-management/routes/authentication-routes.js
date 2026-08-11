@@ -47,7 +47,6 @@ const authenticationRoutes = express.Router();
  *       500:
  *         description: Internal server error
  */
-
 authenticationRoutes.post("/api/authentication/register", registerUserSchema, registerUserController);
 
 /**
@@ -99,13 +98,23 @@ authenticationRoutes.post("/api/authentication/authenticate", authenticateUserSc
 /**
  * @swagger
  * /api/authentication/activate:
- *   get:
+ *   post:
  *     tags:
  *       - Authentication
  *     summary: Activate a user account
  *     description: Activates a user account using the token sent by email
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phoneNumber:
+ *                 type: string
+ *                 example: "0601020304"
  *     responses:
  *       201:
  *         description: User activated successfully
@@ -124,6 +133,6 @@ authenticationRoutes.post("/api/authentication/authenticate", authenticateUserSc
  *                   type: string
  *                   example: Internal server error
  */
-authenticationRoutes.get("/api/authentication/activate", activateUserSchema, activateUserController);
+authenticationRoutes.post("/api/authentication/activate", activateUserSchema, activateUserController);
 
 export default authenticationRoutes;

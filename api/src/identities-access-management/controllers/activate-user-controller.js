@@ -8,6 +8,9 @@ const activateUserSchema = celebrate({
   [Segments.HEADERS]: Joi.object({
     authorization: Joi.string().pattern(/^Bearer .+$/).required(),
   }).unknown(),
+  [Segments.BODY]: Joi.object({
+    phoneNumber: Joi.string().pattern(/^0[67]\d{8}$/),
+  }),
 });
 
 /**
@@ -31,8 +34,9 @@ async function activateUserController(
 
     const decodedData = decodedTokenService(token);
     const userId = decodedData.userId;
+    const { phoneNumber } = req.body;
 
-    await activateUserUsecase(userId);
+    await activateUserUsecase({ userId, phoneNumber });
 
     return res.status(201).send();
   } catch (error) {

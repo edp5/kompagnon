@@ -27,4 +27,13 @@ class InvalidCredentialsError extends DomainError {
   }
 }
 
-export { InvalidCredentialsError, UserIsAlreadyActive, UserNotFoundError };
+/**
+ * Throw when the phone number is already used
+ */
+class PhoneNumberAlreadyUsedError extends DomainError {
+  constructor() {
+    super("Phone number is already used", 409);
+  }
+}
+
+export { InvalidCredentialsError, PhoneNumberAlreadyUsedError, UserIsAlreadyActive, UserNotFoundError };

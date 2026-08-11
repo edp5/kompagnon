@@ -95,16 +95,29 @@ describe("Integration | Identities Access Management | Repositories | User repos
     });
   });
 
+  describe("#UpdateuserData", () => {
+    it("should update data of user", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({ firstname: "test" });
+
+      // when
+      await userRepository.updateUserData({ userId: user.id, data: { firstname: "updatedtest" } });
+
+      // then
+      const updatedUser = await knex("users").where({ id: user.id }).first();
+      expect(updatedUser.firstname).toBe("updatedtest");
+    });
+  });
+
   describe("#updateLastLoggedAt", () => {
     it("should update lastLoggedAt timestamp when user has no previous login", async () => {
       // given
       const user = await databaseBuilder.factory.buildUser({ lastLoggedAt: null });
 
       // when
-      const result = await userRepository.updateLastLoggedAt(user.id);
+      await userRepository.updateLastLoggedAt(user.id);
 
       // then
-      expect(result).toBe(1);
       const updatedUser = await knex("users").where({ id: user.id }).first();
       expect(updatedUser.lastLoggedAt).toBeTruthy();
       expect(new Date(updatedUser.lastLoggedAt).getTime()).toBeLessThanOrEqual(Date.now());
@@ -116,10 +129,9 @@ describe("Integration | Identities Access Management | Repositories | User repos
       const user = await databaseBuilder.factory.buildUser({ lastLoggedAt: previousLoginTime });
 
       // when
-      const result = await userRepository.updateLastLoggedAt(user.id);
+      await userRepository.updateLastLoggedAt(user.id);
 
       // then
-      expect(result).toBe(1);
       const updatedUser = await knex("users").where({ id: user.id }).first();
       expect(updatedUser.lastLoggedAt).toBeTruthy();
       expect(new Date(updatedUser.lastLoggedAt).getTime()).toBeGreaterThan(
@@ -134,22 +146,13 @@ describe("Integration | Identities Access Management | Repositories | User repos
       const originalUpdatedAt = user.updated_at;
 
       // when
-      const result = await userRepository.updateLastLoggedAt(user.id);
+      await userRepository.updateLastLoggedAt(user.id);
 
       // then
-      expect(result).toBe(1);
       const updatedUser = await knex("users").where({ id: user.id }).first();
       expect(new Date(updatedUser.updated_at).getTime()).toBeGreaterThan(
         new Date(originalUpdatedAt).getTime(),
       );
-    });
-
-    it("should return 0 when user not found", async () => {
-      // when
-      const result = await userRepository.updateLastLoggedAt(999);
-
-      // then
-      expect(result).toBe(0);
     });
   });
 

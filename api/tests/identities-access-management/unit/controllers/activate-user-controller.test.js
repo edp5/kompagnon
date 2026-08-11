@@ -10,6 +10,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
     decodedTokenService = vi.fn();
     req = {
       headers: {},
+      body: {},
     };
     res = {
       status: vi.fn().mockReturnThis(),
@@ -23,6 +24,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
     it("should activate user and return 201 when token is valid and user is inactive", async () => {
       // given
       req.headers.authorization = "Bearer valid-token";
+      req.body.phoneNumber = "phonenumber";
       const decodedData = { userId: 123 };
 
       decodedTokenService.mockReturnValue(decodedData);
@@ -32,7 +34,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
 
       // then
       expect(decodedTokenService).toHaveBeenCalledWith("valid-token");
-      expect(activateUserUsecase).toHaveBeenCalledWith(123);
+      expect(activateUserUsecase).toHaveBeenCalledWith({ userId: 123, phoneNumber: "phonenumber" });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.send).toHaveBeenCalled();
     });
@@ -42,6 +44,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
     it("should return an error if usecase failed", async () => {
       // given
       req.headers.authorization = "Bearer valid-token";
+      req.body.phoneNumber = "test";
       const decodedData = { userId: 999 };
 
       decodedTokenService.mockReturnValue(decodedData);
@@ -52,7 +55,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
 
       // then
       expect(decodedTokenService).toHaveBeenCalledWith("valid-token");
-      expect(activateUserUsecase).toHaveBeenCalledWith(999);
+      expect(activateUserUsecase).toHaveBeenCalledWith({ userId: 999, phoneNumber: "test" });
       expect(next).toHaveBeenCalledWith("some error");
     });
   });
