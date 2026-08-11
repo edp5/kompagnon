@@ -1,3 +1,5 @@
+## [1.3.0](https://github.com/edp5/kompagnon/compare/v1.2.0...v1.3.0) (2026-08-11)
+
 ## [1.2.0](https://github.com/edp5/kompagnon/compare/v1.1.1...v1.2.0) (2026-06-12)
 
 ### 🚀 New features
