@@ -72,13 +72,4 @@ class MatchingAlgorithmRequestFailed extends DomainError {
   }
 }
 
-/**
- * Throw when the api key to notify found journey is invalid
- */
-class InvalidNotifyApiKeyError extends DomainError {
-  constructor() {
-    super("Invalid notify api key", 403);
-  }
-}
-
-export { AlreadyAccepted, AlreadyCancelled, AlreadyRejected, InvalidNotifyApiKeyError, JourneyIsNotOfThisUser, JourneyNotFound, MatchingAlgorithmNotConfigured, MatchingAlgorithmRequestFailed, UserHasNoRole };
+export { AlreadyAccepted, AlreadyCancelled, AlreadyRejected, JourneyIsNotOfThisUser, JourneyNotFound, MatchingAlgorithmNotConfigured, MatchingAlgorithmRequestFailed, UserHasNoRole };

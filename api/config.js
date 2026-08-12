@@ -61,7 +61,6 @@ const configuration = (function() {
     algorithm: {
       enabled: process.env.ALGORITHM_ENABLED !== "false",
       apiUrl: process.env.ALGORITHM_API_URL || "http://localhost:8000",
-      apiKey: process.env.ALGORITHM_API_KEY,
     },
     swagger: {
       definition: {
@@ -90,7 +89,6 @@ const configuration = (function() {
     config.baseUrl = "http://localhost/#/";
     config.algorithm.enabled = false;
     config.algorithm.apiUrl = "http://localhost:8000";
-    config.algorithm.apiKey = "kompagnon";
   } else if (config.mailPit.enabled) {
     config.email = config.mailPit;
   }

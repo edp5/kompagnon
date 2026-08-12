@@ -468,30 +468,4 @@ describe("Acceptance | Journeys | Journey routes", () => {
       expect(response.status).toBe(401);
     });
   });
-
-  describe("POST /journeys/match/:foundJourneyId", () => {
-    it("should return 200 http status code", async () => {
-      // given
-      const foundJourney = await databaseBuilder.factory.buildFoundJourney({ passengerStatus: JOURNEY_STATUS.ACCEPTED, companionStatus: JOURNEY_STATUS.ACCEPTED });
-      const body = { data: [foundJourney.id] };
-
-      // when
-      const response = await request(server).post("/api/journeys/match").set("x-api-key", "kompagnon").send(body);
-
-      // then
-      expect(response.status).toBe(200);
-    });
-
-    it("should return 403 if api key is invalid", async () => {
-      // given
-      const foundJourney = await databaseBuilder.factory.buildFoundJourney({ passengerStatus: JOURNEY_STATUS.ACCEPTED, companionStatus: JOURNEY_STATUS.ACCEPTED });
-      const body = { data: [foundJourney.id] };
-
-      // when
-      const response = await request(server).post("/api/journeys/match").set("x-api-key", "fakeapikey").send(body);
-
-      // then
-      expect(response.status).toBe(403);
-    });
-  });
 });

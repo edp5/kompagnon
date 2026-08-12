@@ -1,14 +1,9 @@
 import express from "express";
 
 import { authMiddleware } from "../../../shared/infrastructure/middlewares/auth-middleware.js";
-import { checkMatchApiKey } from "../../infrastructure/middlewares/check-match-api-key.js";
 import { getJourneyController, getJourneyControllerSchema } from "../controllers/get-journey-controller.js";
 import { getJourneyMatchesController, getJourneyMatchesControllerSchema } from "../controllers/get-journey-matches-controller.js";
 import { getJourneysController, getJourneysControllerSchema } from "../controllers/get-journeys-controller.js";
-import {
-  notifyNewMatchController,
-  notifyNewMatchControllerSchema,
-} from "../controllers/notify-new-match-controller.js";
 import { recordJourneyController, recordJourneyControllerSchema } from "../controllers/record-journey-controller.js";
 import {
   updateFoundJourneyStatusController,
@@ -341,37 +336,5 @@ journeysRoutes.get(
   getJourneyMatchesControllerSchema,
   getJourneyMatchesController,
 );
-
-/**
- * @swagger
- * /api/journeys/match:
- *   post:
- *     tags:
- *       - Journeys
- *     summary: Notify users that a new match is found
- *     description: This endpoint must be called by the algorithm to notify users by email that a new match has been found.
- *     security:
- *       - apiKeyAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - data
- *             properties:
- *               data:
- *                 type: array
- *                 items:
- *                   type: integer
- *                 example: [1, 2, 3]
- *     responses:
- *       200:
- *         description: Match notification sent successfully
- *       403:
- *         description: Api key is invalid.
- */
-journeysRoutes.post("/api/journeys/match", checkMatchApiKey, notifyNewMatchControllerSchema, notifyNewMatchController);
 
 export default journeysRoutes;
