@@ -1,6 +1,7 @@
 import { config } from "../../../config.js";
 import { logger } from "../../../logger.js";
 import { requestJourneyMatch } from "../infrastructure/matching-algorithm-api.js";
+import { notifyJourneyMatchesService } from "./notify-journey-matches-service.js";
 
 /**
  * Calls the matching algorithm for a journey that has just been saved. The call
@@ -10,18 +11,24 @@ import { requestJourneyMatch } from "../infrastructure/matching-algorithm-api.js
  * @param {object} params - The match parameters.
  * @param {number} params.journeyId - The id of the journey to match.
  * @param {string} params.role - The role of the journey owner (passenger or companion).
- * @param {Function} params.matchRequester - The matching API client, injected for testing.
- * @returns {Promise<void>} - Resolves when the matching algorithm has been called and notifications sent, or when the call is skipped or fails.
+ * @param {Function} matchRequester - The matching API client, injected for testing.
+ * @param {Function} notifyMatches - Notifies both users of each match, injected for testing.
+ * @returns {Promise<object|undefined>} The match response, or undefined when skipped or failed.
  */
-async function callMatchingAlgorithmService({ journeyId, role, matchRequester = requestJourneyMatch }) {
+async function callMatchingAlgorithmService({ journeyId, role }, matchRequester = requestJourneyMatch, notifyMatches = notifyJourneyMatchesService) {
   if (!config.algorithm.enabled) {
-    return;
+    return undefined;
   }
+
   try {
-    await matchRequester({ journeyId, role });
+    const result = await matchRequester({ journeyId, role });
+    if (result?.found_journey_ids?.length) {
+      await notifyMatches({ foundJourneyIds: result.found_journey_ids });
+    }
+    return result;
   } catch (error) {
     logger.error({ err: error }, "Matching algorithm call failed");
-    return null;
+    return undefined;
   }
 }
 
