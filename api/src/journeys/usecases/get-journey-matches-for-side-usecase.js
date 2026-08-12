@@ -30,6 +30,7 @@ async function getJourneyMatchesForSideUsecase({ findJourneyById, findMatches, m
       user: {
         firstname: match.firstname,
         lastname: match.lastname,
+        phoneNumber: match[otherStatusKey] === JOURNEY_STATUS.ACCEPTED && match[myStatusKey] === JOURNEY_STATUS.ACCEPTED ? match.phoneNumber : null,
       },
       journey: {
         departureAddress: match.departureAddress,
