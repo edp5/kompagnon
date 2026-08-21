@@ -9,6 +9,14 @@ import {
   updateFoundJourneyStatusController,
   updateFoundJourneyStatusSchema,
 } from "../controllers/update-found-journey-status-controller.js";
+import {
+  addTrackingPointController,
+  addTrackingPointSchema,
+  getTrackingPointsController,
+  journeyIdParamSchema,
+  updateJourneyStatusController,
+  updateJourneyStatusSchema as updateJourneyTrackingStatusSchema,
+} from "../controllers/journey-tracking-controller.js";
 
 const journeysRoutes = express.Router();
 
@@ -335,6 +343,141 @@ journeysRoutes.get(
   authMiddleware,
   getJourneyMatchesControllerSchema,
   getJourneyMatchesController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/{journeyId}/tracking:
+ *   post:
+ *     tags:
+ *       - Journeys
+ *     summary: Record a GPS tracking point for a journey
+ *     description: Saves the current GPS position of the user for a journey in progress. Automatically sets the journey status to in_progress if not already started.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: journeyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - lat
+ *               - lon
+ *             properties:
+ *               lat:
+ *                 type: number
+ *                 example: 48.8566
+ *               lon:
+ *                 type: number
+ *                 example: 2.3522
+ *     responses:
+ *       201:
+ *         description: Tracking point recorded
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Journey does not belong to user
+ *       404:
+ *         description: Journey not found
+ *       500:
+ *         description: Internal server error
+ */
+journeysRoutes.post(
+  "/api/journeys/:journeyId/tracking",
+  authMiddleware,
+  addTrackingPointSchema,
+  addTrackingPointController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/{journeyId}/tracking:
+ *   get:
+ *     tags:
+ *       - Journeys
+ *     summary: Get GPS tracking points for a journey
+ *     description: Returns all recorded GPS positions for a journey in chronological order.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: journeyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: List of tracking points
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Journey does not belong to user
+ *       404:
+ *         description: Journey not found
+ *       500:
+ *         description: Internal server error
+ */
+journeysRoutes.get(
+  "/api/journeys/:journeyId/tracking",
+  authMiddleware,
+  journeyIdParamSchema,
+  getTrackingPointsController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/{journeyId}/status:
+ *   patch:
+ *     tags:
+ *       - Journeys
+ *     summary: Update the tracking status of a journey
+ *     description: Transitions the journey tracking status. Valid transitions are not_started → in_progress → completed.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: journeyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [not_started, in_progress, completed]
+ *     responses:
+ *       204:
+ *         description: Status updated
+ *       400:
+ *         description: Invalid status transition
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Journey does not belong to user
+ *       404:
+ *         description: Journey not found
+ *       500:
+ *         description: Internal server error
+ */
+journeysRoutes.patch(
+  "/api/journeys/:journeyId/status",
+  authMiddleware,
+  updateJourneyTrackingStatusSchema,
+  updateJourneyStatusController,
 );
 
 export default journeysRoutes;

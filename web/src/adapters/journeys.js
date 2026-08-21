@@ -209,4 +209,109 @@ async function updateFoundJourneyStatus({ token, foundJourneyId, accept }) {
   }
 }
 
-export { getJourney, getJourneyMatches, getJourneys, recordJourney, updateFoundJourneyStatus };
+/**
+ * Records a GPS tracking point for an in-progress journey.
+ * @param {object} params
+ * @param {string} params.token - The authenticated user's bearer token.
+ * @param {number} params.journeyId - The ID of the journey being tracked.
+ * @param {number} params.lat - GPS latitude.
+ * @param {number} params.lon - GPS longitude.
+ * @returns {Promise<{success: boolean, point?: object, message?: string}>}
+ */
+async function postTrackingPoint({ token, journeyId, lat, lon }) {
+  try {
+    const response = await fetch(`${JOURNEYS_URL}/${journeyId}/tracking`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ lat, lon }),
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: "Impossible d'enregistrer la position GPS. Veuillez réessayer.",
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, point: data?.data ?? null };
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de joindre le serveur. Veuillez réessayer plus tard.",
+    };
+  }
+}
+
+/**
+ * Retrieves all GPS tracking points for a journey.
+ * @param {object} params
+ * @param {string} params.token - The authenticated user's bearer token.
+ * @param {number} params.journeyId - The ID of the journey.
+ * @returns {Promise<{success: boolean, points?: object[], message?: string}>}
+ */
+async function getTrackingPoints({ token, journeyId }) {
+  try {
+    const response = await fetch(`${JOURNEYS_URL}/${journeyId}/tracking`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: "Impossible de récupérer les positions GPS. Veuillez réessayer.",
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, points: data?.data ?? [] };
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de joindre le serveur. Veuillez réessayer plus tard.",
+    };
+  }
+}
+
+/**
+ * Updates the tracking status of a journey (not_started → in_progress → completed).
+ * @param {object} params
+ * @param {string} params.token - The authenticated user's bearer token.
+ * @param {number} params.journeyId - The ID of the journey.
+ * @param {string} params.status - The new tracking status.
+ * @returns {Promise<{success: boolean, message?: string}>}
+ */
+async function updateJourneyStatus({ token, journeyId, status }) {
+  try {
+    const response = await fetch(`${JOURNEYS_URL}/${journeyId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: "Impossible de mettre à jour le statut du trajet. Veuillez réessayer.",
+      };
+    }
+
+    return { success: true };
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de joindre le serveur. Veuillez réessayer plus tard.",
+    };
+  }
+}
+
+export { getJourney, getJourneyMatches, getJourneys, getTrackingPoints, postTrackingPoint, recordJourney, updateFoundJourneyStatus, updateJourneyStatus };

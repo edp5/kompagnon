@@ -1,11 +1,15 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { getJourney, getJourneyMatches, updateFoundJourneyStatus } from "@/adapters/journeys.js";
+import { getJourney, getJourneyMatches, postTrackingPoint, updateFoundJourneyStatus, updateJourneyStatus } from "@/adapters/journeys.js";
 import { useAuthStore } from "@/stores/auth.js";
 
-const STATUS = { WAITING: "waiting", ACCEPTED: "accepted" };
+const TRACKING_STATUS = {
+  NOT_STARTED: "not_started",
+  IN_PROGRESS: "in_progress",
+  COMPLETED: "completed",
+};
 
 const authStore = useAuthStore();
 const route = useRoute();
@@ -16,6 +20,17 @@ const isLoading = ref(true);
 const errorMessage = ref("");
 const matches = ref([]);
 const matchActionId = ref(null);
+
+// ── Tracking state ────────────────────────────────────────────────────────────
+
+/** Current tracking status (mirrors journey.trackingStatus from API) */
+const trackingStatus = ref(TRACKING_STATUS.NOT_STARTED);
+/** Whether a tracking action (start/stop) is in progress */
+const isTrackingLoading = ref(false);
+/** Error message specific to tracking */
+const trackingError = ref("");
+/** ID returned by setInterval for the GPS polling loop */
+let trackingIntervalId = null;
 
 /**
  * Describes the state of a match for display.
@@ -129,11 +144,148 @@ onMounted(async () => {
 
   if (result.success) {
     journey.value = result.journey;
+    trackingStatus.value = result.journey.trackingStatus ?? TRACKING_STATUS.NOT_STARTED;
     await loadMatches(journeyId);
   } else {
     errorMessage.value = result.message ?? "Une erreur est survenue.";
   }
 });
+
+onUnmounted(() => {
+  stopTrackingLoop();
+});
+
+// ── Tracking helpers ──────────────────────────────────────────────────────────
+
+/**
+ * Sends the current GPS position to the API.
+ */
+async function sendPosition() {
+  if (!navigator.geolocation) return;
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      await postTrackingPoint({
+        token: authStore.token,
+        journeyId: Number(route.params.journeyId),
+        lat: pos.coords.latitude,
+        lon: pos.coords.longitude,
+      });
+    },
+    () => {
+      // Silently ignore geolocation errors during tracking loop
+    },
+    { enableHighAccuracy: true, timeout: 10000 },
+  );
+}
+
+/**
+ * Starts the GPS tracking loop (sends position every 30 seconds).
+ */
+function startTrackingLoop() {
+  sendPosition();
+  trackingIntervalId = setInterval(sendPosition, 30_000);
+}
+
+/**
+ * Stops the GPS tracking loop.
+ */
+function stopTrackingLoop() {
+  if (trackingIntervalId !== null) {
+    clearInterval(trackingIntervalId);
+    trackingIntervalId = null;
+  }
+}
+
+/**
+ * Starts the journey: updates status to in_progress and begins GPS loop.
+ */
+async function startJourney() {
+  isTrackingLoading.value = true;
+  trackingError.value = "";
+  const result = await updateJourneyStatus({
+    token: authStore.token,
+    journeyId: Number(route.params.journeyId),
+    status: TRACKING_STATUS.IN_PROGRESS,
+  });
+  isTrackingLoading.value = false;
+  if (result.success) {
+    trackingStatus.value = TRACKING_STATUS.IN_PROGRESS;
+    startTrackingLoop();
+  } else {
+    trackingError.value = result.message ?? "Impossible de démarrer le trajet.";
+  }
+}
+
+/**
+ * Stops the journey: updates status to completed and halts GPS loop.
+ */
+async function stopJourney() {
+  isTrackingLoading.value = true;
+  trackingError.value = "";
+  stopTrackingLoop();
+  const result = await updateJourneyStatus({
+    token: authStore.token,
+    journeyId: Number(route.params.journeyId),
+    status: TRACKING_STATUS.COMPLETED,
+  });
+  isTrackingLoading.value = false;
+  if (result.success) {
+    trackingStatus.value = TRACKING_STATUS.COMPLETED;
+  } else {
+    trackingError.value = result.message ?? "Impossible de terminer le trajet.";
+    // Re-start the loop if the API call failed
+    startTrackingLoop();
+  }
+}
+
+/**
+ * Builds an OpenStreetMap embed URL showing the route bbox between departure and arrival.
+ * @returns {string|null}
+ */
+const osmRouteUrl = computed(() => {
+  const j = journey.value;
+  if (!j) return null;
+  const dLat = parseFloat(j.departureLat);
+  const dLon = parseFloat(j.departureLon);
+  const aLat = parseFloat(j.arrivalLat);
+  const aLon = parseFloat(j.arrivalLon);
+  if ([dLat, dLon, aLat, aLon].some(isNaN)) return null;
+
+  // Bounding box with a small margin around departure and arrival
+  const margin = 0.02;
+  const minLon = Math.min(dLon, aLon) - margin;
+  const maxLon = Math.max(dLon, aLon) + margin;
+  const minLat = Math.min(dLat, aLat) - margin;
+  const maxLat = Math.max(dLat, aLat) + margin;
+
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${minLon},${minLat},${maxLon},${maxLat}&layer=mapnik&marker=${dLat},${dLon}`;
+});
+
+/**
+ * OpenStreetMap directions link (opens in a new tab).
+ */
+const osmDirectionsUrl = computed(() => {
+  const j = journey.value;
+  if (!j) return null;
+  const dLat = parseFloat(j.departureLat);
+  const dLon = parseFloat(j.departureLon);
+  const aLat = parseFloat(j.arrivalLat);
+  const aLon = parseFloat(j.arrivalLon);
+  if ([dLat, dLon, aLat, aLon].some(isNaN)) return null;
+  return `https://www.openstreetmap.org/directions?engine=fossgis_osrm_foot&route=${dLat}%2C${dLon}%3B${aLat}%2C${aLon}`;
+});
+
+/**
+ * Human-readable label for the tracking status badge.
+ */
+const trackingStatusLabel = computed(() => {
+  if (trackingStatus.value === TRACKING_STATUS.IN_PROGRESS) return "En cours";
+  if (trackingStatus.value === TRACKING_STATUS.COMPLETED) return "Terminé";
+  return "Non démarré";
+});
+
+const STATUS = { WAITING: "waiting", ACCEPTED: "accepted" };
 </script>
 
 <template>
@@ -199,6 +351,23 @@ onMounted(async () => {
 
         <!-- Route card -->
         <div class="journey-view__card">
+          <!-- Tracking status badge -->
+          <div class="journey-view__tracking-status">
+            <span
+              class="journey-view__status-badge"
+              :class="{
+                'journey-view__status-badge--in-progress': trackingStatus === 'in_progress',
+                'journey-view__status-badge--completed': trackingStatus === 'completed',
+              }"
+            >
+              <span
+                v-if="trackingStatus === 'in_progress'"
+                class="journey-view__status-pulse"
+                aria-hidden="true"
+              />
+              {{ trackingStatusLabel }}
+            </span>
+          </div>
           <div class="journey-view__route">
             <!-- Departure -->
             <div class="journey-view__stop journey-view__stop--departure">
@@ -246,6 +415,72 @@ onMounted(async () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Map with route itinerary -->
+        <div
+          v-if="osmRouteUrl"
+          class="journey-view__map-block"
+        >
+          <div class="journey-view__map-header">
+            <span class="journey-view__map-label">Itinéraire</span>
+            <a
+              v-if="osmDirectionsUrl"
+              :href="osmDirectionsUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="journey-view__map-link"
+              aria-label="Ouvrir l'itinéraire dans OpenStreetMap"
+            >Voir sur la carte ↗</a>
+          </div>
+          <iframe
+            :src="osmRouteUrl"
+            class="journey-view__map-iframe"
+            title="Itinéraire du trajet sur OpenStreetMap"
+            loading="lazy"
+            aria-label="Carte OpenStreetMap affichant le trajet"
+          />
+        </div>
+
+        <!-- Tracking controls -->
+        <div class="journey-view__tracking">
+          <p
+            v-if="trackingError"
+            class="feedback error feedback--error journey-view__feedback"
+            role="alert"
+            aria-live="assertive"
+          >
+            {{ trackingError }}
+          </p>
+
+          <button
+            v-if="trackingStatus === 'not_started'"
+            id="start-journey-btn"
+            type="button"
+            class="journey-view__track-btn journey-view__track-btn--start"
+            :disabled="isTrackingLoading"
+            @click="startJourney"
+          >
+            {{ isTrackingLoading ? "Démarrage…" : "▶ Démarrer le trajet" }}
+          </button>
+
+          <button
+            v-else-if="trackingStatus === 'in_progress'"
+            id="stop-journey-btn"
+            type="button"
+            class="journey-view__track-btn journey-view__track-btn--stop"
+            :disabled="isTrackingLoading"
+            @click="stopJourney"
+          >
+            {{ isTrackingLoading ? "Arrêt en cours…" : "⏹ Terminer le trajet" }}
+          </button>
+
+          <p
+            v-else-if="trackingStatus === 'completed'"
+            class="journey-view__tracking-done"
+          >
+            ✓ Trajet terminé
+          </p>
         </div>
 
         <!-- Matches -->
@@ -660,5 +895,149 @@ onMounted(async () => {
   color: var(--c-teal-dark);
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+/* ── Tracking status badge ── */
+.journey-view__tracking-status {
+  padding: 0.75rem 1.25rem 0;
+}
+
+.journey-view__status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.875rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(100, 116, 139, 0.1);
+  color: var(--c-text-medium);
+  border: 1px solid rgba(100, 116, 139, 0.15);
+}
+
+.journey-view__status-badge--in-progress {
+  background: rgba(34, 197, 94, 0.12);
+  color: #166534;
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.journey-view__status-badge--completed {
+  background: rgba(72, 175, 196, 0.12);
+  color: var(--c-teal-dark);
+  border-color: rgba(72, 175, 196, 0.2);
+}
+
+.journey-view__status-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulse-online 2.5s ease-in-out infinite;
+}
+
+/* ── Map block ── */
+.journey-view__map-block {
+  border-radius: var(--radius-lg, 1rem);
+  overflow: hidden;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+}
+
+.journey-view__map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+}
+
+.journey-view__map-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--c-text-medium);
+}
+
+.journey-view__map-link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--c-teal);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.journey-view__map-link:hover {
+  color: var(--c-teal-dark);
+  text-decoration: underline;
+}
+
+.journey-view__map-iframe {
+  width: 100%;
+  height: 260px;
+  border: none;
+  display: block;
+}
+
+/* ── Tracking controls ── */
+.journey-view__tracking {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.journey-view__track-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.875rem 1.2rem;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.96rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.journey-view__track-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.journey-view__track-btn--start {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.28);
+}
+
+.journey-view__track-btn--start:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 34px rgba(34, 197, 94, 0.36);
+}
+
+.journey-view__track-btn--stop {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(239, 68, 68, 0.28);
+}
+
+.journey-view__track-btn--stop:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 34px rgba(239, 68, 68, 0.36);
+}
+
+.journey-view__tracking-done {
+  margin: 0;
+  padding: 0.875rem 1.25rem;
+  border-radius: var(--radius-lg, 1rem);
+  background: rgba(34, 197, 94, 0.08);
+  color: #166534;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+  border: 1px solid rgba(34, 197, 94, 0.2);
 }
 </style>
