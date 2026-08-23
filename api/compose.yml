@@ -2,10 +2,16 @@ services:
   postgres:
     image: postgres:18.4-alpine
     container_name: kompagnon-postgres
+    restart: unless-stopped
     ports:
       - '${DATABASE_PORT:-5432}:5432'
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -45,6 +51,8 @@ services:
       - "8025:8025" # Web UI
       - '${MAILING_MAILPIT_PORT:-1025}:1025' # SMTP
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8025 || exit 1" ]
 
 
 volumes:
