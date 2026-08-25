@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import databaseBuilder from "../../../../db/database-builder/index.js";
 import { knex } from "../../../../db/knex-database-connection.js";
+import { JOURNEY_TRACKING_STATUS } from "../../../../src/journeys/constants.js";
 import {
   findLastTrackingPoint,
   findTrackingPointsByJourneyId,
   saveTrackingPoint,
   updateJourneyTrackingStatus,
 } from "../../../../src/journeys/repositories/journey-tracking-repository.js";
-import { JOURNEY_TRACKING_STATUS } from "../../../../src/journeys/constants.js";
 
 describe("Integration | Journeys | Repositories | Journey tracking repository", () => {
   describe("#saveTrackingPoint", () => {

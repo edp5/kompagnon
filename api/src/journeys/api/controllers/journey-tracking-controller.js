@@ -45,7 +45,7 @@ const updateJourneyStatusSchema = celebrate({
  * @param {object} res - The response object.
  * @param {Function} next - Express error handler.
  * @param {Function} addTrackingPoint - Use case (injectable for tests).
- * @returns {Promise<*>}
+ * @returns {Promise<*>} A promise resolving to the Express response sent to the client.
  */
 async function addTrackingPointController(
   req,
@@ -74,7 +74,7 @@ async function addTrackingPointController(
  * @param {object} res - The response object.
  * @param {Function} next - Express error handler.
  * @param {Function} getTrackingPoints - Use case (injectable for tests).
- * @returns {Promise<*>}
+ * @returns {Promise<*>} A promise resolving to the Express response sent to the client.
  */
 async function getTrackingPointsController(
   req,
@@ -101,7 +101,7 @@ async function getTrackingPointsController(
  * @param {object} res - The response object.
  * @param {Function} next - Express error handler.
  * @param {Function} updateJourneyStatus - Use case (injectable for tests).
- * @returns {Promise<*>}
+ * @returns {Promise<*>} A promise resolving to the Express response sent to the client.
  */
 async function updateJourneyStatusController(
   req,

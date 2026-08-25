@@ -4,11 +4,6 @@ import { authMiddleware } from "../../../shared/infrastructure/middlewares/auth-
 import { getJourneyController, getJourneyControllerSchema } from "../controllers/get-journey-controller.js";
 import { getJourneyMatchesController, getJourneyMatchesControllerSchema } from "../controllers/get-journey-matches-controller.js";
 import { getJourneysController, getJourneysControllerSchema } from "../controllers/get-journeys-controller.js";
-import { recordJourneyController, recordJourneyControllerSchema } from "../controllers/record-journey-controller.js";
-import {
-  updateFoundJourneyStatusController,
-  updateFoundJourneyStatusSchema,
-} from "../controllers/update-found-journey-status-controller.js";
 import {
   addTrackingPointController,
   addTrackingPointSchema,
@@ -17,6 +12,11 @@ import {
   updateJourneyStatusController,
   updateJourneyStatusSchema as updateJourneyTrackingStatusSchema,
 } from "../controllers/journey-tracking-controller.js";
+import { recordJourneyController, recordJourneyControllerSchema } from "../controllers/record-journey-controller.js";
+import {
+  updateFoundJourneyStatusController,
+  updateFoundJourneyStatusSchema,
+} from "../controllers/update-found-journey-status-controller.js";
 
 const journeysRoutes = express.Router();
 

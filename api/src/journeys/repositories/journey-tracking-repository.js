@@ -61,7 +61,7 @@ async function findLastTrackingPoint(journeyId, journeyType) {
 export {
   findLastTrackingPoint,
   findTrackingPointsByJourneyId,
+  JOURNEY_TRACKING_STATUS,
   saveTrackingPoint,
   updateJourneyTrackingStatus,
-  JOURNEY_TRACKING_STATUS,
 };
