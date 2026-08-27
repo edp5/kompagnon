@@ -36,6 +36,37 @@ describe("Integration | Journeys | Usecases | Get passenger journey matches", ()
     });
   });
 
+  it("should return the companion match with the other user, journey and statuses and phone number if journey is accepted", async () => {
+    // given
+    const passenger = await databaseBuilder.factory.buildUser();
+    const passengerJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: passenger.id });
+    const companion = await databaseBuilder.factory.buildUser({ firstname: "Adrien", lastname: "Le Guen", phoneNumber: "0612345678" });
+    const companionJourney = await databaseBuilder.factory.buildCompanionJourney({
+      userId: companion.id,
+      departureAddress: "Paris Gare de Lyon",
+      arrivalAddress: "Lyon Part-Dieu",
+    });
+    const foundJourney = await databaseBuilder.factory.buildFoundJourney({
+      passengerJourneyId: passengerJourney.id,
+      companionJourneyId: companionJourney.id,
+      passengerStatus: JOURNEY_STATUS.ACCEPTED,
+      companionStatus: JOURNEY_STATUS.ACCEPTED,
+    });
+
+    // when
+    const result = await getPassengerJourneyMatchesUsecase({ journeyId: Number(passengerJourney.id), userId: passenger.id });
+
+    // then
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      foundJourneyId: Number(foundJourney.id),
+      user: { firstname: "Adrien", lastname: "Le Guen", phoneNumber: "0612345678" },
+      journey: { departureAddress: "Paris Gare de Lyon", arrivalAddress: "Lyon Part-Dieu" },
+      myStatus: JOURNEY_STATUS.ACCEPTED,
+      otherStatus: JOURNEY_STATUS.ACCEPTED,
+    });
+  });
+
   it("should return null when the journey is not owned by the user", async () => {
     // given
     const owner = await databaseBuilder.factory.buildUser();
