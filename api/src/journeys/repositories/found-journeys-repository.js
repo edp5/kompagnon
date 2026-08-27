@@ -31,6 +31,7 @@ async function findMatchesByPassengerJourneyId(passengerJourneyId) {
       "found_journeys.companionStatus",
       "users.firstname",
       "users.lastname",
+      "users.phoneNumber",
       "companion_journeys.departureAddress",
       "companion_journeys.arrivalAddress",
       "companion_journeys.departureTime",

@@ -213,7 +213,7 @@ async function acceptedJourney(databasebuilder) {
   const departureTime = new Date();
   departureTime.setDate(departureTime.getDate() + 3);
   const companion = await databasebuilder.factory.buildCompanionJourney({
-    userId: user1.id,
+    userId: user2.id,
     departureTime,
     arrivalTime: new Date(departureTime.getTime() + 2 * 60 * 60 * 1000),
     departureAddress: "Paris Gare de Lyon",
@@ -225,7 +225,7 @@ async function acceptedJourney(databasebuilder) {
   });
 
   const passenger = await databasebuilder.factory.buildPassengerJourney({
-    userId: user2.id,
+    userId: user1.id,
     departureTime: departureTime,
     arrivalTime: new Date(departureTime.getTime() + 2 * 60 * 60 * 1000),
     departureAddress: "Paris Gare de Lyon",
