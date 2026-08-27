@@ -32,9 +32,9 @@ async function getJourneysController(
   try {
     const user = await findUserRepository(auth.userId);
     let journeys;
-    if (user.role === USER_ROLE.INVALID) {
+    if (user.role === USER_ROLE.PASSENGER) {
       journeys = await getPassengerJourneys({ userId: user.id });
-    } else if (user.role === USER_ROLE.VALID) {
+    } else if (user.role === USER_ROLE.COMPANION) {
       journeys = await getCompanionJourneys({ userId: user.id });
     } else {
       throw new UserHasNoRole();

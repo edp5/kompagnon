@@ -5,14 +5,14 @@ async function matchingJourneyforUsers(databasebuilder) {
     firstname: "Josh",
     lastname: "Tartour",
     email: "josh.tartour@example.net",
-    role: USER_ROLE.VALID,
+    role: USER_ROLE.COMPANION,
   });
 
   const invalidUser = await databasebuilder.factory.buildUser({
     firstname: "Adrien",
     lastname: "Le Guen",
     email: "lebeaugosse@example.net",
-    role: USER_ROLE.INVALID,
+    role: USER_ROLE.PASSENGER,
     disabilities: [USER_DISABILITIES.MENTAL, USER_DISABILITIES.WHEELCHAIR],
   });
   const departureTime = new Date();
@@ -49,7 +49,7 @@ async function pastJourneys(databasebuilder) {
     firstname: "Alice",
     lastname: "Dupont",
     email: "alice.dupont@example.net",
-    role: USER_ROLE.VALID,
+    role: USER_ROLE.COMPANION,
   });
 
   const departureTime = new Date();
@@ -74,7 +74,7 @@ async function unmatchedJourneys(databasebuilder) {
     firstname: "Bob",
     lastname: "Martin",
     email: "bob.martin@example.net",
-    role: USER_ROLE.INVALID,
+    role: USER_ROLE.PASSENGER,
     disabilities: [USER_DISABILITIES.BLIND],
   });
 
@@ -100,14 +100,14 @@ async function additionalVariedJourneys(databasebuilder) {
     firstname: "Clara",
     lastname: "Lefevre",
     email: "clara.lefevre@example.net",
-    role: USER_ROLE.VALID,
+    role: USER_ROLE.COMPANION,
   });
 
   const user2 = await databasebuilder.factory.buildUser({
     firstname: "David",
     lastname: "Roux",
     email: "david.roux@example.net",
-    role: USER_ROLE.INVALID,
+    role: USER_ROLE.PASSENGER,
     disabilities: [USER_DISABILITIES.DEAF],
   });
 
@@ -115,7 +115,7 @@ async function additionalVariedJourneys(databasebuilder) {
     firstname: "Emma",
     lastname: "Bernard",
     email: "emma.bernard@example.net",
-    role: USER_ROLE.INVALID,
+    role: USER_ROLE.PASSENGER,
     disabilities: [USER_DISABILITIES.WHEELCHAIR],
   });
 
@@ -123,7 +123,7 @@ async function additionalVariedJourneys(databasebuilder) {
     firstname: "Fabien",
     lastname: "Moreau",
     email: "fabien.moreau@example.net",
-    role: USER_ROLE.VALID,
+    role: USER_ROLE.COMPANION,
   });
 
   const departureTime1 = new Date();
@@ -200,14 +200,14 @@ async function acceptedJourney(databasebuilder) {
     firstname: "Franc",
     lastname: "Dupuis",
     email: "fdupuis@example.net",
-    role: USER_ROLE.INVALID,
+    role: USER_ROLE.PASSENGER,
   });
 
   const user2 = await databasebuilder.factory.buildUser({
     firstname: "Gina",
     lastname: "Morel",
     email: "g.morel@example.net",
-    role: USER_ROLE.VALID,
+    role: USER_ROLE.COMPANION,
   });
 
   const departureTime = new Date();

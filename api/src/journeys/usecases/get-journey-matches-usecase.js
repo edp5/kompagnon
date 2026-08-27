@@ -19,9 +19,9 @@ async function getJourneyMatchesUsecase({ userId, journeyId }) {
   const user = await findUserById(userId);
 
   let matches;
-  if (user.role === USER_ROLE.INVALID) {
+  if (user.role === USER_ROLE.PASSENGER) {
     matches = await getPassengerJourneyMatchesUsecase({ journeyId, userId });
-  } else if (user.role === USER_ROLE.VALID) {
+  } else if (user.role === USER_ROLE.COMPANION) {
     matches = await getCompanionJourneyMatchesUsecase({ journeyId, userId });
   } else {
     throw new UserHasNoRole();

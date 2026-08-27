@@ -7,7 +7,7 @@ async function users(databaseBuilder) {
       firstname: "Albert",
       lastname: "Berlat",
       email: "albert.berlat@example.net",
-      role: USER_ROLE.VALID,
+      role: USER_ROLE.COMPANION,
       genre: USER_GENRES.M,
     },
     // Invalid user with blind disability
@@ -15,7 +15,7 @@ async function users(databaseBuilder) {
       firstname: "Andrea",
       lastname: "Marceti",
       email: "a.marceti@example.net",
-      role: USER_ROLE.INVALID,
+      role: USER_ROLE.PASSENGER,
       disabilities: [USER_DISABILITIES.BLIND],
     },
     // Add other users here

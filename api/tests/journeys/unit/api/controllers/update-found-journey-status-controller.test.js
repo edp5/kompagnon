@@ -33,7 +33,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
             updatedStatus: true,
           },
         };
-        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.VALID });
+        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.COMPANION });
 
         // when
         await updateFoundJourneyStatusController(
@@ -70,7 +70,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
             updatedStatus: false,
           },
         };
-        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.VALID });
+        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.COMPANION });
 
         // when
         await updateFoundJourneyStatusController(
@@ -109,7 +109,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
             updatedStatus: true,
           },
         };
-        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.VALID });
+        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.COMPANION });
         acceptCompanionUsecase.mockRejectedValue(new Error("Error message"));
 
         // when
@@ -151,7 +151,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
             updatedStatus: true,
           },
         };
-        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.INVALID });
+        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.PASSENGER });
 
         // when
         await updateFoundJourneyStatusController(
@@ -188,7 +188,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
             updatedStatus: false,
           },
         };
-        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.INVALID });
+        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.PASSENGER });
 
         // when
         await updateFoundJourneyStatusController(
@@ -226,7 +226,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
             updatedStatus: true,
           },
         };
-        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.INVALID });
+        findUser.mockResolvedValue({ id: 123, role: USER_ROLE.PASSENGER });
         acceptPassengerUsecase.mockRejectedValue(new Error("Error message"));
 
         // when
