@@ -2,7 +2,7 @@ import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getJourney, getJourneyMatches, updateFoundJourneyStatus } from "@/adapters/journeys.js";
+import { getJourney, getJourneyMatches, postTrackingPoint, updateFoundJourneyStatus, updateJourneyStatus } from "@/adapters/journeys.js";
 import { useAuthStore } from "@/stores/auth.js";
 import JourneyView from "@/views/JourneyView.vue";
 
@@ -10,6 +10,8 @@ vi.mock("@/adapters/journeys.js", () => ({
   getJourney: vi.fn(),
   getJourneyMatches: vi.fn(),
   updateFoundJourneyStatus: vi.fn(),
+  updateJourneyStatus: vi.fn(),
+  postTrackingPoint: vi.fn(),
 }));
 
 const mockBack = vi.fn();
@@ -45,6 +47,14 @@ describe("Unit | Views | JourneyView", () => {
     authStore.setAuth("jwt-token", 1);
     vi.clearAllMocks();
     getJourneyMatches.mockResolvedValue({ success: true, matches: [] });
+
+    Object.defineProperty(global.navigator, "geolocation", {
+      value: {
+        getCurrentPosition: vi.fn((success) => success({ coords: { latitude: 48, longitude: 2 } })),
+      },
+      writable: true,
+      configurable: true,
+    });
   });
 
   it("should display a loading indicator while fetching the journey", () => {
@@ -271,5 +281,189 @@ describe("Unit | Views | JourneyView", () => {
     // then
     expect(wrapper.find(".journey-view__match-btn--accept").exists()).toBe(false);
     expect(wrapper.text()).toContain("En attente de la réponse");
+  });
+
+  describe("Tracking", () => {
+    it("should start tracking when start button is clicked", async () => {
+      vi.useFakeTimers();
+      getJourney.mockResolvedValue({ success: true, journey });
+      updateJourneyStatus.mockResolvedValue({ success: true });
+      postTrackingPoint.mockResolvedValue({ success: true });
+
+      const wrapper = mountView();
+      await flushPromises();
+
+      const startBtn = wrapper.find("#start-journey-btn");
+      expect(startBtn.exists()).toBe(true);
+      
+      await startBtn.trigger("click");
+      await flushPromises();
+
+      expect(updateJourneyStatus).toHaveBeenCalledWith({
+        token: "jwt-token",
+        journeyId: 42,
+        status: "in_progress",
+      });
+
+      // Advance timers to trigger interval
+      vi.advanceTimersByTime(30000);
+      
+      expect(postTrackingPoint).toHaveBeenCalledWith({
+        token: "jwt-token",
+        journeyId: 42,
+        lat: 48,
+        lon: 2,
+      });
+
+      vi.useRealTimers();
+    });
+
+    it("should stop tracking when stop button is clicked", async () => {
+      getJourney.mockResolvedValue({ success: true, journey: { ...journey, trackingStatus: "in_progress" } });
+      updateJourneyStatus.mockResolvedValue({ success: true });
+
+      const wrapper = mountView();
+      await flushPromises();
+
+      const stopBtn = wrapper.find("#stop-journey-btn");
+      expect(stopBtn.exists()).toBe(true);
+      
+      await stopBtn.trigger("click");
+      await flushPromises();
+
+      expect(updateJourneyStatus).toHaveBeenCalledWith({
+        token: "jwt-token",
+        journeyId: 42,
+        status: "completed",
+      });
+      
+      expect(wrapper.text()).toContain("Trajet terminé");
+    });
+
+    it("should display geolocation warning if permission is denied", async () => {
+      getJourney.mockResolvedValue({ success: true, journey });
+      
+      Object.defineProperty(global.navigator, "geolocation", {
+        value: {
+          getCurrentPosition: vi.fn((success, error) => error({ code: 1 })),
+        },
+        writable: true,
+      });
+
+      const wrapper = mountView();
+      await flushPromises();
+
+      const startBtn = wrapper.find("#start-journey-btn");
+      await startBtn.trigger("click");
+      await flushPromises();
+
+      expect(wrapper.text()).toContain("Location access required");
+      expect(updateJourneyStatus).not.toHaveBeenCalled();
+    });
+
+    it("should handle error when updating journey status fails on start", async () => {
+      getJourney.mockResolvedValue({ success: true, journey });
+      updateJourneyStatus.mockResolvedValue({ success: false, message: "Error updating" });
+
+      const wrapper = mountView();
+      await flushPromises();
+
+      const startBtn = wrapper.find("#start-journey-btn");
+      await startBtn.trigger("click");
+      await flushPromises();
+
+      expect(wrapper.text()).toContain("Error updating");
+    });
+
+    it("should handle error when updating journey status fails on stop and restart loop", async () => {
+      getJourney.mockResolvedValue({ success: true, journey: { ...journey, trackingStatus: "in_progress" } });
+      updateJourneyStatus.mockResolvedValue({ success: false, message: "Error stopping" });
+
+      const wrapper = mountView();
+      await flushPromises();
+
+      const stopBtn = wrapper.find("#stop-journey-btn");
+      await stopBtn.trigger("click");
+      await flushPromises();
+
+      expect(wrapper.text()).toContain("Error stopping");
+    });
+
+    it("should handle missing navigator.geolocation gracefully", async () => {
+      getJourney.mockResolvedValue({ success: true, journey });
+      
+      const origGeo = global.navigator.geolocation;
+      Object.defineProperty(global.navigator, "geolocation", {
+        value: undefined,
+        writable: true,
+        configurable: true,
+      });
+
+      const wrapper = mountView();
+      await flushPromises();
+
+      const startBtn = wrapper.find("#start-journey-btn");
+      await startBtn.trigger("click");
+      await flushPromises();
+
+      expect(wrapper.text()).toContain("Location access required");
+      
+      // Restore
+      Object.defineProperty(global.navigator, "geolocation", {
+        value: origGeo,
+        writable: true,
+        configurable: true,
+      });
+    });
+
+    it("should silently ignore non-permission errors (code 2 or 3) from geolocation", async () => {
+      vi.useFakeTimers();
+      getJourney.mockResolvedValue({ success: true, journey });
+      updateJourneyStatus.mockResolvedValue({ success: true });
+      postTrackingPoint.mockResolvedValue({ success: true });
+
+      Object.defineProperty(global.navigator, "geolocation", {
+        value: {
+          // Success on first call (for permission check in startJourney), error code 2 on second call (sendPosition)
+          getCurrentPosition: vi.fn()
+            .mockImplementationOnce((success) => success({ coords: { latitude: 48, longitude: 2 } }))
+            .mockImplementationOnce((success, error) => error({ code: 2 }))
+            .mockImplementation((success) => success({ coords: { latitude: 48, longitude: 2 } })),
+        },
+        writable: true,
+      });
+
+      const wrapper = mountView();
+      await flushPromises();
+
+      const startBtn = wrapper.find("#start-journey-btn");
+      await startBtn.trigger("click");
+      await flushPromises();
+
+      // No error should be shown for code 2
+      expect(wrapper.text()).not.toContain("Location access required");
+      
+      vi.useRealTimers();
+    });
+
+    it("should clear interval on unmount", async () => {
+      vi.useFakeTimers();
+      const clearIntervalSpy = vi.spyOn(global, "clearInterval");
+      getJourney.mockResolvedValue({ success: true, journey });
+      updateJourneyStatus.mockResolvedValue({ success: true });
+      postTrackingPoint.mockResolvedValue({ success: true });
+      
+      const wrapper = mountView();
+      await flushPromises();
+
+      const startBtn = wrapper.find("#start-journey-btn");
+      await startBtn.trigger("click");
+      await flushPromises();
+
+      wrapper.unmount();
+
+      expect(clearIntervalSpy).toHaveBeenCalled();
+      vi.useRealTimers();
+    });
   });
 });
