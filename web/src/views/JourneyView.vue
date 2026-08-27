@@ -495,7 +495,10 @@ const STATUS = { WAITING: "waiting", ACCEPTED: "accepted" };
             class="journey-view__geo-warning"
             role="alert"
           >
-            <span class="journey-view__geo-warning-icon" aria-hidden="true">📍</span>
+            <span
+              class="journey-view__geo-warning-icon"
+              aria-hidden="true"
+            >📍</span>
             <div>
               <strong>Location access required</strong>
               <p>

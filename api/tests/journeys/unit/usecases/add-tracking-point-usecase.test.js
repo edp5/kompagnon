@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { findUserById } from "../../../../src/identities-access-management/repositories/user-repository.js";
-import { USER_ROLE } from "../../../../src/shared/constants.js";
 import { JOURNEY_TRACKING_STATUS, JOURNEY_TYPE } from "../../../../src/journeys/constants.js";
 import { JourneyIsNotOfThisUser, JourneyNotFound } from "../../../../src/journeys/errors.js";
 import { findJourneyById as findCompanionJourneyById } from "../../../../src/journeys/repositories/companion-users-repository.js";
 import { saveTrackingPoint, updateJourneyTrackingStatus } from "../../../../src/journeys/repositories/journey-tracking-repository.js";
 import { findJourneyById as findPassengerJourneyById } from "../../../../src/journeys/repositories/passenger-users-repository.js";
 import { addTrackingPointUsecase } from "../../../../src/journeys/usecases/add-tracking-point-usecase.js";
+import { USER_ROLE } from "../../../../src/shared/constants.js";
 
 vi.mock("../../../../src/identities-access-management/repositories/user-repository.js");
 vi.mock("../../../../src/journeys/repositories/companion-users-repository.js");

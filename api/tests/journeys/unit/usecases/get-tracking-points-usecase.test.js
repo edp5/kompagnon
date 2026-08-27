@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { findUserById } from "../../../../src/identities-access-management/repositories/user-repository.js";
-import { USER_ROLE } from "../../../../src/shared/constants.js";
 import { JOURNEY_TYPE } from "../../../../src/journeys/constants.js";
 import { JourneyIsNotOfThisUser, JourneyNotFound } from "../../../../src/journeys/errors.js";
 import { findJourneyById as findCompanionJourneyById } from "../../../../src/journeys/repositories/companion-users-repository.js";
 import { findTrackingPointsByJourneyId } from "../../../../src/journeys/repositories/journey-tracking-repository.js";
 import { findJourneyById as findPassengerJourneyById } from "../../../../src/journeys/repositories/passenger-users-repository.js";
 import { getTrackingPointsUsecase } from "../../../../src/journeys/usecases/get-tracking-points-usecase.js";
+import { USER_ROLE } from "../../../../src/shared/constants.js";
 
 vi.mock("../../../../src/identities-access-management/repositories/user-repository.js");
 vi.mock("../../../../src/journeys/repositories/companion-users-repository.js");
@@ -40,7 +40,7 @@ describe("getTrackingPointsUsecase", () => {
     findTrackingPointsByJourneyId.mockResolvedValue(points);
 
     const result = await getTrackingPointsUsecase({ userId: 1, journeyId: 1 });
-    
+
     expect(findTrackingPointsByJourneyId).toHaveBeenCalledWith(1, JOURNEY_TYPE.PASSENGER);
     expect(result).toEqual(points);
   });
@@ -52,7 +52,7 @@ describe("getTrackingPointsUsecase", () => {
     findTrackingPointsByJourneyId.mockResolvedValue(points);
 
     const result = await getTrackingPointsUsecase({ userId: 1, journeyId: 1 });
-    
+
     expect(findTrackingPointsByJourneyId).toHaveBeenCalledWith(1, JOURNEY_TYPE.COMPANION);
     expect(result).toEqual(points);
   });

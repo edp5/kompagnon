@@ -295,7 +295,7 @@ describe("Unit | Views | JourneyView", () => {
 
       const startBtn = wrapper.find("#start-journey-btn");
       expect(startBtn.exists()).toBe(true);
-      
+
       await startBtn.trigger("click");
       await flushPromises();
 
@@ -307,7 +307,7 @@ describe("Unit | Views | JourneyView", () => {
 
       // Advance timers to trigger interval
       vi.advanceTimersByTime(30000);
-      
+
       expect(postTrackingPoint).toHaveBeenCalledWith({
         token: "jwt-token",
         journeyId: 42,
@@ -327,7 +327,7 @@ describe("Unit | Views | JourneyView", () => {
 
       const stopBtn = wrapper.find("#stop-journey-btn");
       expect(stopBtn.exists()).toBe(true);
-      
+
       await stopBtn.trigger("click");
       await flushPromises();
 
@@ -336,13 +336,13 @@ describe("Unit | Views | JourneyView", () => {
         journeyId: 42,
         status: "completed",
       });
-      
+
       expect(wrapper.text()).toContain("Trajet terminé");
     });
 
     it("should display geolocation warning if permission is denied", async () => {
       getJourney.mockResolvedValue({ success: true, journey });
-      
+
       Object.defineProperty(global.navigator, "geolocation", {
         value: {
           getCurrentPosition: vi.fn((success, error) => error({ code: 1 })),
@@ -391,7 +391,7 @@ describe("Unit | Views | JourneyView", () => {
 
     it("should handle missing navigator.geolocation gracefully", async () => {
       getJourney.mockResolvedValue({ success: true, journey });
-      
+
       const origGeo = global.navigator.geolocation;
       Object.defineProperty(global.navigator, "geolocation", {
         value: undefined,
@@ -407,7 +407,7 @@ describe("Unit | Views | JourneyView", () => {
       await flushPromises();
 
       expect(wrapper.text()).toContain("Location access required");
-      
+
       // Restore
       Object.defineProperty(global.navigator, "geolocation", {
         value: origGeo,
@@ -442,7 +442,7 @@ describe("Unit | Views | JourneyView", () => {
 
       // No error should be shown for code 2
       expect(wrapper.text()).not.toContain("Location access required");
-      
+
       vi.useRealTimers();
     });
 
@@ -452,7 +452,7 @@ describe("Unit | Views | JourneyView", () => {
       getJourney.mockResolvedValue({ success: true, journey });
       updateJourneyStatus.mockResolvedValue({ success: true });
       postTrackingPoint.mockResolvedValue({ success: true });
-      
+
       const wrapper = mountView();
       await flushPromises();
 
