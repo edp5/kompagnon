@@ -9,9 +9,10 @@ describe("Unit | Journeys | Services | Notify journey matches", () => {
       findPassengerJourney: vi.fn().mockResolvedValue({ id: 10, userId: 100 }),
       findCompanionJourney: vi.fn().mockResolvedValue({ id: 20, userId: 200 }),
       findUser: vi.fn(async (id) => (id === 100
-        ? { firstname: "Marie", lastname: "Durand", email: "marie@example.net" }
-        : { firstname: "Paul", lastname: "Martin", email: "paul@example.net" })),
+        ? { id: 100, firstname: "Marie", lastname: "Durand", email: "marie@example.net" }
+        : { id: 200, firstname: "Paul", lastname: "Martin", email: "paul@example.net" })),
       sendMailOnMatch: vi.fn().mockResolvedValue(),
+      createNotification: vi.fn().mockResolvedValue(1),
     };
   }
 
@@ -36,6 +37,25 @@ describe("Unit | Journeys | Services | Notify journey matches", () => {
     }));
   });
 
+  it("should create an in-app notification for both users of each match", async () => {
+    // given
+    const deps = buildDeps();
+
+    // when
+    await notifyJourneyMatchesService({ foundJourneyIds: [3], ...deps });
+
+    // then
+    expect(deps.createNotification).toHaveBeenCalledTimes(2);
+    expect(deps.createNotification).toHaveBeenCalledWith(expect.objectContaining({
+      userId: 100,
+      type: "journey_match_found",
+    }));
+    expect(deps.createNotification).toHaveBeenCalledWith(expect.objectContaining({
+      userId: 200,
+      type: "journey_match_found",
+    }));
+  });
+
   it("should skip a match whose found journey is missing without throwing", async () => {
     // given
     const deps = buildDeps();
@@ -44,6 +64,7 @@ describe("Unit | Journeys | Services | Notify journey matches", () => {
     // when / then
     await expect(notifyJourneyMatchesService({ foundJourneyIds: [3], ...deps })).resolves.toBeUndefined();
     expect(deps.sendMailOnMatch).not.toHaveBeenCalled();
+    expect(deps.createNotification).not.toHaveBeenCalled();
   });
 
   it("should skip a match whose journeys can no longer be found", async () => {
@@ -54,6 +75,7 @@ describe("Unit | Journeys | Services | Notify journey matches", () => {
     // when / then
     await expect(notifyJourneyMatchesService({ foundJourneyIds: [3], ...deps })).resolves.toBeUndefined();
     expect(deps.sendMailOnMatch).not.toHaveBeenCalled();
+    expect(deps.createNotification).not.toHaveBeenCalled();
   });
 
   it("should not stop the other matches when one notification fails", async () => {

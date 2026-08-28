@@ -1,20 +1,125 @@
 <script setup>
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
+import {
+  deleteNotification,
+  getNotifications,
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
+} from "@/adapters/notifications.js";
 import KIcon from "@/components/KIcon.vue";
+import { useAuthStore } from "@/stores/auth.js";
+
+const NOTIFICATION_PRESENTATION = {
+  journey_match_found: {
+    icon: "route",
+    iconBg: "rgba(72, 175, 196, 0.12)",
+    iconColor: "#2f8fa8",
+    borderColor: "#48afc4",
+  },
+};
+
+const DEFAULT_PRESENTATION = {
+  icon: "notifications",
+  iconBg: "rgba(15, 23, 42, 0.06)",
+  iconColor: "#475569",
+  borderColor: "#94a3b8",
+};
+
+const authStore = useAuthStore();
 
 const activeFilter = ref("all");
+const notifications = ref([]);
+const isLoading = ref(true);
+const errorMessage = ref("");
+const actionId = ref(null);
 
-const notifications = [];
+const displayed = computed(() =>
+  activeFilter.value === "unread" ? notifications.value.filter((n) => n.unread) : notifications.value,
+);
 
-const unreadCount = notifications.filter((n) => n.unread).length;
+const unreadCount = computed(() => notifications.value.filter((n) => n.unread).length);
 
-const displayed = ref(notifications);
+/**
+ * Formats an ISO date into a short relative French label.
+ * @param {string} isoString - The ISO date to format.
+ * @returns {string} The relative time label.
+ */
+function formatRelativeTime(isoString) {
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return "";
+  const diffMinutes = Math.round((Date.now() - date.getTime()) / 60000);
+  if (diffMinutes < 1) return "à l'instant";
+  if (diffMinutes < 60) return `il y a ${diffMinutes} min`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `il y a ${diffHours} h`;
+  const diffDays = Math.round(diffHours / 24);
+  if (diffDays === 1) return "hier";
+  if (diffDays < 7) return `il y a ${diffDays} j`;
+  return date.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
+}
+
+/**
+ * Maps a raw API notification to the shape expected by the template.
+ * @param {object} notification - The raw notification returned by the API.
+ * @returns {object} The notification enriched with its display fields.
+ */
+function toDisplayNotification(notification) {
+  const presentation = NOTIFICATION_PRESENTATION[notification.type] ?? DEFAULT_PRESENTATION;
+  return {
+    id: notification.id,
+    title: notification.title,
+    text: notification.message,
+    unread: !notification.isRead,
+    time: formatRelativeTime(notification.created_at),
+    ...presentation,
+  };
+}
 
 function setFilter(f) {
   activeFilter.value = f;
-  displayed.value = f === "unread" ? notifications.filter((n) => n.unread) : notifications;
 }
+
+async function loadNotifications() {
+  isLoading.value = true;
+  errorMessage.value = "";
+  const result = await getNotifications({ token: authStore.token });
+  isLoading.value = false;
+  if (result.success) {
+    notifications.value = result.notifications.map(toDisplayNotification);
+  } else {
+    errorMessage.value = result.message ?? "Impossible de récupérer vos notifications.";
+  }
+}
+
+async function markAsRead(notification) {
+  actionId.value = notification.id;
+  const result = await markNotificationAsRead({ token: authStore.token, notificationId: notification.id });
+  actionId.value = null;
+  if (result.success) {
+    notification.unread = false;
+  }
+}
+
+async function markAllAsRead() {
+  const result = await markAllNotificationsAsRead({ token: authStore.token });
+  if (result.success) {
+    for (const notification of notifications.value) {
+      notification.unread = false;
+    }
+  }
+}
+
+async function removeNotification(notification) {
+  actionId.value = notification.id;
+  const result = await deleteNotification({ token: authStore.token, notificationId: notification.id });
+  actionId.value = null;
+  if (result.success) {
+    notifications.value = notifications.value.filter((n) => n.id !== notification.id);
+  }
+}
+
+onMounted(loadNotifications);
 </script>
 
 <template>
@@ -58,77 +163,107 @@ function setFilter(f) {
     </header>
 
     <div class="notif-content app-page__content app-page__content--stack">
-      <!-- Banner unread -->
+      <!-- Loading state -->
       <div
-        v-if="unreadCount > 0"
-        class="notif-banner notif-card glass-panel"
+        v-if="isLoading"
+        class="notif-loading"
+        role="status"
+        aria-live="polite"
       >
-        <div class="notif-banner__left">
-          <div class="notif-banner__dot" />
-          <span>{{ unreadCount }} notification{{ unreadCount > 1 ? 's' : '' }} non lue{{ unreadCount > 1 ? 's' : '' }}</span>
-        </div>
-        <a
-          href="#"
-          class="notif-banner__link"
-          aria-label="Marquer toutes les notifications comme lues"
-          title="Cliquez pour marquer l'ensemble des notifications comme lues"
-        >Tout marquer comme lu →</a>
+        <span
+          class="notif-spinner"
+          aria-hidden="true"
+        />
+        <span>Chargement des notifications…</span>
       </div>
 
-      <!-- Notification list -->
-      <div class="notif-list">
-        <article
-          v-for="n in displayed"
-          :key="n.title"
-          class="notif-item notif-card glass-panel"
-          :class="{ 'notif-item--unread': n.unread }"
-          :style="n.unread ? `border-left-color: ${n.borderColor}` : ''"
+      <!-- Error state -->
+      <p
+        v-else-if="errorMessage"
+        class="feedback error feedback--error"
+        role="alert"
+        aria-live="assertive"
+      >
+        {{ errorMessage }}
+      </p>
+
+      <template v-else>
+        <!-- Banner unread -->
+        <div
+          v-if="unreadCount > 0"
+          class="notif-banner notif-card glass-panel"
         >
-          <div
-            class="notif-item__icon"
-            :style="{ background: n.iconBg, color: n.iconColor }"
-          >
-            <KIcon
-              :name="n.icon"
-              :size="20"
-              aria-hidden="true"
-            />
+          <div class="notif-banner__left">
+            <div class="notif-banner__dot" />
+            <span>{{ unreadCount }} notification{{ unreadCount > 1 ? 's' : '' }} non lue{{ unreadCount > 1 ? 's' : '' }}</span>
           </div>
-          <div class="notif-item__body">
-            <div class="notif-item__header">
-              <strong class="notif-item__title">{{ n.title }}</strong>
-              <div class="notif-item__time-row">
-                <span class="notif-item__time">{{ n.time }}</span>
-                <span
-                  v-if="n.unread"
-                  class="notif-item__dot"
-                />
-              </div>
+          <a
+            href="#"
+            class="notif-banner__link"
+            aria-label="Marquer toutes les notifications comme lues"
+            title="Cliquez pour marquer l'ensemble des notifications comme lues"
+            @click.prevent="markAllAsRead"
+          >Tout marquer comme lu →</a>
+        </div>
+
+        <!-- Notification list -->
+        <div class="notif-list">
+          <article
+            v-for="n in displayed"
+            :key="n.id"
+            class="notif-item notif-card glass-panel"
+            :class="{ 'notif-item--unread': n.unread }"
+            :style="n.unread ? `border-left-color: ${n.borderColor}` : ''"
+          >
+            <div
+              class="notif-item__icon"
+              :style="{ background: n.iconBg, color: n.iconColor }"
+            >
+              <KIcon
+                :name="n.icon"
+                :size="20"
+                aria-hidden="true"
+              />
             </div>
-            <p class="notif-item__text">
-              {{ n.text }}
-            </p>
-            <a
-              v-if="n.unread"
-              href="#"
-              class="notif-item__mark"
-              aria-label="Marquer cette notification comme lue"
-              title="Cliquez pour marquer comme lue"
-            >Marquer comme lu</a>
-          </div>
-          <button
-            class="notif-item__del"
-            :aria-label="`Supprimer la notification: ${n.title}`"
-            :title="`Supprimer cette notification: ${n.title}`"
-          >
-            <KIcon
-              name="close"
-              :size="15"
-              aria-hidden="true"
-            />
-          </button>
-        </article>
-      </div>
+            <div class="notif-item__body">
+              <div class="notif-item__header">
+                <strong class="notif-item__title">{{ n.title }}</strong>
+                <div class="notif-item__time-row">
+                  <span class="notif-item__time">{{ n.time }}</span>
+                  <span
+                    v-if="n.unread"
+                    class="notif-item__dot"
+                  />
+                </div>
+              </div>
+              <p class="notif-item__text">
+                {{ n.text }}
+              </p>
+              <a
+                v-if="n.unread"
+                href="#"
+                class="notif-item__mark"
+                aria-label="Marquer cette notification comme lue"
+                title="Cliquez pour marquer comme lue"
+                @click.prevent="markAsRead(n)"
+              >Marquer comme lu</a>
+            </div>
+            <button
+              class="notif-item__del"
+              :aria-label="`Supprimer la notification: ${n.title}`"
+              :title="`Supprimer cette notification: ${n.title}`"
+              :disabled="actionId === n.id"
+              @click="removeNotification(n)"
+            >
+              <KIcon
+                name="close"
+                :size="15"
+                aria-hidden="true"
+              />
+            </button>
+          </article>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -243,6 +378,31 @@ function setFilter(f) {
   color: white;
   border-color: var(--kompagnon-turquoise);
   box-shadow: 0 6px 16px rgba(72, 175, 196, 0.28);
+}
+
+/* -- Loading -- */
+.notif-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #7b8794;
+  font-size: 0.95rem;
+  padding: 1rem 1.5rem;
+}
+
+.notif-spinner {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(15, 23, 42, 0.1);
+  border-top-color: var(--kompagnon-turquoise);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* -- Content -- */

@@ -6,6 +6,7 @@ import { logger } from "./logger.js";
 import authenticationRoutes from "./src/identities-access-management/routes/authentication-routes.js";
 import usersRoutes from "./src/identities-access-management/routes/users-routes.js";
 import journeysRoutes from "./src/journeys/api/routes/journeys-routes.js";
+import notificationsRoutes from "./src/notifications/api/routes/notifications-routes.js";
 import fronts from "./src/shared/fronts/fronts-routes.js";
 import health from "./src/shared/health/routes.js";
 import { errorHandler } from "./src/shared/infrastructure/middlewares/error-handler.js";
@@ -32,6 +33,7 @@ server.use(health);
 server.use(authenticationRoutes);
 server.use(usersRoutes);
 server.use(journeysRoutes);
+server.use(notificationsRoutes);
 
 // do not write routes under this line
 server.use(errorHandler);
