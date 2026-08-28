@@ -24,7 +24,7 @@ async function rejectFoundJourneyPassengerStatusUsecase({
     throw new JourneyNotFound();
   }
   const journey = await findJourneyById(foundJourney.passengerJourneyId);
-  if (journey.userId === userId) {
+  if (Number(journey.userId) === Number(userId)) {
     checkFoundJourneyStatus({ oupdatedStatus: foundJourney.passengerStatus, updatedStatus: JOURNEY_STATUS.REJECTED });
     await updateFoundJourneyStatusUsecase({ updateRepository: updateFoundJourneyPassengerStatusByFoundJourneyId, foundJourneyId, updatedStatus: JOURNEY_STATUS.REJECTED });
   } else {

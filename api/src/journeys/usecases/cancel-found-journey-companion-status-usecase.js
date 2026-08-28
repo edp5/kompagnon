@@ -24,7 +24,7 @@ async function cancelFoundJourneyCompanionStatusUsecase({
     throw new JourneyNotFound();
   }
   const journey = await findJourneyById(foundJourney.companionJourneyId);
-  if (journey.userId === userId) {
+  if (Number(journey.userId) === Number(userId)) {
     checkFoundJourneyStatus({ oupdatedStatus: foundJourney.companionStatus, updatedStatus: JOURNEY_STATUS.CANCELLED });
     await updateFoundJourneyStatusUsecase({ updateRepository: updateFoundJourneyCompanionStatusByFoundJourneyId, foundJourneyId, updatedStatus: JOURNEY_STATUS.CANCELLED });
   } else {
