@@ -1,19 +1,202 @@
 <script setup>
-import KIcon from "@/components/KIcon.vue";
+import "leaflet/dist/leaflet.css";
 
+import L from "leaflet";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+
+import { getJourneys } from "@/adapters/journeys.js";
+import KIcon from "@/components/KIcon.vue";
+import { useGeolocation } from "@/composables/useGeolocation.js";
+import { useAuthStore } from "@/stores/auth.js";
+
+// Vite does not resolve Leaflet's default marker asset paths, so they must be provided explicitly.
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+
+const PARIS_CENTER = [48.8566, 2.3522];
+const DEFAULT_ZOOM = 12;
+
+const authStore = useAuthStore();
+const { coords, error: geolocationError, isLoading: isLocating, isSupported: isGeolocationSupported, locate } = useGeolocation();
+
+const mapContainer = ref(null);
+const journeys = ref([]);
+const isLoadingJourneys = ref(true);
+const journeysError = ref("");
 const volunteers = [];
+
+let map = null;
+let userMarker = null;
+let journeyLayers = [];
+
+/**
+ * Extracts the valid departure/arrival coordinate pairs from the loaded journeys.
+ * @returns {Array<{ departure: [number, number], arrival: [number, number], journey: object }>}
+ */
+const validJourneys = computed(() =>
+  journeys.value
+    .map((journey) => {
+      const departure = [parseFloat(journey.departureLat), parseFloat(journey.departureLon)];
+      const arrival = [parseFloat(journey.arrivalLat), parseFloat(journey.arrivalLon)];
+      return { departure, arrival, journey };
+    })
+    .filter(({ departure, arrival }) => [...departure, ...arrival].every((value) => !Number.isNaN(value))),
+);
+
+function clearJourneyLayers() {
+  for (const layer of journeyLayers) {
+    map.removeLayer(layer);
+  }
+  journeyLayers = [];
+}
+
+function renderJourneys() {
+  if (!map) return;
+  clearJourneyLayers();
+
+  for (const { departure, arrival, journey } of validJourneys.value) {
+    const departureMarker = L.marker(departure).bindPopup(`Départ · ${journey.departureAddress ?? "Adresse inconnue"}`);
+    const arrivalMarker = L.marker(arrival).bindPopup(`Arrivée · ${journey.arrivalAddress ?? "Adresse inconnue"}`);
+    const link = L.polyline([departure, arrival], { color: "#2f8fa8", weight: 3, dashArray: "6 6" });
+
+    departureMarker.addTo(map);
+    arrivalMarker.addTo(map);
+    link.addTo(map);
+
+    journeyLayers.push(departureMarker, arrivalMarker, link);
+  }
+
+  fitMapToContent();
+}
+
+function updateUserMarker(position) {
+  if (!map || !position) return;
+  const point = [position.latitude, position.longitude];
+
+  if (!userMarker) {
+    userMarker = L.circleMarker(point, {
+      radius: 8,
+      weight: 2,
+      color: "#fff",
+      fillColor: "#2f8fa8",
+      fillOpacity: 1,
+    })
+      .bindPopup("Votre position")
+      .addTo(map);
+  } else {
+    userMarker.setLatLng(point);
+  }
+
+  fitMapToContent();
+}
+
+function fitMapToContent() {
+  if (!map) return;
+
+  const points = validJourneys.value.flatMap(({ departure, arrival }) => [departure, arrival]);
+  if (coords.value) {
+    points.push([coords.value.latitude, coords.value.longitude]);
+  }
+
+  if (points.length > 1) {
+    map.fitBounds(points, { padding: [48, 48] });
+  } else if (points.length === 1) {
+    map.setView(points[0], DEFAULT_ZOOM);
+  }
+}
+
+async function loadJourneys() {
+  isLoadingJourneys.value = true;
+  journeysError.value = "";
+
+  const result = await getJourneys({ token: authStore.token });
+  isLoadingJourneys.value = false;
+
+  if (result.success) {
+    journeys.value = result.journeys;
+    renderJourneys();
+  } else {
+    journeysError.value = result.message ?? "Impossible de récupérer vos trajets.";
+  }
+}
+
+onMounted(() => {
+  map = L.map(mapContainer.value).setView(PARIS_CENTER, DEFAULT_ZOOM);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+    maxZoom: 19,
+  }).addTo(map);
+
+  locate();
+  loadJourneys();
+});
+
+watch(coords, (position) => {
+  updateUserMarker(position);
+});
+
+onBeforeUnmount(() => {
+  map?.remove();
+  map = null;
+});
 </script>
 
 <template>
   <div class="map-view app-page">
-    <!-- Carte OSM iframe zoomée sur Île de France -->
+    <!-- Carte interactive Leaflet centrée sur les trajets de l'utilisateur et sa position -->
     <div class="map-container">
-      <iframe
-        title="Carte OpenStreetMap - Île de France"
-        src="https://www.openstreetmap.org/export/embed.html?bbox=1.5,48.1,3.0,49.0&layer=mapnik&marker=48.8566,2.3522"
-        class="map-iframe"
-        loading="lazy"
+      <div
+        ref="mapContainer"
+        class="map-canvas"
+        role="application"
+        aria-label="Carte des trajets"
       />
+
+      <div
+        v-if="isLoadingJourneys"
+        class="map-overlay map-overlay--loading"
+        role="status"
+        aria-live="polite"
+      >
+        Chargement des trajets…
+      </div>
+
+      <p
+        v-if="journeysError"
+        class="map-overlay map-overlay--error"
+        role="alert"
+      >
+        {{ journeysError }}
+      </p>
+
+      <p
+        v-if="!isGeolocationSupported || geolocationError"
+        class="map-overlay map-overlay--geolocation"
+        role="status"
+      >
+        {{ geolocationError || "La géolocalisation n'est pas disponible sur cet appareil." }}
+      </p>
+
+      <button
+        type="button"
+        class="map-locate-btn"
+        aria-label="Me géolocaliser"
+        :disabled="isLocating || !isGeolocationSupported"
+        @click="locate"
+      >
+        <KIcon
+          name="tracking"
+          :size="18"
+          aria-hidden="true"
+        />
+      </button>
     </div>
 
 
@@ -133,11 +316,68 @@ const volunteers = [];
   overflow: hidden;
 }
 
-.map-iframe {
+.map-canvas {
   width: 100%;
   height: 100%;
+}
+
+.map-overlay {
+  position: absolute;
+  left: 0.75rem;
+  z-index: 1000;
+  margin: 0;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-card);
+}
+
+.map-overlay--loading {
+  top: 0.75rem;
+  background: var(--c-surface);
+  color: var(--c-text-medium);
+}
+
+.map-overlay--error {
+  top: 0.75rem;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.map-overlay--geolocation {
+  bottom: 0.75rem;
+  background: var(--c-surface);
+  color: var(--c-text-medium);
+}
+
+.map-locate-btn {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  z-index: 1000;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
-  border-radius: 0;
+  border-radius: 50%;
+  background: var(--c-surface);
+  color: var(--c-teal-dark);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.map-locate-btn:hover:not(:disabled) {
+  transform: scale(1.06);
+  box-shadow: var(--shadow-card-hov);
+}
+
+.map-locate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .map-volunteers {
@@ -149,19 +389,6 @@ const volunteers = [];
   overflow-y: auto;
   background: var(--c-surface);
   border-top: 1px solid var(--c-border);
-}
-
-
-.map-zoom {
-  display: none !important;
-}
-
-.map-geolocate {
-  display: none !important;
-}
-
-.map-area__footer {
-  display: none !important;
 }
 
 
