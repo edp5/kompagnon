@@ -5,7 +5,7 @@ import { useRoute, useRouter } from "vue-router";
 import { getJourney, getJourneyMatches, updateFoundJourneyStatus } from "@/adapters/journeys.js";
 import { useAuthStore } from "@/stores/auth.js";
 
-const STATUS = { WAITING: "waiting", ACCEPTED: "accepted" };
+const STATUS = { WAITING: "waiting", ACCEPTED: "accepted", CANCELLED: "cancelled", COMPLETED: "completed" };
 
 const authStore = useAuthStore();
 const route = useRoute();
@@ -20,16 +20,22 @@ const matchActionId = ref(null);
 /**
  * Describes the state of a match for display.
  * @param {object} match - The match with myStatus and otherStatus.
- * @returns {{ actionable: boolean, message: string }}
+ * @returns {{ actionable: boolean, variant: string, message: string }}
  */
 function matchState(match) {
+  if (match.myStatus === STATUS.CANCELLED || match.otherStatus === STATUS.CANCELLED) {
+    return { actionable: false, variant: "cancelled", message: "Ce trajet a été annulé." };
+  }
+  if (match.myStatus === STATUS.COMPLETED || match.otherStatus === STATUS.COMPLETED) {
+    return { actionable: false, variant: "completed", message: "Ce trajet est terminé." };
+  }
   if (match.myStatus === STATUS.WAITING) {
-    return { actionable: true, message: "" };
+    return { actionable: true, variant: "waiting", message: "" };
   }
   if (match.myStatus === STATUS.ACCEPTED && match.otherStatus === STATUS.ACCEPTED) {
-    return { actionable: false, message: "Trajet confirmé, vous êtes bien en binôme." };
+    return { actionable: false, variant: "confirmed", message: "Trajet confirmé, vous êtes bien en binôme." };
   }
-  return { actionable: false, message: "Vous avez accepté. En attente de la réponse de l'autre personne." };
+  return { actionable: false, variant: "pending", message: "Vous avez accepté. En attente de la réponse de l'autre personne." };
 }
 
 async function loadMatches(journeyId) {
@@ -52,6 +58,10 @@ const durationEstimate = computed(() => {
   if (!journey.value) return null;
   return estimateDuration(journey.value);
 });
+
+const matchesWithState = computed(() =>
+  matches.value.map((match) => ({ ...match, state: matchState(match) })),
+);
 
 function formatDate(isoString) {
   if (!isoString) return "—";
@@ -259,7 +269,7 @@ onMounted(async () => {
           </h2>
 
           <article
-            v-for="match in matches"
+            v-for="match in matchesWithState"
             :key="match.foundJourneyId"
             class="journey-view__match-card"
           >
@@ -288,7 +298,7 @@ onMounted(async () => {
             </dl>
 
             <div
-              v-if="matchState(match).actionable"
+              v-if="match.state.actionable"
               class="journey-view__match-actions"
             >
               <button
@@ -311,9 +321,13 @@ onMounted(async () => {
             <p
               v-else
               class="journey-view__match-status"
+              :class="{
+                'journey-view__match-status--cancelled': match.state.variant === 'cancelled',
+                'journey-view__match-status--completed': match.state.variant === 'completed',
+              }"
               role="status"
             >
-              {{ matchState(match).message }}
+              {{ match.state.message }}
             </p>
           </article>
         </section>
@@ -660,5 +674,15 @@ onMounted(async () => {
   color: var(--c-teal-dark);
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+.journey-view__match-status--cancelled {
+  background: rgba(211, 47, 47, 0.08);
+  color: #b3261e;
+}
+
+.journey-view__match-status--completed {
+  background: rgba(46, 125, 50, 0.08);
+  color: #2e7d32;
 }
 </style>
