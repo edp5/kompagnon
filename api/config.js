@@ -57,6 +57,9 @@ const configuration = (function() {
       secure: false,
       host: "localhost",
     },
+    allowedOrigins: process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(",").filter(Boolean)
+      : [],
     baseUrl: process.env.BASE_URL,
     algorithm: {
       enabled: process.env.ALGORITHM_ENABLED !== "false",
@@ -91,6 +94,7 @@ const configuration = (function() {
     config.algorithm.enabled = false;
     config.algorithm.apiUrl = "http://localhost:8000";
     config.algorithm.apiKey = "kompagnon";
+    config.allowedOrigins = [];
   } else if (config.mailPit.enabled) {
     config.email = config.mailPit;
   }
