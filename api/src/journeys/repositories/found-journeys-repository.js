@@ -36,6 +36,10 @@ async function findMatchesByPassengerJourneyId(passengerJourneyId) {
       "companion_journeys.arrivalAddress",
       "companion_journeys.departureTime",
       "companion_journeys.arrivalTime",
+      "companion_journeys.departureLat",
+      "companion_journeys.departureLon",
+      "companion_journeys.arrivalLat",
+      "companion_journeys.arrivalLon",
     );
 }
 
@@ -62,6 +66,10 @@ async function findMatchesByCompanionJourneyId(companionJourneyId) {
       "passenger_journeys.arrivalAddress",
       "passenger_journeys.departureTime",
       "passenger_journeys.arrivalTime",
+      "passenger_journeys.departureLat",
+      "passenger_journeys.departureLon",
+      "passenger_journeys.arrivalLat",
+      "passenger_journeys.arrivalLon",
     );
 }
 
