@@ -20,7 +20,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
   });
   describe("valid user", () => {
     describe("Success cases", () => {
-      it("should accept journey and call 201 http status code", async () => {
+      it("should accept journey and call 204 http status code", async () => {
         // given
         const req = {
           auth: {
@@ -48,7 +48,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
         );
 
         // then
-        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.status).toHaveBeenCalledWith(204);
         expect(res.send).toHaveBeenCalled();
         expect(acceptCompanionUsecase).toHaveBeenCalledWith({ userId: 123, foundJourneyId: 234 });
         expect(rejectCompanionUsecase).not.toHaveBeenCalled();
@@ -57,7 +57,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
         expect(rejectPassengerUsecase).not.toHaveBeenCalled();
       });
 
-      it("should reject journey and call 201 http status code", async () => {
+      it("should reject journey and call 204 http status code", async () => {
         // given
         const req = {
           auth: {
@@ -85,7 +85,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
         );
 
         // then
-        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.status).toHaveBeenCalledWith(204);
         expect(res.send).toHaveBeenCalled();
         expect(acceptCompanionUsecase).not.toHaveBeenCalled();
         expect(rejectCompanionUsecase).toHaveBeenCalledWith({ userId: 123, foundJourneyId: 234 });
@@ -138,7 +138,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
 
   describe("invalid user", () => {
     describe("Success cases", () => {
-      it("should accept journey and call 201 http status code", async () => {
+      it("should accept journey and call 204 http status code", async () => {
         // given
         const req = {
           auth: {
@@ -166,7 +166,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
         );
 
         // then
-        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.status).toHaveBeenCalledWith(204);
         expect(res.send).toHaveBeenCalled();
         expect(acceptPassengerUsecase).toHaveBeenCalledWith({ userId: 123, foundJourneyId: 234 });
         expect(rejectPassengerUsecase).not.toHaveBeenCalled();
@@ -175,7 +175,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
         expect(rejectPassengerUsecase).not.toHaveBeenCalled();
       });
 
-      it("should reject journey and call 201 http status code", async () => {
+      it("should reject journey and call 204 http status code", async () => {
         // given
         const req = {
           auth: {
@@ -203,7 +203,7 @@ describe("Unit | Journeys | Api | Controller | Update found journey status contr
         );
 
         // then
-        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.status).toHaveBeenCalledWith(204);
         expect(res.send).toHaveBeenCalled();
         expect(acceptPassengerUsecase).not.toHaveBeenCalled();
         expect(rejectPassengerUsecase).toHaveBeenCalledWith({ userId: 123, foundJourneyId: 234 });

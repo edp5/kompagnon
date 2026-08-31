@@ -252,9 +252,11 @@ journeysRoutes.get(
  *       204:
  *         description: Found journey status updated successfully
  *       400:
- *         description: Validation failed
+ *         description: Validation failed or invalid status transition
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized - missing or invalid token
+ *       403:
+ *         description: Forbidden - User has no role or journey does not belong to the user
  *       404:
  *         description: Found journey not found
  *       500:

@@ -205,7 +205,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
   describe("PUT /journeys/found/:id", () => {
     describe("valid users", () => {
       describe("success cases", () => {
-        it("should return http 201 status code if user accepts journey", async () => {
+        it("should return http 204 status code if user accepts journey", async () => {
           // given
           const validUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
           const validJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: validUser.id });
@@ -219,12 +219,12 @@ describe("Acceptance | Journeys | Journey routes", () => {
           const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
 
           // then
-          expect(response.status).toBe(201);
+          expect(response.status).toBe(204);
           const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
           expect(updatedFoundJourney.companionStatus).toBe(JOURNEY_STATUS.ACCEPTED);
         });
 
-        it("should return http 201 status code if user refuses journey", async () => {
+        it("should return http 204 status code if user refuses journey", async () => {
           // given
           const validUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
           const validJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: validUser.id });
@@ -238,7 +238,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
           const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
 
           // then
-          expect(response.status).toBe(201);
+          expect(response.status).toBe(204);
           const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
           expect(updatedFoundJourney.companionStatus).toBe(JOURNEY_STATUS.REJECTED);
         });
@@ -281,7 +281,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
     describe("invalid users", () => {
       describe("success cases", () => {
-        it("should return http 201 status code if user accepts journey", async () => {
+        it("should return http 204 status code if user accepts journey", async () => {
           // given
           const invalidUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
           const invalidJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: invalidUser.id });
@@ -295,12 +295,12 @@ describe("Acceptance | Journeys | Journey routes", () => {
           const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
 
           // then
-          expect(response.status).toBe(201);
+          expect(response.status).toBe(204);
           const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
           expect(updatedFoundJourney.passengerStatus).toBe(JOURNEY_STATUS.ACCEPTED);
         });
 
-        it("should return http 201 status code if user refuses journey", async () => {
+        it("should return http 204 status code if user refuses journey", async () => {
           // given
           const invalidUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
           const invalidJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: invalidUser.id });
@@ -314,7 +314,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
           const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
 
           // then
-          expect(response.status).toBe(201);
+          expect(response.status).toBe(204);
           const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
           expect(updatedFoundJourney.passengerStatus).toBe(JOURNEY_STATUS.REJECTED);
         });
