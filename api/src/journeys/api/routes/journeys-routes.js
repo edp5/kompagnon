@@ -322,6 +322,18 @@ journeysRoutes.put(
  *                           arrivalTime:
  *                             type: string
  *                             format: date-time
+ *                           departureLat:
+ *                             type: number
+ *                             example: 48.8566
+ *                           departureLon:
+ *                             type: number
+ *                             example: 2.3522
+ *                           arrivalLat:
+ *                             type: number
+ *                             example: 48.8584
+ *                           arrivalLon:
+ *                             type: number
+ *                             example: 2.2945
  *                       myStatus:
  *                         type: string
  *                         example: waiting
