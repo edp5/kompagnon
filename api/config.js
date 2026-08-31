@@ -59,7 +59,7 @@ const configuration = (function() {
     },
     baseUrl: process.env.BASE_URL,
     algorithm: {
-      enabled: process.env.ALGORITHM_ENABLED !== "false",
+      enabled: toBoolean(process.env.ALGORITHM_ENABLED),
       apiUrl: process.env.ALGORITHM_API_URL || "http://localhost:8000",
       apiKey: process.env.ALGORITHM_API_KEY,
     },
