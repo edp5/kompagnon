@@ -12,11 +12,11 @@ import { sendMailOnMatchService } from "./send-mail-on-match-service.js";
  * best-effort: a failure is logged and does not stop the other notifications.
  * @param {object} params - The parameters and repositories.
  * @param {number[]} params.foundJourneyIds - The ids of the newly created matches.
- * @param {Function} params.findFoundJourney - Finds a found journey by id (dependency injection).
- * @param {Function} params.findPassengerJourney - Finds a passenger journey by id (dependency injection).
- * @param {Function} params.findCompanionJourney - Finds a companion journey by id (dependency injection).
- * @param {Function} params.findUser - Finds a user by id (dependency injection).
- * @param {Function} params.sendMailOnMatch - Sends the match email (dependency injection).
+ * @param {Function} [params.findFoundJourney] - Finds a found journey by id (dependency injection).
+ * @param {Function} [params.findPassengerJourney] - Finds a passenger journey by id (dependency injection).
+ * @param {Function} [params.findCompanionJourney] - Finds a companion journey by id (dependency injection).
+ * @param {Function} [params.findUser] - Finds a user by id (dependency injection).
+ * @param {Function} [params.sendMailOnMatch] - Sends the match email (dependency injection).
  * @returns {Promise<void>}
  */
 async function notifyJourneyMatchesService({
@@ -31,17 +31,37 @@ async function notifyJourneyMatchesService({
     try {
       const foundJourney = await findFoundJourney(foundJourneyId);
       if (!foundJourney) {
+        logger.warn({ foundJourneyId }, "Found journey not found when sending match notifications");
         continue;
       }
 
       const passengerJourney = await findPassengerJourney(foundJourney.passengerJourneyId);
       const companionJourney = await findCompanionJourney(foundJourney.companionJourneyId);
       if (!passengerJourney || !companionJourney) {
+        logger.warn(
+          {
+            foundJourneyId,
+            passengerJourneyId: foundJourney.passengerJourneyId,
+            companionJourneyId: foundJourney.companionJourneyId,
+          },
+          "Associated journey not found when sending match notifications",
+        );
         continue;
       }
 
       const passengerUser = await findUser(passengerJourney.userId);
       const companionUser = await findUser(companionJourney.userId);
+      if (!passengerUser || !companionUser) {
+        logger.warn(
+          {
+            foundJourneyId,
+            passengerUserId: passengerJourney.userId,
+            companionUserId: companionJourney.userId,
+          },
+          "Associated user not found when sending match notifications",
+        );
+        continue;
+      }
 
       await sendMailOnMatch({
         firstname: passengerUser.firstname,
