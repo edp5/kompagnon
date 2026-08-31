@@ -34,4 +34,40 @@ describe("Unit | Journeys | Infrastructure | middlewares | Check match api key",
     // then
     expect(next).toHaveBeenCalledWith(new InvalidNotifyApiKeyError());
   });
+
+  it("should throw an error if ALGORITHM_API_KEY is empty", async () => {
+    // given
+    config.algorithm.apiKey = "";
+    const req = { headers: { "x-api-key": "" } };
+
+    // when
+    await checkMatchApiKey(req, res, next);
+
+    // then
+    expect(next).toHaveBeenCalledWith(new InvalidNotifyApiKeyError());
+  });
+
+  it("should throw an error if ALGORITHM_API_KEY is undefined", async () => {
+    // given
+    config.algorithm.apiKey = undefined;
+    const req = { headers: { "x-api-key": "someApiKey" } };
+
+    // when
+    await checkMatchApiKey(req, res, next);
+
+    // then
+    expect(next).toHaveBeenCalledWith(new InvalidNotifyApiKeyError());
+  });
+
+  it("should throw an error if ALGORITHM_API_KEY is undefined and no header is sent", async () => {
+    // given
+    config.algorithm.apiKey = undefined;
+    const req = { headers: {} };
+
+    // when
+    await checkMatchApiKey(req, res, next);
+
+    // then
+    expect(next).toHaveBeenCalledWith(new InvalidNotifyApiKeyError());
+  });
 });

@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 
 import { getInfos } from "./api.js";
+import { config } from "./config.js";
 import { logger } from "./logger.js";
 import authenticationRoutes from "./src/identities-access-management/routes/authentication-routes.js";
 import usersRoutes from "./src/identities-access-management/routes/users-routes.js";
@@ -13,7 +14,11 @@ import swaggerRoute from "./swagger.js";
 
 const server = express();
 
-server.use(cors());
+const corsOptions = config.allowedOrigins.length > 0
+  ? { origin: config.allowedOrigins, credentials: true }
+  : {};
+
+server.use(cors(corsOptions));
 server.use(express.json());
 server.use(swaggerRoute);
 server.get("/api/", getInfos);
