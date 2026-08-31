@@ -20,16 +20,11 @@ jobs:
     if: github.event.pull_request.draft == false
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: Setup node
-        uses: actions/setup-node@v7
+      - name: Checkout code, setup node and install dependencies
+        uses: edp5/edp5-actions/checkout-node@v1.9.0
         with:
-          node-version-file: '.nvmrc'
-
-      - name: Install dependencies
-        run: npm ci
+          file-version: .nvmrc
+          installCommand: npm ci
 
       - name: Run lint
         run: npm run lint:root
@@ -38,17 +33,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: Setup node
-        uses: actions/setup-node@v7
+      - name: Checkout code, setup node and install dependencies
+        uses: edp5/edp5-actions/checkout-node@v1.9.0
         with:
-          node-version-file: '.nvmrc'
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./api
+          file-version: .nvmrc
+          installCommand: npm ci
+          workingDirectory: ./api
 
       - name: Run lint
         run: npm run lint
@@ -58,20 +48,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: setup node
-        uses: actions/setup-node@v7
+      - name: Checkout code, setup node and install dependencies
+        uses: edp5/edp5-actions/checkout-node@v1.9.0
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: configure project
-        run: |
-          npm ci
-          cp sample.env .env
-        working-directory: ./api
+          file-version: .nvmrc
+          installCommand: |
+            npm ci
+            cp sample.env .env
+          workingDirectory: ./api
 
       - name: Setup docker compose
         uses: edp5/edp5-actions/setup-docker-compose@v1.8.1
@@ -96,17 +80,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: Setup node
-        uses: actions/setup-node@v7
+      - name: Checkout code, setup node and install dependencies
+        uses: edp5/edp5-actions/checkout-node@v1.9.0
         with:
-          node-version-file: '.nvmrc'
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./web
+          file-version: .nvmrc
+          installCommand: npm ci
+          workingDirectory: ./web
 
       - name: Run lint
         run: npm run lint
@@ -116,18 +95,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: setup node
-        uses: actions/setup-node@v7
+      - name: Checkout code, setup node and install dependencies
+        uses: edp5/edp5-actions/checkout-node@v1.9.0
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./web
+          file-version: .nvmrc
+          installCommand: npm ci
+          workingDirectory: ./web
 
       - name: run tests with coverage
         run: npm run test:coverage
@@ -146,17 +119,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: Setup node
-        uses: actions/setup-node@v7
+      - name: Checkout code, setup node and install dependencies
+        uses: edp5/edp5-actions/checkout-node@v1.9.0
         with:
-          node-version-file: '.nvmrc'
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./admin
+          file-version: .nvmrc
+          installCommand: npm ci
+          workingDirectory: ./admin
 
       - name: Run lint
         run: npm run lint
@@ -166,18 +134,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: setup node
-        uses: actions/setup-node@v7
+      - name: Checkout code, setup node and install dependencies
+        uses: edp5/edp5-actions/checkout-node@v1.9.0
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./admin
+          file-version: .nvmrc
+          installCommand: npm ci
+          workingDirectory: ./admin
 
       - name: run tests with coverage
         run: npm run test:coverage
