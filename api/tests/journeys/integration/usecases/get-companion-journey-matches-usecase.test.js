@@ -79,4 +79,33 @@ describe("Integration | Journeys | Usecases | Get companion journey matches", ()
     // then
     expect(result).toBeNull();
   });
+
+  it("should include the other journey's coordinates", async () => {
+    // given
+    const owner = await databaseBuilder.factory.buildUser();
+    const ownerJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: owner.id });
+    const other = await databaseBuilder.factory.buildUser();
+    const otherJourney = await databaseBuilder.factory.buildPassengerJourney({
+      userId: other.id,
+      departureLat: 48.8443,
+      departureLon: 2.3743,
+      arrivalLat: 45.7602,
+      arrivalLon: 4.8596,
+    });
+    await databaseBuilder.factory.buildFoundJourney({
+      companionJourneyId: ownerJourney.id,
+      passengerJourneyId: otherJourney.id,
+      companionStatus: JOURNEY_STATUS.WAITING,
+      passengerStatus: JOURNEY_STATUS.ACCEPTED,
+    });
+
+    // when
+    const result = await getCompanionJourneyMatchesUsecase({ journeyId: Number(ownerJourney.id), userId: owner.id });
+
+    // then
+    expect(Number(result[0].journey.departureLat)).toBeCloseTo(48.8443);
+    expect(Number(result[0].journey.departureLon)).toBeCloseTo(2.3743);
+    expect(Number(result[0].journey.arrivalLat)).toBeCloseTo(45.7602);
+    expect(Number(result[0].journey.arrivalLon)).toBeCloseTo(4.8596);
+  });
 });
