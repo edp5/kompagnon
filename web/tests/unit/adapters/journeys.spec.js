@@ -395,6 +395,22 @@ describe("Unit | Adapters | Journeys", () => {
       expect(result.message).toBe("Session expirée. Merci de vous reconnecter.");
     });
 
+    it("should handle generic server error status", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false, status: 500 });
+
+      // when
+      const result = await submitJourneyReview({
+        token: "jwt-token",
+        foundJourneyId: 10,
+        rating: 5,
+      });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de déposer l'avis. Veuillez réessayer.");
+    });
+
     it("should handle network exception", async () => {
       // given
       vi.spyOn(global, "fetch").mockRejectedValue(new Error("Network error"));

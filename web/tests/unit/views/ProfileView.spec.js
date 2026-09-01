@@ -79,6 +79,72 @@ describe("Unit | Views | ProfileView", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
+  it("should display empty review state when user has no reviews", async () => {
+    // given
+    const authStore = useAuthStore();
+    authStore.setAuth("valid-token", 1);
+    getUserProfile.mockResolvedValue({
+      success: true,
+      profile: {
+        userId: 1,
+        firstname: "Jane",
+        lastname: "Doe",
+        email: "jane.doe@example.com",
+        birthday: "1990-05-15",
+      },
+    });
+    getUserReviews.mockResolvedValue({
+      success: true,
+      averageRating: 0,
+      reviewCount: 0,
+      reviews: [],
+    });
+
+    // when
+    const wrapper = mount(ProfileView);
+    await flushPromises();
+
+    // then
+    expect(wrapper.text()).toContain("Aucun avis reçu pour le moment");
+  });
+
+  it("should handle review with missing or invalid date gracefully", async () => {
+    // given
+    const authStore = useAuthStore();
+    authStore.setAuth("valid-token", 1);
+    getUserProfile.mockResolvedValue({
+      success: true,
+      profile: {
+        userId: 1,
+        firstname: "Jane",
+        lastname: "Doe",
+        email: "jane.doe@example.com",
+        birthday: "1990-05-15",
+      },
+    });
+    getUserReviews.mockResolvedValue({
+      success: true,
+      averageRating: 5,
+      reviewCount: 1,
+      reviews: [
+        {
+          id: 2,
+          rating: 5,
+          authorFirstname: "John",
+          authorLastname: "Smith",
+          created_at: "invalid-date",
+        },
+      ],
+    });
+
+    // when
+    const wrapper = mount(ProfileView);
+    await flushPromises();
+
+    // then
+    expect(wrapper.text()).toContain("John Smith");
+  });
+
   it("should clear token and redirect to login when session is expired", async () => {
     // given
     const authStore = useAuthStore();
@@ -99,4 +165,5 @@ describe("Unit | Views | ProfileView", () => {
     expect(mockPush).toHaveBeenCalledWith({ name: "login" });
   });
 });
+
 

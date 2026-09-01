@@ -62,16 +62,56 @@ describe("Unit | Components | ReviewModal", () => {
     expect(wrapper.emitted("close")).toHaveLength(1);
   });
 
-  it("should update star rating when clicking on a star button", async () => {
+  it("should update star rating when clicking on a star button and display proper hints", async () => {
     // given
     const wrapper = mountReviewModal();
     const starButtons = wrapper.findAll(".review-modal__star-btn");
 
+    const hints = [
+      { index: 0, hint: "Décevant" },
+      { index: 1, hint: "Moyen" },
+      { index: 2, hint: "Correct" },
+      { index: 3, hint: "Très bien" },
+      { index: 4, hint: "Parfait !" },
+    ];
+
+    for (const { index, hint } of hints) {
+      await starButtons[index].trigger("click");
+      expect(wrapper.text()).toContain(hint);
+    }
+  });
+
+  it("should handle star hover and mouseleave", async () => {
+    // given
+    const wrapper = mountReviewModal();
+    const starButtons = wrapper.findAll(".review-modal__star-btn");
+
+    await starButtons[1].trigger("mouseenter");
+    expect(wrapper.findAll(".review-modal__star-btn--active").length).toBeGreaterThanOrEqual(2);
+
+    await starButtons[1].trigger("mouseleave");
+    expect(wrapper.text()).toContain("Parfait !");
+  });
+
+  it("should emit close when clicking the backdrop", async () => {
+    // given
+    const wrapper = mountReviewModal();
+
     // when
-    await starButtons[2].trigger("click"); // 3rd star -> rating = 3
+    await wrapper.find(".review-modal-backdrop").trigger("click");
 
     // then
-    expect(wrapper.text()).toContain("Correct");
+    expect(wrapper.emitted("close")).toBeTruthy();
+  });
+
+  it("should reset form state when isOpen transitions to true", async () => {
+    // given
+    const wrapper = mountReviewModal({ isOpen: false });
+    await wrapper.setProps({ isOpen: true });
+    await flushPromises();
+
+    // then
+    expect(wrapper.find("textarea#review-comment").element.value).toBe("");
   });
 
   it("should call submitJourneyReview and emit submitted and close events on success", async () => {
@@ -121,4 +161,20 @@ describe("Unit | Components | ReviewModal", () => {
     expect(wrapper.emitted("submitted")).toBeFalsy();
     expect(wrapper.emitted("close")).toBeFalsy();
   });
+
+  it("should display default error message when failure message is missing", async () => {
+    // given
+    submitJourneyReview.mockResolvedValue({
+      success: false,
+    });
+    const wrapper = mountReviewModal();
+
+    // when
+    await wrapper.find("form").trigger("submit.prevent");
+    await flushPromises();
+
+    // then
+    expect(wrapper.text()).toContain("Une erreur est survenue lors de l'envoi de votre avis.");
+  });
 });
+

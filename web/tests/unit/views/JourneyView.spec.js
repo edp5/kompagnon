@@ -295,7 +295,20 @@ describe("Unit | Views | JourneyView", () => {
     await flushPromises();
 
     // then
-    expect(wrapper.findComponent({ name: "ReviewModal" }).exists()).toBe(true);
+    const modal = wrapper.findComponent({ name: "ReviewModal" });
+    expect(modal.exists()).toBe(true);
+
+    // when modal emits submitted
+    await modal.vm.$emit("submitted", { id: 1 });
+    await flushPromises();
+
+    // then review is marked done
+    expect(wrapper.text()).toContain("✓ Avis envoyé");
+
+    // when modal emits close
+    await modal.vm.$emit("close");
+    await flushPromises();
   });
 });
+
 
