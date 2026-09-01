@@ -1,4 +1,5 @@
 import { JOURNEY_STATUS } from "../../shared/constants.js";
+import { DomainTransaction } from "../../shared/infrastructure/DomainTransaction.js";
 import { JourneyIsNotOfThisUser, JourneyNotFound } from "../errors.js";
 import { findJourneyById } from "../repositories/companion-users-repository.js";
 import {
@@ -6,7 +7,6 @@ import {
   updateFoundJourneyCompanionStatusByFoundJourneyId,
 } from "../repositories/found-journeys-repository.js";
 import { checkFoundJourneyStatus } from "../utils/check-found-journey-status.js";
-import { updateFoundJourneyStatusUsecase } from "./update-found-journey-status-usecase.js";
 
 /**
  * Update the status of a companion found journey
@@ -26,7 +26,9 @@ async function acceptFoundJourneyCompanionStatusUsecase({
   const journey = await findJourneyById(foundJourney.companionJourneyId);
   if (journey.userId === userId) {
     checkFoundJourneyStatus({ oupdatedStatus: foundJourney.companionStatus, updatedStatus: JOURNEY_STATUS.ACCEPTED });
-    await updateFoundJourneyStatusUsecase({ updateRepository: updateFoundJourneyCompanionStatusByFoundJourneyId, foundJourneyId, updatedStatus: JOURNEY_STATUS.ACCEPTED });
+    await DomainTransaction.execute(async () => {
+      await updateFoundJourneyCompanionStatusByFoundJourneyId({ foundJourneyId, status: JOURNEY_STATUS.ACCEPTED });
+    });
   } else {
     throw new JourneyIsNotOfThisUser();
   }

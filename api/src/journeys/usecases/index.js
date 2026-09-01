@@ -12,6 +12,7 @@ import { recordCompanionJourneyUsecase } from "./record-companion-journey-usecas
 import { recordPassengerJourneyUsecase } from "./record-passenger-journey-usecase.js";
 import { rejectFoundJourneyCompanionStatusUsecase } from "./reject-found-journey-companion-status-usecase.js";
 import { rejectFoundJourneyPassengerStatusUsecase } from "./reject-found-journey-passenger-status-usecase.js";
+import { updateFoundJourneyStatusUsecase } from "./update-found-journey-status-usecase.js";
 
 const usecases = {
   acceptFoundJourneyCompanionStatusUsecase,
@@ -28,6 +29,7 @@ const usecases = {
   recordPassengerJourneyUsecase,
   rejectFoundJourneyCompanionStatusUsecase,
   rejectFoundJourneyPassengerStatusUsecase,
+  updateFoundJourneyStatusUsecase,
 };
 
 export default usecases;

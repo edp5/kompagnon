@@ -1,9 +1,6 @@
 import { celebrate, Joi, Segments } from "celebrate";
 
 import { logger } from "../../../../logger.js";
-import { findUserById } from "../../../identities-access-management/repositories/user-repository.js";
-import { USER_ROLE } from "../../../shared/constants.js";
-import { UserHasNoRole } from "../../errors.js";
 import usecases from "../../usecases/index.js";
 
 const updateFoundJourneyStatusSchema = celebrate({
@@ -16,48 +13,29 @@ const updateFoundJourneyStatusSchema = celebrate({
 });
 
 /**
- * Controller to update the found journey status, it will check the user role and update the status accordingly
- * @param {object} req - The request object, it should contain the user id in the auth property, the found journey id in the params and the updated status in the body
- * @param {object} res - The response object, it will return a 204 status code if the status is updated successfully, otherwise it will return a 500 status code
- * @param {Function} next - The next function to call in case of an error, it will pass the error to the error handling middleware
- * @param {Function} acceptCompanionUsecase - The usecase to accept the companion status, it will be injected for testing purposes, it should receive an object with the user id and the found journey id and return a promise
- * @param {Function} rejectCompanionUsecase - The usecase to reject the companion status, it will be injected for testing purposes, it should receive an object with the user id and the found journey id and return a promise
- * @param {Function} acceptPassengerUsecase - The usecase to accept the passenger status, it will be injected for testing purposes, it should receive an object with the user id and the found journey id and return a promise
- * @param {Function} rejectPassengerUsecase - The usecase to reject the passenger status, it will be injected for testing purposes, it should receive an object with the user id and the found journey id and return a promise
- * @param {Function} findUser - The function to find the user by id, it will be injected for testing purposes, it should receive the user id and return a promise that resolves to the user object
- * @returns {Promise<*>} - It will return a promise that resolves to the response object, it will return a 204 status code if the status is updated successfully, otherwise it will return a 500 status code
+ * Controller to update the found journey status for the authenticated user.
+ * It delegates user resolution, role checks, and status updates to the usecase layer.
+ *
+ * @param {object} req - Express request object containing auth, params, and body
+ * @param {object} res - Express response object
+ * @param {Function} next - Express next middleware function for error handling
+ * @param {Function} updateFoundJourneyStatus - Usecase to update found journey status (injected for tests)
+ * @returns {Promise<*>} The Express response object (204 No Content on success)
  */
 async function updateFoundJourneyStatusController(
   req,
   res,
   next,
-  acceptCompanionUsecase = usecases.acceptFoundJourneyCompanionStatusUsecase,
-  rejectCompanionUsecase = usecases.rejectFoundJourneyCompanionStatusUsecase,
-  acceptPassengerUsecase = usecases.acceptFoundJourneyPassengerStatusUsecase,
-  rejectPassengerUsecase = usecases.rejectFoundJourneyPassengerStatusUsecase,
-  findUser = findUserById,
+  updateFoundJourneyStatus = usecases.updateFoundJourneyStatusUsecase,
 ) {
   const { auth, body, params } = req;
   try {
-    const user = await findUser(auth.userId);
-    switch (user.role) {
-    case USER_ROLE.INVALID:
-      if (body.updatedStatus) {
-        await acceptPassengerUsecase({ userId: auth.userId, foundJourneyId: params.foundJourneyId });
-      } else {
-        await rejectPassengerUsecase({ userId: auth.userId, foundJourneyId: params.foundJourneyId });
-      }
-      return res.status(204).send();
-    case USER_ROLE.VALID:
-      if (body.updatedStatus) {
-        await acceptCompanionUsecase({ userId: auth.userId, foundJourneyId: params.foundJourneyId });
-      } else {
-        await rejectCompanionUsecase({ userId: auth.userId, foundJourneyId: params.foundJourneyId });
-      }
-      return res.status(204).send();
-    default:
-      throw new UserHasNoRole();
-    }
+    await updateFoundJourneyStatus({
+      userId: auth.userId,
+      foundJourneyId: params.foundJourneyId,
+      updatedStatus: body.updatedStatus,
+    });
+    return res.status(204).send();
   } catch (error) {
     logger.error({ err: error }, "Error updating found journey status");
     return next(error);
