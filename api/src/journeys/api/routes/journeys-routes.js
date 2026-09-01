@@ -2,6 +2,7 @@ import express from "express";
 
 import { authMiddleware } from "../../../shared/infrastructure/middlewares/auth-middleware.js";
 import { checkMatchApiKey } from "../../infrastructure/middlewares/check-match-api-key.js";
+import { createReviewController, createReviewSchema } from "../controllers/create-review-controller.js";
 import { getJourneyController, getJourneyControllerSchema } from "../controllers/get-journey-controller.js";
 import { getJourneyMatchesController, getJourneyMatchesControllerSchema } from "../controllers/get-journey-matches-controller.js";
 import { getJourneysController, getJourneysControllerSchema } from "../controllers/get-journeys-controller.js";
@@ -388,4 +389,83 @@ journeysRoutes.get(
  */
 journeysRoutes.post("/api/journeys/match", checkMatchApiKey, notifyNewMatchControllerSchema, notifyNewMatchController);
 
+/**
+ * @swagger
+ * /api/journeys/found/{foundJourneyId}/reviews:
+ *   post:
+ *     tags:
+ *       - Journeys
+ *     summary: Submit a review for a completed found journey
+ *     description: Allows a participant (companion or passenger) to rate and review the other user after a journey is completed.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: foundJourneyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the completed found journey
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - rating
+ *             properties:
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *                 example: 5
+ *               comment:
+ *                 type: string
+ *                 maxLength: 1000
+ *                 example: Très bon accompagnement, ponctuel et agréable !
+ *     responses:
+ *       201:
+ *         description: Review created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     foundJourneyId:
+ *                       type: integer
+ *                     authorId:
+ *                       type: integer
+ *                     targetUserId:
+ *                       type: integer
+ *                     rating:
+ *                       type: integer
+ *                     comment:
+ *                       type: string
+ *       400:
+ *         description: Bad request - journey not completed or invalid rating
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - user is not a participant
+ *       404:
+ *         description: Found journey not found
+ *       409:
+ *         description: Review already submitted
+ *       500:
+ *         description: Internal server error
+ */
+journeysRoutes.post(
+  "/api/journeys/found/:foundJourneyId/reviews",
+  authMiddleware,
+  createReviewSchema,
+  createReviewController,
+);
+
 export default journeysRoutes;
+

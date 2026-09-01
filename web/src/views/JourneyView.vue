@@ -3,9 +3,10 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { getJourney, getJourneyMatches, updateFoundJourneyStatus } from "@/adapters/journeys.js";
+import ReviewModal from "@/components/ReviewModal.vue";
 import { useAuthStore } from "@/stores/auth.js";
 
-const STATUS = { WAITING: "waiting", ACCEPTED: "accepted" };
+const STATUS = { WAITING: "waiting", ACCEPTED: "accepted", COMPLETED: "completed" };
 
 const authStore = useAuthStore();
 const route = useRoute();
@@ -16,6 +17,21 @@ const isLoading = ref(true);
 const errorMessage = ref("");
 const matches = ref([]);
 const matchActionId = ref(null);
+const isReviewModalOpen = ref(false);
+const reviewingMatch = ref(null);
+const reviewedMatchIds = ref(new Set());
+
+function openReviewModal(match) {
+  reviewingMatch.value = match;
+  isReviewModalOpen.value = true;
+}
+
+function onReviewSubmitted() {
+  if (reviewingMatch.value) {
+    reviewedMatchIds.value.add(reviewingMatch.value.foundJourneyId);
+  }
+}
+
 
 /**
  * Describes the state of a match for display.
@@ -308,17 +324,46 @@ onMounted(async () => {
                 Refuser
               </button>
             </div>
-            <p
+            <div
               v-else
-              class="journey-view__match-status"
-              role="status"
+              class="journey-view__match-status-row"
             >
-              {{ matchState(match).message }}
-            </p>
+              <p
+                class="journey-view__match-status"
+                role="status"
+              >
+                {{ matchState(match).message }}
+              </p>
+              <template v-if="(match.myStatus === STATUS.ACCEPTED && match.otherStatus === STATUS.ACCEPTED) || match.myStatus === STATUS.COMPLETED || match.otherStatus === STATUS.COMPLETED">
+                <span
+                  v-if="reviewedMatchIds.has(match.foundJourneyId)"
+                  class="journey-view__review-done"
+                >
+                  ✓ Avis envoyé
+                </span>
+                <button
+                  v-else
+                  type="button"
+                  class="journey-view__review-btn"
+                  @click="openReviewModal(match)"
+                >
+                  ★ Évaluer le trajet
+                </button>
+              </template>
+            </div>
           </article>
         </section>
       </template>
     </div>
+
+    <ReviewModal
+      v-if="reviewingMatch"
+      :is-open="isReviewModalOpen"
+      :found-journey-id="reviewingMatch.foundJourneyId"
+      :user-name="`${reviewingMatch.user.firstname} ${reviewingMatch.user.lastname}`"
+      @close="isReviewModalOpen = false"
+      @submitted="onReviewSubmitted"
+    />
   </div>
 </template>
 
@@ -652,6 +697,12 @@ onMounted(async () => {
   color: var(--c-text-medium);
 }
 
+.journey-view__match-status-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
 .journey-view__match-status {
   margin: 0;
   padding: 0.75rem 1rem;
@@ -661,4 +712,37 @@ onMounted(async () => {
   font-size: 0.9rem;
   font-weight: 600;
 }
+
+.journey-view__review-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #d97706;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.journey-view__review-btn:hover {
+  background: #f59e0b;
+  color: #ffffff;
+  border-color: #f59e0b;
+}
+
+.journey-view__review-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #16a34a;
+  padding: 0.25rem 0.5rem;
+}
 </style>
+

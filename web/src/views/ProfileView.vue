@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { getUserProfile } from "@/adapters/users.js";
+import { getUserProfile, getUserReviews } from "@/adapters/users.js";
 import KIcon from "@/components/KIcon.vue";
 import { USER_GENRE, USER_ROLES } from "@/constants.js";
 import { useAuthStore } from "@/stores/auth.js";
@@ -13,6 +13,11 @@ const authStore = useAuthStore();
 const profile = ref(null);
 const errorMessage = ref("");
 const isLoading = ref(true);
+const reviewsData = ref({
+  averageRating: 0,
+  reviewCount: 0,
+  reviews: [],
+});
 
 onMounted(async () => {
   const token = authStore.token;
@@ -25,6 +30,13 @@ onMounted(async () => {
   const result = await getUserProfile({ token });
   if (result.success) {
     profile.value = result.profile;
+    const userId = profile.value?.userId ?? profile.value?.id;
+    if (userId) {
+      const reviewsResult = await getUserReviews({ userId });
+      if (reviewsResult.success) {
+        reviewsData.value = reviewsResult;
+      }
+    }
   } else {
     errorMessage.value = result.message ?? "Impossible de charger le profil.";
     if (result.errorCode === "SESSION_EXPIRED") {
@@ -64,7 +76,11 @@ const displayRole = computed(() => USER_ROLES[profile.value?.role] ?? "-");
 const stats = computed(() => [
   { value: displayGenre.value, label: "Civilité", accent: "var(--kompagnon-turquoise)" },
   { value: displayRole.value, label: "Rôle", accent: "var(--kompagnon-navy)" },
-  { value: profile.value?.birthday ?? "-", label: "Naissance", accent: "#f59e0b" },
+  {
+    value: reviewsData.value.reviewCount > 0 ? `★ ${reviewsData.value.averageRating}` : "Nouveau",
+    label: reviewsData.value.reviewCount > 0 ? `Avis (${reviewsData.value.reviewCount})` : "Avis",
+    accent: "#f59e0b",
+  },
   { value: profile.value?.email ? "Actif" : "-", label: "Compte", accent: "var(--kompagnon-turquoise)" },
 ]);
 
@@ -94,7 +110,13 @@ const highlights = computed(() => [
   },
 ]);
 
-const reviews = [];
+function formatReviewDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
+}
+
 </script>
 
 <template>
@@ -320,12 +342,23 @@ const reviews = [];
                 Expérience ressentie
               </h3>
             </div>
+            <div
+              v-if="reviewsData.reviewCount > 0"
+              class="profile-reviews__score-badge"
+            >
+              <span class="profile-reviews__score-star">★</span>
+              <strong>{{ reviewsData.averageRating }}</strong>
+              <span class="profile-reviews__score-count">({{ reviewsData.reviewCount }} avis)</span>
+            </div>
           </div>
 
-          <div class="profile-reviews">
+          <div
+            v-if="reviewsData.reviews && reviewsData.reviews.length > 0"
+            class="profile-reviews"
+          >
             <article
-              v-for="review in reviews"
-              :key="review.author"
+              v-for="review in reviewsData.reviews"
+              :key="review.id"
               class="profile-review"
             >
               <div class="profile-review__top">
@@ -334,21 +367,31 @@ const reviews = [];
                     v-for="star in 5"
                     :key="star"
                     name="star"
-                    :size="12"
+                    :size="13"
                     class="profile-review__star"
+                    :class="{ 'profile-review__star--active': star <= review.rating }"
                     aria-hidden="true"
                   />
                 </div>
-                <span class="profile-review__time">{{ review.time }}</span>
+                <span class="profile-review__time">{{ formatReviewDate(review.created_at) }}</span>
               </div>
               <p class="profile-review__author">
-                {{ review.author }}
+                {{ review.authorFirstname }} {{ review.authorLastname }}
               </p>
-              <p class="profile-review__text">
-                {{ review.text }}
+              <p
+                v-if="review.comment"
+                class="profile-review__text"
+              >
+                {{ review.comment }}
               </p>
             </article>
           </div>
+          <p
+            v-else
+            class="profile-reviews__empty"
+          >
+            Aucun avis reçu pour le moment. Vos futurs retours d’accompagnement apparaîtront ici.
+          </p>
         </section>
       </div>
     </div>
@@ -781,6 +824,28 @@ const reviews = [];
   color: #64748b;
 }
 
+.profile-reviews__score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.16);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.profile-reviews__score-star {
+  color: #f59e0b;
+}
+
+.profile-reviews__score-count {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
 .profile-reviews {
   display: grid;
   gap: 0.85rem;
@@ -806,13 +871,27 @@ const reviews = [];
 }
 
 .profile-review__star {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.profile-review__star--active {
   color: #fbbf24;
-  fill: #fbbf24;
 }
 
 .profile-review__time {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.55);
+}
+
+.profile-reviews__empty {
+  margin: 0;
+  padding: 1.25rem 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.88rem;
+  text-align: center;
 }
 
 .profile-review__author {

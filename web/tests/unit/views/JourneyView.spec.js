@@ -272,4 +272,30 @@ describe("Unit | Views | JourneyView", () => {
     expect(wrapper.find(".journey-view__match-btn--accept").exists()).toBe(false);
     expect(wrapper.text()).toContain("En attente de la réponse");
   });
+
+  it("should show review button when match is accepted by both parties", async () => {
+    // given
+    getJourney.mockResolvedValue({ success: true, journey });
+    getJourneyMatches.mockResolvedValue({
+      success: true,
+      matches: [{ ...waitingMatch, myStatus: "accepted", otherStatus: "accepted" }],
+    });
+
+    // when
+    const wrapper = mountView();
+    await flushPromises();
+
+    // then
+    const reviewBtn = wrapper.find(".journey-view__review-btn");
+    expect(reviewBtn.exists()).toBe(true);
+    expect(reviewBtn.text()).toContain("Évaluer le trajet");
+
+    // when clicking review button
+    await reviewBtn.trigger("click");
+    await flushPromises();
+
+    // then
+    expect(wrapper.findComponent({ name: "ReviewModal" }).exists()).toBe(true);
+  });
 });
+

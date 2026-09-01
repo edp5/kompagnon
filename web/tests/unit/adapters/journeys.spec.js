@@ -1,6 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getJourney, getJourneyMatches, getJourneys, recordJourney, updateFoundJourneyStatus } from "@/adapters/journeys.js";
+import {
+  getJourney,
+  getJourneyMatches,
+  getJourneys,
+  recordJourney,
+  submitJourneyReview,
+  updateFoundJourneyStatus,
+} from "@/adapters/journeys.js";
 
 describe("Unit | Adapters | Journeys", () => {
   const payload = {
@@ -308,6 +315,100 @@ describe("Unit | Adapters | Journeys", () => {
       // then
       expect(result.success).toBe(false);
       expect(result.message).toBe("Impossible de mettre à jour le trajet. Veuillez réessayer.");
+    });
+  });
+
+  describe("#submitJourneyReview", () => {
+    it("should POST review and return success with data", async () => {
+      // given
+      const mockReview = { id: 1, rating: 5, comment: "Super" };
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ data: mockReview }),
+      });
+
+      // when
+      const result = await submitJourneyReview({
+        token: "jwt-token",
+        foundJourneyId: 10,
+        rating: 5,
+        comment: "Super",
+      });
+
+      // then
+      expect(result).toEqual({ success: true, review: mockReview });
+      expect(fetchSpy).toHaveBeenCalledWith("/api/journeys/found/10/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer jwt-token",
+        },
+        body: JSON.stringify({ rating: 5, comment: "Super" }),
+      });
+    });
+
+    it("should handle 409 duplicate review error", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false, status: 409 });
+
+      // when
+      const result = await submitJourneyReview({
+        token: "jwt-token",
+        foundJourneyId: 10,
+        rating: 5,
+      });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Vous avez déjà laissé un avis pour ce trajet.");
+    });
+
+    it("should handle 400 not completed error", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false, status: 400 });
+
+      // when
+      const result = await submitJourneyReview({
+        token: "jwt-token",
+        foundJourneyId: 10,
+        rating: 5,
+      });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de déposer un avis : le trajet n'est pas encore terminé.");
+    });
+
+    it("should handle 401 session expired error", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false, status: 401 });
+
+      // when
+      const result = await submitJourneyReview({
+        token: "jwt-token",
+        foundJourneyId: 10,
+        rating: 5,
+      });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Session expirée. Merci de vous reconnecter.");
+    });
+
+    it("should handle network exception", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockRejectedValue(new Error("Network error"));
+
+      // when
+      const result = await submitJourneyReview({
+        token: "jwt-token",
+        foundJourneyId: 10,
+        rating: 5,
+      });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de joindre le serveur. Veuillez réessayer plus tard.");
     });
   });
 });

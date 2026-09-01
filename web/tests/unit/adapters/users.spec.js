@@ -1,13 +1,13 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getUserProfile } from "@/adapters/users.js";
+import { getUserProfile, getUserReviews } from "@/adapters/users.js";
 
 describe("Unit | Adapters | Users", () => {
-  describe("#getUserProfile", () => {
-    afterEach(() => {
-      vi.restoreAllMocks();
-    });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
+  describe("#getUserProfile", () => {
     it("should return profile data on success", async () => {
       // given
       vi.spyOn(global, "fetch").mockResolvedValue({
@@ -54,4 +54,60 @@ describe("Unit | Adapters | Users", () => {
       });
     });
   });
+
+  describe("#getUserReviews", () => {
+    it("should fetch reviews and statistics for the given user id", async () => {
+      // given
+      const mockReviewsData = {
+        averageRating: 4.9,
+        reviewCount: 3,
+        reviews: [
+          { id: 1, rating: 5, comment: "Top", authorFirstname: "Ada", authorLastname: "Lovelace" },
+        ],
+      };
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ data: mockReviewsData }),
+      });
+
+      // when
+      const result = await getUserReviews({ userId: 15, limit: 5, offset: 0 });
+
+      // then
+      expect(result).toEqual({
+        success: true,
+        averageRating: 4.9,
+        reviewCount: 3,
+        reviews: mockReviewsData.reviews,
+      });
+      expect(fetchSpy).toHaveBeenCalledWith("/api/users/15/reviews?limit=5&offset=0", {
+        method: "GET",
+      });
+    });
+
+    it("should return error message when response is not ok", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false, status: 500 });
+
+      // when
+      const result = await getUserReviews({ userId: 15 });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de charger les avis utilisateur.");
+    });
+
+    it("should handle network exceptions gracefully", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockRejectedValue(new Error("Network error"));
+
+      // when
+      const result = await getUserReviews({ userId: 15 });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de joindre le serveur. Veuillez réessayer plus tard.");
+    });
+  });
 });
+
