@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { logger } from "../../../../logger.js";
 import { notifyJourneyMatchesService } from "../../../../src/journeys/services/notify-journey-matches-service.js";
 
 describe("Unit | Journeys | Services | Notify journey matches", () => {
@@ -36,36 +37,88 @@ describe("Unit | Journeys | Services | Notify journey matches", () => {
     }));
   });
 
-  it("should skip a match whose found journey is missing without throwing", async () => {
+  it("should process multiple matches sequentially without throwing", async () => {
+    // given
+    const deps = buildDeps();
+
+    // when
+    await notifyJourneyMatchesService({ foundJourneyIds: [3, 4, 5], ...deps });
+
+    // then
+    expect(deps.findFoundJourney).toHaveBeenCalledTimes(3);
+    expect(deps.sendMailOnMatch).toHaveBeenCalledTimes(6);
+  });
+
+  it("should log a warning and skip a match whose found journey is missing without throwing", async () => {
     // given
     const deps = buildDeps();
     deps.findFoundJourney.mockResolvedValue(null);
+    const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
 
     // when / then
     await expect(notifyJourneyMatchesService({ foundJourneyIds: [3], ...deps })).resolves.toBeUndefined();
+    expect(warnSpy).toHaveBeenCalledWith(
+      { foundJourneyId: 3 },
+      "Found journey not found when sending match notifications",
+    );
     expect(deps.sendMailOnMatch).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 
-  it("should skip a match whose journeys can no longer be found", async () => {
+  it("should log a warning and skip a match whose journeys can no longer be found", async () => {
     // given
     const deps = buildDeps();
     deps.findPassengerJourney.mockResolvedValue(null);
+    const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
 
     // when / then
     await expect(notifyJourneyMatchesService({ foundJourneyIds: [3], ...deps })).resolves.toBeUndefined();
+    expect(warnSpy).toHaveBeenCalledWith(
+      { foundJourneyId: 3, passengerJourneyId: 10, companionJourneyId: 20 },
+      "Associated journey not found when sending match notifications",
+    );
     expect(deps.sendMailOnMatch).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 
-  it("should not stop the other matches when one notification fails", async () => {
+  it("should log a warning and skip a match whose users can no longer be found", async () => {
+    // given
+    const deps = buildDeps();
+    deps.findUser.mockResolvedValue(null);
+    const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
+
+    // when / then
+    await expect(notifyJourneyMatchesService({ foundJourneyIds: [3], ...deps })).resolves.toBeUndefined();
+    expect(warnSpy).toHaveBeenCalledWith(
+      { foundJourneyId: 3, passengerUserId: 100, companionUserId: 200 },
+      "Associated user not found when sending match notifications",
+    );
+    expect(deps.sendMailOnMatch).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
+  it("should not stop the other emails when one email notification fails within the same match", async () => {
     // given
     const deps = buildDeps();
     deps.sendMailOnMatch
-      .mockRejectedValueOnce(new Error("smtp down"))
-      .mockResolvedValue();
+      .mockRejectedValueOnce(new Error("passenger smtp error"))
+      .mockResolvedValueOnce();
+
+    // when / then
+    await expect(notifyJourneyMatchesService({ foundJourneyIds: [3], ...deps })).resolves.toBeUndefined();
+    expect(deps.sendMailOnMatch).toHaveBeenCalledTimes(2);
+  });
+
+  it("should not stop the other matches when one match repository lookup fails", async () => {
+    // given
+    const deps = buildDeps();
+    deps.findFoundJourney
+      .mockRejectedValueOnce(new Error("DB connection error"))
+      .mockResolvedValueOnce({ passengerJourneyId: 10, companionJourneyId: 20 });
 
     // when / then
     await expect(notifyJourneyMatchesService({ foundJourneyIds: [3, 4], ...deps })).resolves.toBeUndefined();
-    // second match still processed (2 emails attempted for it)
     expect(deps.findFoundJourney).toHaveBeenCalledTimes(2);
+    expect(deps.sendMailOnMatch).toHaveBeenCalledTimes(2);
   });
 });
