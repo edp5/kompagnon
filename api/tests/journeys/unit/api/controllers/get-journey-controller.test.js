@@ -22,7 +22,7 @@ describe("Unit | Journey | Api | Controller | Get journey controller", () => {
     it("should return the passenger journey with a 200 status", async () => {
       // given
       const req = { auth: { userId: 123 }, params: { journeyId: "7" } };
-      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.INVALID });
+      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.PASSENGER });
       getPassengerJourney.mockResolvedValue({ id: 7, userId: 123 });
 
       // when
@@ -40,7 +40,7 @@ describe("Unit | Journey | Api | Controller | Get journey controller", () => {
     it("should return the companion journey with a 200 status", async () => {
       // given
       const req = { auth: { userId: 123 }, params: { journeyId: "7" } };
-      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.VALID });
+      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.COMPANION });
       getCompanionJourney.mockResolvedValue({ id: 7, userId: 123 });
 
       // when
@@ -57,7 +57,7 @@ describe("Unit | Journey | Api | Controller | Get journey controller", () => {
     it("should forward a JourneyNotFound error to next", async () => {
       // given
       const req = { auth: { userId: 123 }, params: { journeyId: "7" } };
-      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.INVALID });
+      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.PASSENGER });
       getPassengerJourney.mockResolvedValue(null);
 
       // when

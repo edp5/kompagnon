@@ -45,11 +45,11 @@ export const USER_GENRES = {
 
 /**
  * User status
- * invalid / valid
+ * passenger / companion
  */
 export const USER_ROLE = {
-  VALID: "valid",
-  INVALID: "invalid",
+  COMPANION: "companion",
+  PASSENGER: "passenger",
 };
 
 /**

@@ -41,14 +41,14 @@ async function updateFoundJourneyStatusController(
   try {
     const user = await findUser(auth.userId);
     switch (user.role) {
-    case USER_ROLE.INVALID:
+    case USER_ROLE.PASSENGER:
       if (body.updatedStatus) {
         await acceptPassengerUsecase({ userId: auth.userId, foundJourneyId: params.foundJourneyId });
       } else {
         await rejectPassengerUsecase({ userId: auth.userId, foundJourneyId: params.foundJourneyId });
       }
       return res.status(204).send();
-    case USER_ROLE.VALID:
+    case USER_ROLE.COMPANION:
       if (body.updatedStatus) {
         await acceptCompanionUsecase({ userId: auth.userId, foundJourneyId: params.foundJourneyId });
       } else {

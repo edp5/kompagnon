@@ -38,9 +38,9 @@ async function recordJourneyController(
   try {
     const user = await findUserRepository(auth.userId);
     let result;
-    if (user.role === USER_ROLE.INVALID) {
+    if (user.role === USER_ROLE.PASSENGER) {
       result = await journeyUsecases.recordPassengerJourneyUsecase({ userId: user.id, ...body });
-    } else if (user.role === USER_ROLE.VALID) {
+    } else if (user.role === USER_ROLE.COMPANION) {
       result = await journeyUsecases.recordCompanionJourneyUsecase({ userId: user.id, ...body });
     } else {
       return res.status(400).json({ error: "Invalid user role" });

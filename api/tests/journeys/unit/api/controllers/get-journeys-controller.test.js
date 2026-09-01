@@ -23,7 +23,7 @@ describe("Unit | Journey | Api | Controller | Get journeys controller", () => {
     it("should return the passenger journeys with a 200 status", async () => {
       // given
       const req = { auth: { userId: 123 } };
-      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.INVALID });
+      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.PASSENGER });
       const mockJourneys = [{ id: 1, userId: 123 }];
       getPassengerJourneys.mockResolvedValue(mockJourneys);
 
@@ -42,7 +42,7 @@ describe("Unit | Journey | Api | Controller | Get journeys controller", () => {
     it("should return the companion journeys with a 200 status", async () => {
       // given
       const req = { auth: { userId: 123 } };
-      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.VALID });
+      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.COMPANION });
       const mockJourneys = [{ id: 2, userId: 123 }];
       getCompanionJourneys.mockResolvedValue(mockJourneys);
 
