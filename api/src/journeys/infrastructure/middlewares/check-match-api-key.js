@@ -15,6 +15,9 @@ async function checkMatchApiKey(req, res, next) {
 }
 
 function _checkApiKey(apiKey) {
+  if (!config.algorithm.apiKey) {
+    throw new InvalidNotifyApiKeyError();
+  }
   if (config.algorithm.apiKey !== apiKey) {
     throw new InvalidNotifyApiKeyError();
   }
@@ -22,3 +25,4 @@ function _checkApiKey(apiKey) {
 }
 
 export { checkMatchApiKey };
+

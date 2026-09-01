@@ -21,23 +21,17 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: setup node
-        uses: actions/setup-node@v7
+      - name: Checkout code, setup node and install dependencies
+        uses: edp5/edp5-actions/checkout-node@v1.9.0
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: configure project
-        run: |
-          npm ci
-          cp sample.env .env
-        working-directory: ./api
+          file-version: .nvmrc
+          installCommand: |
+            npm ci
+            cp sample.env .env
+          workingDirectory: ./api
 
       - name: Setup docker compose
-        uses: edp5/edp5-actions/setup-docker-compose@v1.8.0
+        uses: edp5/edp5-actions/setup-docker-compose@v1.8.1
         with:
           waitTime: '2'
           path: ./api

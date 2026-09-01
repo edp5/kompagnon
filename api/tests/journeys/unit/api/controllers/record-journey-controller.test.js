@@ -28,7 +28,7 @@ describe("Unit | Journey | Api | Controller | Record journey controller", () => 
         },
         body: { a: 1 },
       };
-      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.VALID });
+      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.COMPANION });
       usecases.recordCompanionJourneyUsecase.mockResolvedValue({ journeyId: 1 });
 
       // when
@@ -51,7 +51,7 @@ describe("Unit | Journey | Api | Controller | Record journey controller", () => 
         },
         body: { a: 1 },
       };
-      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.INVALID });
+      findUserRepository.mockResolvedValue({ id: 123, role: USER_ROLE.PASSENGER });
       usecases.recordPassengerJourneyUsecase.mockResolvedValue({ journeyId: 1 });
 
       // when

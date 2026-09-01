@@ -9,7 +9,7 @@ describe("Integration | Identities Access Management | Usecases | Get user data 
   describe("success case", () => {
     it("should return some data of user", async () => {
       // given
-      const userData = { email: "test@example.net", role: USER_ROLE.VALID, genre: USER_GENRES.F, firstname: "Jeanne", lastname: "Galbon", birthday: "1990-01-01" };
+      const userData = { email: "test@example.net", role: USER_ROLE.COMPANION, genre: USER_GENRES.F, firstname: "Jeanne", lastname: "Galbon", birthday: "1990-01-01" };
       const user = await databaseBuilder.factory.buildUser(userData);
 
       // when

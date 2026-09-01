@@ -28,4 +28,7 @@ server.listen(PORT, async () => {
     apiStatus.algorithm = "inactive";
   }
   logger.info(apiStatus, "API status:");
+  if (apiStatus.algorithm === "active" && !config.algorithm.apiKey) {
+    logger.warn("ALGORITHM_API_KEY is not set — POST /api/journeys/match is unprotected");
+  }
 });

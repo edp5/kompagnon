@@ -12,7 +12,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
     describe("invalid user", () => {
       it("should return 201 http status code", async () => {
         // given
-        const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+        const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
         const body = {
           departureTime: new Date("2024-06-01T10:00:00Z"),
           arrivalTime: new Date("2024-06-01T11:00:00Z"),
@@ -38,7 +38,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
     describe("valid user", () => {
       it("should return 201 http status code", async () => {
         // given
-        const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+        const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.COMPANION });
         const body = {
           departureTime: new Date("2024-06-01T10:00:00Z"),
           arrivalTime: new Date("2024-06-01T11:00:00Z"),
@@ -88,7 +88,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
     describe("body check", () => {
       it("should return 400 http status code if one body field is not present", async () => {
         // given
-        const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+        const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
         const body = {
           departureTime: new Date("2024-06-01T10:00:00Z"),
           arrivalTime: new Date("2024-06-01T11:00:00Z"),
@@ -110,7 +110,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
       it("should return 400 http status code if one body field has an incorrect format", async () => {
         // given
-        const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+        const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
         const body = {
           departureTime: new Date("2024-06-01T10:00:00Z"),
           arrivalTime: new Date("2024-06-01T11:00:00Z"),
@@ -136,7 +136,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
   describe("GET /journeys/:journeyId", () => {
     it("should return 200 and the journey for its owner (passenger)", async () => {
       // given
-      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
       const journey = await databaseBuilder.factory.buildPassengerJourney({ userId: user.id });
       const auth = generateAuthenticatedUser(user.id, user.userType);
 
@@ -150,7 +150,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
     it("should return 200 and the journey for its owner (companion)", async () => {
       // given
-      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.COMPANION });
       const journey = await databaseBuilder.factory.buildCompanionJourney({ userId: user.id });
       const auth = generateAuthenticatedUser(user.id, user.userType);
 
@@ -165,11 +165,11 @@ describe("Acceptance | Journeys | Journey routes", () => {
     it("should return 404 when the journey belongs to another user", async () => {
       // given
       const owner = await databaseBuilder.factory.buildUser({
-        role: USER_ROLE.INVALID,
+        role: USER_ROLE.PASSENGER,
         email: `owner-${crypto.randomUUID()}@example.net`,
       });
       const otherUser = await databaseBuilder.factory.buildUser({
-        role: USER_ROLE.INVALID,
+        role: USER_ROLE.PASSENGER,
         email: `other-${crypto.randomUUID()}@example.net`,
       });
       const journey = await databaseBuilder.factory.buildPassengerJourney({ userId: owner.id });
@@ -184,7 +184,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
     it("should return 404 when the journey does not exist", async () => {
       // given
-      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
       const auth = generateAuthenticatedUser(user.id, user.userType);
 
       // when
@@ -205,9 +205,9 @@ describe("Acceptance | Journeys | Journey routes", () => {
   describe("PUT /journeys/found/:id", () => {
     describe("valid users", () => {
       describe("success cases", () => {
-        it("should return http 201 status code if user accepts journey", async () => {
+        it("should return http 204 status code if user accepts journey", async () => {
           // given
-          const validUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+          const validUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.COMPANION });
           const validJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: validUser.id });
 
           const foundJourney = await databaseBuilder.factory.buildFoundJourney({ companionJourneyId: validJourney.id });
@@ -219,14 +219,14 @@ describe("Acceptance | Journeys | Journey routes", () => {
           const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
 
           // then
-          expect(response.status).toBe(201);
+          expect(response.status).toBe(204);
           const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
           expect(updatedFoundJourney.companionStatus).toBe(JOURNEY_STATUS.ACCEPTED);
         });
 
-        it("should return http 201 status code if user refuses journey", async () => {
+        it("should return http 204 status code if user refuses journey", async () => {
           // given
-          const validUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+          const validUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.COMPANION });
           const validJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: validUser.id });
 
           const foundJourney = await databaseBuilder.factory.buildFoundJourney({ companionJourneyId: validJourney.id });
@@ -238,7 +238,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
           const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
 
           // then
-          expect(response.status).toBe(201);
+          expect(response.status).toBe(204);
           const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
           expect(updatedFoundJourney.companionStatus).toBe(JOURNEY_STATUS.REJECTED);
         });
@@ -247,7 +247,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
       describe("error cases", () => {
         it("should throw an error if foundJourneyId param is not a number", async () => {
           // given
-          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.COMPANION });
           const journey = await databaseBuilder.factory.buildCompanionJourney({ userId: user.id });
           await databaseBuilder.factory.buildFoundJourney({ companionJourneyId: journey.id });
           const authorization = generateAuthenticatedUser(user.id, user.userType);
@@ -263,7 +263,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
         it("should throw an error if updatedStatus is not a boolean", async () => {
           // given
-          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.COMPANION });
           const journey = await databaseBuilder.factory.buildCompanionJourney({ userId: user.id });
           const foundJourney = await databaseBuilder.factory.buildFoundJourney({ companionJourneyId: journey.id });
           const authorization = generateAuthenticatedUser(user.id, user.userType);
@@ -281,9 +281,9 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
     describe("invalid users", () => {
       describe("success cases", () => {
-        it("should return http 201 status code if user accepts journey", async () => {
+        it("should return http 204 status code if user accepts journey", async () => {
           // given
-          const invalidUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+          const invalidUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
           const invalidJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: invalidUser.id });
 
           const foundJourney = await databaseBuilder.factory.buildFoundJourney({ passengerJourneyId: invalidJourney.id });
@@ -295,14 +295,14 @@ describe("Acceptance | Journeys | Journey routes", () => {
           const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
 
           // then
-          expect(response.status).toBe(201);
+          expect(response.status).toBe(204);
           const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
           expect(updatedFoundJourney.passengerStatus).toBe(JOURNEY_STATUS.ACCEPTED);
         });
 
-        it("should return http 201 status code if user refuses journey", async () => {
+        it("should return http 204 status code if user refuses journey", async () => {
           // given
-          const invalidUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+          const invalidUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
           const invalidJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: invalidUser.id });
 
           const foundJourney = await databaseBuilder.factory.buildFoundJourney({ passengerJourneyId: invalidJourney.id });
@@ -314,7 +314,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
           const response = await request(server).put(`/api/journeys/found/${foundJourney.id}`).set("Authorization", authorization).send(body);
 
           // then
-          expect(response.status).toBe(201);
+          expect(response.status).toBe(204);
           const updatedFoundJourney = await knex("found_journeys").where({ id: foundJourney.id }).first();
           expect(updatedFoundJourney.passengerStatus).toBe(JOURNEY_STATUS.REJECTED);
         });
@@ -323,7 +323,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
       describe("error cases", () => {
         it("should throw an error if foundJourneyId param is not a number", async () => {
           // given
-          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
           const journey = await databaseBuilder.factory.buildPassengerJourney({ userId: user.id });
           await databaseBuilder.factory.buildFoundJourney({ passengerJourneyId: journey.id });
           const authorization = generateAuthenticatedUser(user.id, user.userType);
@@ -339,7 +339,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
         it("should throw an error if updatedStatus is not a boolean", async () => {
           // given
-          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+          const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
           const journey = await databaseBuilder.factory.buildPassengerJourney({ userId: user.id });
           const foundJourney = await databaseBuilder.factory.buildFoundJourney({ passengerJourneyId: journey.id });
           const authorization = generateAuthenticatedUser(user.id, user.userType);
@@ -369,7 +369,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
   describe("GET /journeys", () => {
     it("should return 200 and the list of passenger journeys for passenger user", async () => {
       // given
-      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
       const journey = await databaseBuilder.factory.buildPassengerJourney({ userId: user.id });
       const auth = generateAuthenticatedUser(user.id, user.userType);
 
@@ -385,7 +385,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
     it("should return 200 and the list of companion journeys for companion user", async () => {
       // given
-      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.VALID });
+      const user = await databaseBuilder.factory.buildUser({ role: USER_ROLE.COMPANION });
       const journey = await databaseBuilder.factory.buildCompanionJourney({ userId: user.id });
       const auth = generateAuthenticatedUser(user.id, user.userType);
 
@@ -423,7 +423,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
   describe("GET /journeys/:journeyId/matches", () => {
     it("should return 200 and the matches of the owner's journey", async () => {
       // given
-      const passenger = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+      const passenger = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
       const passengerJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: passenger.id });
       const companion = await databaseBuilder.factory.buildUser({ firstname: "Adrien", lastname: "Le Guen" });
       const companionJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: companion.id });
@@ -448,7 +448,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
     it("should return 200 and the matches of the owner when is accepted's journey", async () => {
       // given
-      const passenger = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+      const passenger = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
       const passengerJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: passenger.id });
       const companion = await databaseBuilder.factory.buildUser({ firstname: "Adrien", lastname: "Le Guen" });
       const companionJourney = await databaseBuilder.factory.buildCompanionJourney({ userId: companion.id });
@@ -473,8 +473,8 @@ describe("Acceptance | Journeys | Journey routes", () => {
 
     it("should return 404 when the journey is not the user's", async () => {
       // given
-      const owner = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
-      const otherUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.INVALID });
+      const owner = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
+      const otherUser = await databaseBuilder.factory.buildUser({ role: USER_ROLE.PASSENGER });
       const passengerJourney = await databaseBuilder.factory.buildPassengerJourney({ userId: owner.id });
       const auth = generateAuthenticatedUser(otherUser.id, otherUser.userType);
 
