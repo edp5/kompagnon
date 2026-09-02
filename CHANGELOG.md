@@ -1,3 +1,80 @@
+## [1.4.0](https://github.com/edp5/kompagnon/compare/v1.3.0...v1.4.0) (2026-09-02)
+
+### 🚀 New features
+
+* Create an endpoint to notify users when journey match ([#804](https://github.com/edp5/kompagnon/issues/804)) ([d49057e](https://github.com/edp5/kompagnon/commit/d49057e15461cc03a108a1f64653c661ba8fd05e))
+* Create an endpoint to recive new match n°2 ([#840](https://github.com/edp5/kompagnon/issues/840)) ([0ed0016](https://github.com/edp5/kompagnon/commit/0ed0016f07aa11e5877b7a04d40fe28a05ae2355))
+* expose match coordinates on the matches endpoint ([#914](https://github.com/edp5/kompagnon/issues/914)) ([abd3c41](https://github.com/edp5/kompagnon/commit/abd3c414d9fa42790e8c4819507ce9faee5db82c))
+* Include the phone number in data return by journey route ([#838](https://github.com/edp5/kompagnon/issues/838)) ([a0faa86](https://github.com/edp5/kompagnon/commit/a0faa8689061d86179dd43d3f46663e574690bbf))
+
+### 🐛 Bug Fixes
+
+* **api:** return 204 No Content on PUT /journeys/found/:id ([#902](https://github.com/edp5/kompagnon/issues/902)) ([4aee6a2](https://github.com/edp5/kompagnon/commit/4aee6a20edb5f4955213898fbe063e5c0f6e362c))
+* **api:** send companion and passenger match notification emails with allSettled ([#926](https://github.com/edp5/kompagnon/issues/926)) ([87d4002](https://github.com/edp5/kompagnon/commit/87d40021bc1959b4f39e2dcbdb8b9969616fd608))
+* Fix the data produced by match route ([#874](https://github.com/edp5/kompagnon/issues/874)) ([269bf1a](https://github.com/edp5/kompagnon/commit/269bf1acef37f68d9e029bb73367dc9d3734daaf))
+* restrict CORS to allowed origins in production ([#907](https://github.com/edp5/kompagnon/issues/907)) ([345e329](https://github.com/edp5/kompagnon/commit/345e329c3b6cea04272fe87c3c2a89627ed44799))
+* validate ALGORITHM_API_KEY is set when algorithm is enabled ([#901](https://github.com/edp5/kompagnon/issues/901)) ([04adf0d](https://github.com/edp5/kompagnon/commit/04adf0da93b8d5bf0e253c92922b337a2563f24b))
+
+### 🛠️ Technical
+
+* Fix seeds and add api informations for developers ([#859](https://github.com/edp5/kompagnon/issues/859)) ([6df527d](https://github.com/edp5/kompagnon/commit/6df527d605db7002b8ff9c9d58bc098881d91843))
+* use edp5/edp5-actions checkout-node action in workflows ([#925](https://github.com/edp5/kompagnon/issues/925)) ([951dc0d](https://github.com/edp5/kompagnon/commit/951dc0d57c02d15c3b050a999c51f7b6290a0923))
+
+### 🔖 Version Bumps
+
+* **deps-dev:** bump @vitest/coverage-v8 from 4.1.10 to 4.1.11 in /admin ([#862](https://github.com/edp5/kompagnon/issues/862)) ([3b80b2e](https://github.com/edp5/kompagnon/commit/3b80b2e29a22f743f361b0577e6a3351cfd359fc))
+* **deps-dev:** bump @vitest/coverage-v8 from 4.1.10 to 4.1.11 in /api ([#864](https://github.com/edp5/kompagnon/issues/864)) ([dfcf825](https://github.com/edp5/kompagnon/commit/dfcf8253b2f838c6d65cbc07f62058ba3bd2c281))
+* **deps-dev:** bump @vitest/coverage-v8 from 4.1.10 to 4.1.11 in /web ([#865](https://github.com/edp5/kompagnon/issues/865)) ([3ec289c](https://github.com/edp5/kompagnon/commit/3ec289c379d8e0e8e9aa7a8eb8d3dc4fe603e083))
+* **deps-dev:** bump @vitest/eslint-plugin from 1.6.26 to 1.6.27 in /admin ([#845](https://github.com/edp5/kompagnon/issues/845)) ([aadc044](https://github.com/edp5/kompagnon/commit/aadc044f65a76bfdb80d30be51fc038f5cd4256a))
+* **deps-dev:** bump @vitest/eslint-plugin from 1.6.26 to 1.6.27 in /web ([#847](https://github.com/edp5/kompagnon/issues/847)) ([2f1c83c](https://github.com/edp5/kompagnon/commit/2f1c83c036726e0d4703b4128ed2c6ba5edd3bae))
+* **deps-dev:** bump @vue/test-utils from 2.4.11 to 2.5.0 in /admin ([#919](https://github.com/edp5/kompagnon/issues/919)) ([14ecba5](https://github.com/edp5/kompagnon/commit/14ecba56d0caa020df38285b2d2805819717b48b))
+* **deps-dev:** bump @vue/test-utils from 2.4.11 to 2.5.0 in /web ([#922](https://github.com/edp5/kompagnon/issues/922)) ([6c30d81](https://github.com/edp5/kompagnon/commit/6c30d81a32693c6fb5eeb27c599486e5019005b1))
+* **deps-dev:** bump eslint from 10.8.1 to 10.9.0 ([#868](https://github.com/edp5/kompagnon/issues/868)) ([74a4e11](https://github.com/edp5/kompagnon/commit/74a4e1138e82c011d3add0881d7cd12ca8ac81c1))
+* **deps-dev:** bump eslint from 10.8.1 to 10.9.0 in /admin ([#869](https://github.com/edp5/kompagnon/issues/869)) ([e8b84c2](https://github.com/edp5/kompagnon/commit/e8b84c2a2cd8b52e595ee83b5d8b153f1224e963))
+* **deps-dev:** bump eslint from 10.8.1 to 10.9.0 in /api ([#870](https://github.com/edp5/kompagnon/issues/870)) ([81536e4](https://github.com/edp5/kompagnon/commit/81536e49a3841592795ef329ff8c9671d08dd1b8))
+* **deps-dev:** bump eslint from 10.8.1 to 10.9.0 in /web ([#871](https://github.com/edp5/kompagnon/issues/871)) ([aed6c34](https://github.com/edp5/kompagnon/commit/aed6c34ff817da710e50a07b4fbd46c1b808fd50))
+* **deps-dev:** bump eslint from 10.9.0 to 10.9.1 ([#896](https://github.com/edp5/kompagnon/issues/896)) ([5c01d31](https://github.com/edp5/kompagnon/commit/5c01d31b1fcdd37edceaaab3b8d2911c3c2fd1fc))
+* **deps-dev:** bump eslint from 10.9.0 to 10.9.1 in /admin ([#897](https://github.com/edp5/kompagnon/issues/897)) ([318afe8](https://github.com/edp5/kompagnon/commit/318afe8207272a17ae8c3deb0979b3db09a8390c))
+* **deps-dev:** bump eslint from 10.9.0 to 10.9.1 in /api ([#899](https://github.com/edp5/kompagnon/issues/899)) ([6e6ff02](https://github.com/edp5/kompagnon/commit/6e6ff021b020048fc991c8c6f901441f14f9cad3))
+* **deps-dev:** bump eslint from 10.9.0 to 10.9.1 in /web ([#900](https://github.com/edp5/kompagnon/issues/900)) ([9870399](https://github.com/edp5/kompagnon/commit/9870399700162e358c8ca7d249b2da0b54e64c75))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.0.0 to 64.0.1 ([#834](https://github.com/edp5/kompagnon/issues/834)) ([40b92ba](https://github.com/edp5/kompagnon/commit/40b92badd6ee94a02fcde42aa23f490d7b17c612))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.0.0 to 64.0.1 in /api ([#837](https://github.com/edp5/kompagnon/issues/837)) ([de5d88a](https://github.com/edp5/kompagnon/commit/de5d88acf26f689edcf283d7e37126f35c85b77a))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.0.1 to 64.0.2 ([#841](https://github.com/edp5/kompagnon/issues/841)) ([fde487a](https://github.com/edp5/kompagnon/commit/fde487a4873102c214b6612aadc420677b5189b6))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.0.1 to 64.0.2 in /api ([#842](https://github.com/edp5/kompagnon/issues/842)) ([b0bfcdb](https://github.com/edp5/kompagnon/commit/b0bfcdbc1de700987d6a4285e80a98ca5543c2f6))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.0.2 to 64.1.0 ([#844](https://github.com/edp5/kompagnon/issues/844)) ([b366743](https://github.com/edp5/kompagnon/commit/b36674357f9a7974edc74d063eac0da82efef960))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.0.2 to 64.1.0 in /api ([#846](https://github.com/edp5/kompagnon/issues/846)) ([cb6e80d](https://github.com/edp5/kompagnon/commit/cb6e80d5af99196936c64d5b798b65f6975ab9ab))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.1.0 to 64.2.0 ([#854](https://github.com/edp5/kompagnon/issues/854)) ([dbde604](https://github.com/edp5/kompagnon/commit/dbde6040c70a4fe90494a847a01c4d4b855d2681))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.1.0 to 64.2.0 in /api ([#855](https://github.com/edp5/kompagnon/issues/855)) ([deb6dd9](https://github.com/edp5/kompagnon/commit/deb6dd9c389f1191ce488bb1890468c47be2d91d))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.2.0 to 64.2.1 ([#856](https://github.com/edp5/kompagnon/issues/856)) ([5aab1b8](https://github.com/edp5/kompagnon/commit/5aab1b8e66b734271d585ec24980a59934f89d09))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.2.0 to 64.2.1 in /api ([#857](https://github.com/edp5/kompagnon/issues/857)) ([a1d80e8](https://github.com/edp5/kompagnon/commit/a1d80e83ab26464f936120c1af14312a25d40651))
+* **deps-dev:** bump globals from 17.9.0 to 17.11.0 ([#848](https://github.com/edp5/kompagnon/issues/848)) ([ea2c725](https://github.com/edp5/kompagnon/commit/ea2c725bed2d818cc838210f0375de47cc524e67))
+* **deps-dev:** bump globals from 17.9.0 to 17.11.0 in /admin ([#850](https://github.com/edp5/kompagnon/issues/850)) ([17456a2](https://github.com/edp5/kompagnon/commit/17456a26cd6a6285132d8323edce8d8ab0be8896))
+* **deps-dev:** bump globals from 17.9.0 to 17.11.0 in /api ([#851](https://github.com/edp5/kompagnon/issues/851)) ([a62c092](https://github.com/edp5/kompagnon/commit/a62c09210cfc53e9b139e7915f15a806fe8e1963))
+* **deps-dev:** bump globals from 17.9.0 to 17.11.0 in /web ([#853](https://github.com/edp5/kompagnon/issues/853)) ([2eebe8a](https://github.com/edp5/kompagnon/commit/2eebe8a602129be9892299a68690d7020393bfc2))
+* **deps-dev:** bump vite from 8.2.1 to 8.2.2 in /admin ([#860](https://github.com/edp5/kompagnon/issues/860)) ([4cc0fcc](https://github.com/edp5/kompagnon/commit/4cc0fcc0243d13da59a2d3d029812767fdf29252))
+* **deps-dev:** bump vite from 8.2.1 to 8.2.2 in /web ([#867](https://github.com/edp5/kompagnon/issues/867)) ([01bb2ac](https://github.com/edp5/kompagnon/commit/01bb2ac84dd672ebcf8b00c8ebde2c29e9dea6fd))
+* **deps-dev:** bump vitest from 4.1.10 to 4.1.11 in /admin ([#861](https://github.com/edp5/kompagnon/issues/861)) ([0bc29c0](https://github.com/edp5/kompagnon/commit/0bc29c0223c99e552392c24d5b134cab00692f28))
+* **deps-dev:** bump vitest from 4.1.10 to 4.1.11 in /api ([#863](https://github.com/edp5/kompagnon/issues/863)) ([47b9ea0](https://github.com/edp5/kompagnon/commit/47b9ea0f757f9b08948e721357e833efc4ef75f6))
+* **deps:** bump celebrate from 15.0.3 to 16.0.0 in /api ([#929](https://github.com/edp5/kompagnon/issues/929)) ([5567bc0](https://github.com/edp5/kompagnon/commit/5567bc0a6b01e16b40c7f05aa6f67c5827c5ca62))
+* **deps:** bump edp5/edp5-actions from 1.8.0 to 1.8.1 ([#916](https://github.com/edp5/kompagnon/issues/916)) ([e35d767](https://github.com/edp5/kompagnon/commit/e35d76713ea5282ae683a9ca127889b4c37953d1))
+* **deps:** bump marked from 18.0.10 to 18.0.11 in /api ([#898](https://github.com/edp5/kompagnon/issues/898)) ([20e2a30](https://github.com/edp5/kompagnon/commit/20e2a3025323673cd1e11d8471c8e01e4af9b11d))
+* **deps:** bump marked from 18.0.7 to 18.0.9 in /api ([#835](https://github.com/edp5/kompagnon/issues/835)) ([7b7bd48](https://github.com/edp5/kompagnon/commit/7b7bd4899d1c490897c99c7686fc8afa110c3047))
+* **deps:** bump marked from 18.0.9 to 18.0.10 in /api ([#872](https://github.com/edp5/kompagnon/issues/872)) ([460fe9a](https://github.com/edp5/kompagnon/commit/460fe9a0f716382ae83410fbdd6544d060d05bd5))
+* **deps:** bump nodemailer from 9.0.4 to 9.0.5 in /api ([#843](https://github.com/edp5/kompagnon/issues/843)) ([f95da97](https://github.com/edp5/kompagnon/commit/f95da977b83d8b9f90c01f62000341b645933a72))
+* **deps:** bump nodemailer from 9.0.5 to 9.0.6 in /api ([#928](https://github.com/edp5/kompagnon/issues/928)) ([9abed50](https://github.com/edp5/kompagnon/commit/9abed507744c3479542fd1aa1c98f627d8520e99))
+* **deps:** bump pg from 8.22.0 to 8.23.0 in /api ([#836](https://github.com/edp5/kompagnon/issues/836)) ([619b8ed](https://github.com/edp5/kompagnon/commit/619b8ed78f357bd38f47f0b385f738fce76276c8))
+* **deps:** bump pinia from 4.0.2 to 4.0.3 in /admin ([#849](https://github.com/edp5/kompagnon/issues/849)) ([e4b2355](https://github.com/edp5/kompagnon/commit/e4b23551c11b8a41894fe2b7e7951fae708cb57d))
+* **deps:** bump pinia from 4.0.2 to 4.0.3 in /web ([#852](https://github.com/edp5/kompagnon/issues/852)) ([eb90c1c](https://github.com/edp5/kompagnon/commit/eb90c1cbfba9bf92c4950785f9d93b91c2ff73d9))
+* **deps:** bump vue from 3.5.41 to 3.5.42 in /admin ([#918](https://github.com/edp5/kompagnon/issues/918)) ([491a787](https://github.com/edp5/kompagnon/commit/491a78734a8ddd655be6ca0bbca167434becb12b))
+* **deps:** bump vue from 3.5.41 to 3.5.42 in /web ([#921](https://github.com/edp5/kompagnon/issues/921)) ([59853c7](https://github.com/edp5/kompagnon/commit/59853c7698e42ad747c0549c21d41df49db9fc31))
+* **deps:** bump vue-router from 5.2.0 to 5.3.0 in /admin ([#917](https://github.com/edp5/kompagnon/issues/917)) ([03426b3](https://github.com/edp5/kompagnon/commit/03426b3ec59138c49d43d85a54977f9608104790))
+* **deps:** bump vue-router from 5.2.0 to 5.3.0 in /web ([#920](https://github.com/edp5/kompagnon/issues/920)) ([7a8a045](https://github.com/edp5/kompagnon/commit/7a8a0457c3b37a1158e1d1523240b17f0f9846f6))
+* Update Node.js version from 26.5.1 to 26.8.1 ([#930](https://github.com/edp5/kompagnon/issues/930)) ([ab5a9a9](https://github.com/edp5/kompagnon/commit/ab5a9a9defa98bb109316244de656af5956c1e02))
+
+### ⏪ Reverts
+
+* feat: Create an endpoint to notify users when journey match ([#839](https://github.com/edp5/kompagnon/issues/839)) ([5f8756e](https://github.com/edp5/kompagnon/commit/5f8756e24eee797fc02dafd1a78a55d1658b144c))
+
 ## [1.3.0](https://github.com/edp5/kompagnon/compare/v1.2.0...v1.3.0) (2026-08-11)
 
 ## [1.2.0](https://github.com/edp5/kompagnon/compare/v1.1.1...v1.2.0) (2026-06-12)
