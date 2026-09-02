@@ -12,12 +12,13 @@ import ProfileView from "@/views/ProfileView.vue";
 import RecordJourneyView from "@/views/RecordJourneyView.vue";
 import SupportView from "@/views/SupportView.vue";
 
-function _withAppLayout(path, name, component) {
+function _withAppLayout(path, name, component, title) {
   return {
     path,
     component: AppLayout,
     meta: {
       requiresAuth: true,
+      title,
     },
     children: [
       {
@@ -26,6 +27,7 @@ function _withAppLayout(path, name, component) {
         component,
         meta: {
           requiresAuth: true,
+          title,
         },
       },
     ],
@@ -41,43 +43,46 @@ const routesList = [
     path: "/login",
     name: "login",
     component: LoginView,
+    meta: { title: "Connexion" },
   },
   {
     path: "/register",
     name: "register",
     component: RegisterView,
+    meta: { title: "Inscription" },
   },
   {
     path: "/authentication/activate",
     name: "activate-account",
     component: ActivateAccountView,
+    meta: { title: "Activation de compte" },
   },
   {
-    ..._withAppLayout("/home", "home", HomeView),
+    ..._withAppLayout("/home", "home", HomeView, "Accueil"),
   },
   {
-    ..._withAppLayout("/map", "map", MapView),
+    ..._withAppLayout("/map", "map", MapView, "Carte"),
   },
   {
-    ..._withAppLayout("/journeys", "journeys", JourneysView),
+    ..._withAppLayout("/journeys", "journeys", JourneysView, "Mes trajets"),
   },
   {
-    ..._withAppLayout("/journeys/new", "record-journey", RecordJourneyView),
+    ..._withAppLayout("/journeys/new", "record-journey", RecordJourneyView, "Nouveau trajet"),
   },
   {
-    ..._withAppLayout("/journeys/:journeyId", "journey", JourneyView),
+    ..._withAppLayout("/journeys/:journeyId", "journey", JourneyView, "détails du trajet"),
   },
   {
-    ..._withAppLayout("/profile", "profile", ProfileView),
+    ..._withAppLayout("/profile", "profile", ProfileView, "Mon profil"),
   },
   {
-    ..._withAppLayout("/notifications", "notifications", NotificationsView),
+    ..._withAppLayout("/notifications", "notifications", NotificationsView, "Notifications"),
   },
   {
-    ..._withAppLayout("/support", "support", SupportView),
+    ..._withAppLayout("/support", "support", SupportView, "Support"),
   },
   {
-    ..._withAppLayout("/privacy", "privacy", PrivacyView),
+    ..._withAppLayout("/privacy", "privacy", PrivacyView, "Vie privée"),
   },
 ];
 
