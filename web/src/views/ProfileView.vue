@@ -32,7 +32,7 @@ onMounted(async () => {
     profile.value = result.profile;
     const userId = profile.value?.userId ?? profile.value?.id;
     if (userId) {
-      const reviewsResult = await getUserReviews({ userId });
+      const reviewsResult = await getUserReviews({ token, userId });
       if (reviewsResult.success) {
         reviewsData.value = reviewsResult;
       }

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 
 import { submitJourneyReview } from "@/adapters/journeys.js";
 import KIcon from "@/components/KIcon.vue";
@@ -24,26 +24,39 @@ const emit = defineEmits(["close", "submitted"]);
 
 const authStore = useAuthStore();
 
+const modalRef = ref(null);
+const closeBtnRef = ref(null);
+const starRefs = ref([]);
 const rating = ref(5);
 const hoverRating = ref(0);
 const comment = ref("");
 const isSubmitting = ref(false);
 const errorMessage = ref("");
+let previousActiveElement = null;
 
 watch(
   () => props.isOpen,
-  (newVal) => {
+  async (newVal) => {
     if (newVal) {
+      previousActiveElement = document.activeElement;
       rating.value = 5;
       hoverRating.value = 0;
       comment.value = "";
       errorMessage.value = "";
+      await nextTick();
+      if (closeBtnRef.value) {
+        closeBtnRef.value.focus();
+      }
+    } else {
+      if (previousActiveElement && typeof previousActiveElement.focus === "function") {
+        previousActiveElement.focus();
+      }
     }
   },
 );
 
 function setRating(val) {
-  rating.value = val;
+  rating.value = Math.max(1, Math.min(5, val));
 }
 
 function onHover(val) {
@@ -52,6 +65,49 @@ function onHover(val) {
 
 function onLeave() {
   hoverRating.value = 0;
+}
+
+function onKeydownStars(event, currentStar) {
+  if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+    event.preventDefault();
+    const nextStar = Math.min(5, currentStar + 1);
+    setRating(nextStar);
+    starRefs.value[nextStar - 1]?.focus();
+  } else if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+    event.preventDefault();
+    const prevStar = Math.max(1, currentStar - 1);
+    setRating(prevStar);
+    starRefs.value[prevStar - 1]?.focus();
+  }
+}
+
+function onKeydownDialog(event) {
+  if (!props.isOpen) return;
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    emit("close");
+    return;
+  }
+
+  if (event.key === "Tab") {
+    if (!modalRef.value) return;
+    const focusables = modalRef.value.querySelectorAll(
+      "button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])",
+    );
+    if (!focusables || focusables.length === 0) return;
+
+    const firstEl = focusables[0];
+    const lastEl = focusables[focusables.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstEl) {
+      event.preventDefault();
+      lastEl.focus();
+    } else if (!event.shiftKey && document.activeElement === lastEl) {
+      event.preventDefault();
+      firstEl.focus();
+    }
+  }
 }
 
 async function onSubmit() {
@@ -84,8 +140,13 @@ async function onSubmit() {
     aria-modal="true"
     aria-labelledby="review-modal-title"
     @click.self="emit('close')"
+    @keydown="onKeydownDialog"
   >
-    <div class="review-modal glass-panel">
+    <div
+      ref="modalRef"
+      class="review-modal"
+      tabindex="-1"
+    >
       <header class="review-modal__header">
         <h2
           id="review-modal-title"
@@ -94,6 +155,7 @@ async function onSubmit() {
           Évaluer le trajet
         </h2>
         <button
+          ref="closeBtnRef"
           type="button"
           class="review-modal__close"
           aria-label="Fermer la boîte de dialogue"
@@ -125,6 +187,7 @@ async function onSubmit() {
             <button
               v-for="star in 5"
               :key="star"
+              :ref="(el) => { if (el) starRefs[star - 1] = el; }"
               type="button"
               class="review-modal__star-btn"
               :class="{
@@ -132,10 +195,12 @@ async function onSubmit() {
               }"
               :aria-label="`${star} étoile${star > 1 ? 's' : ''}`"
               :aria-checked="rating === star"
+              :tabindex="rating === star ? 0 : -1"
               role="radio"
               @click="setRating(star)"
               @mouseenter="onHover(star)"
               @mouseleave="onLeave"
+              @keydown="onKeydownStars($event, star)"
             >
               <KIcon
                 name="star"
@@ -211,15 +276,16 @@ async function onSubmit() {
 }
 
 .review-modal {
-  background: #ffffff;
+  background: var(--c-surface);
   border-radius: 1.5rem;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.2);
+  border: 1px solid var(--c-border);
+  box-shadow: var(--shadow-xl);
   width: min(100%, 480px);
   padding: 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  outline: none;
   animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
@@ -239,14 +305,14 @@ async function onSubmit() {
   margin: 0;
   font-size: 1.35rem;
   font-weight: 800;
-  color: var(--kompagnon-navy);
+  color: var(--c-navy);
   letter-spacing: -0.02em;
 }
 
 .review-modal__close {
   background: transparent;
   border: none;
-  color: #64748b;
+  color: var(--c-text-medium);
   cursor: pointer;
   padding: 0.4rem;
   border-radius: 0.5rem;
@@ -257,14 +323,19 @@ async function onSubmit() {
 }
 
 .review-modal__close:hover {
-  background: #f1f5f9;
-  color: var(--kompagnon-navy);
+  background: var(--c-teal-light);
+  color: var(--c-teal-dark);
+}
+
+.review-modal__close:focus-visible {
+  outline: 2px solid var(--c-teal);
+  outline-offset: 2px;
 }
 
 .review-modal__description {
   margin: 0;
   font-size: 0.95rem;
-  color: #475569;
+  color: var(--c-text-medium);
   line-height: 1.5;
 }
 
@@ -280,9 +351,9 @@ async function onSubmit() {
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
-  background: rgba(72, 175, 196, 0.06);
+  background: var(--c-teal-light);
   border-radius: 1rem;
-  border: 1px solid rgba(72, 175, 196, 0.12);
+  border: 1px solid rgba(72, 175, 196, 0.2);
 }
 
 .review-modal__label {
@@ -290,7 +361,7 @@ async function onSubmit() {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #64748b;
+  color: var(--c-text-medium);
 }
 
 .review-modal__stars {
@@ -303,12 +374,18 @@ async function onSubmit() {
   border: none;
   padding: 0.25rem;
   cursor: pointer;
-  color: #cbd5e1;
+  color: var(--c-text-light);
+  border-radius: 0.5rem;
   transition: transform 0.15s, color 0.15s;
 }
 
 .review-modal__star-btn:hover {
   transform: scale(1.15);
+}
+
+.review-modal__star-btn:focus-visible {
+  outline: 2px solid var(--c-teal);
+  outline-offset: 2px;
 }
 
 .review-modal__star-btn--active {
@@ -318,7 +395,7 @@ async function onSubmit() {
 .review-modal__rating-hint {
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--kompagnon-navy);
+  color: var(--c-navy);
 }
 
 .review-modal__field {
@@ -331,36 +408,36 @@ async function onSubmit() {
   width: 100%;
   padding: 0.85rem 1rem;
   border-radius: 0.875rem;
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: var(--kompagnon-navy);
+  border: 1px solid var(--c-border);
+  background: var(--c-bg);
+  color: var(--c-text);
   font-family: inherit;
   font-size: 0.92rem;
   resize: vertical;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   box-sizing: border-box;
 }
 
 .review-modal__textarea:focus {
-  border-color: var(--kompagnon-turquoise);
-  box-shadow: 0 0 0 3px rgba(72, 175, 196, 0.2);
-  background: #ffffff;
+  border-color: var(--c-teal);
+  box-shadow: 0 0 0 3px var(--c-teal-shadow);
+  background: var(--c-surface);
 }
 
 .review-modal__char-count {
   align-self: flex-end;
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--c-text-light);
 }
 
 .review-modal__error {
   margin: 0;
   padding: 0.75rem 1rem;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  background: var(--c-danger-bg);
+  border: 1px solid var(--c-danger-border);
   border-radius: 0.75rem;
-  color: #b91c1c;
+  color: var(--c-danger);
   font-size: 0.85rem;
 }
 
@@ -383,23 +460,34 @@ async function onSubmit() {
 
 .review-modal__btn--cancel {
   background: transparent;
-  border: 1px solid #cbd5e1;
-  color: #475569;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-medium);
 }
 
 .review-modal__btn--cancel:hover:not(:disabled) {
-  background: #f1f5f9;
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+.review-modal__btn--cancel:focus-visible {
+  outline: 2px solid var(--c-teal);
+  outline-offset: 2px;
 }
 
 .review-modal__btn--submit {
-  background: linear-gradient(135deg, var(--kompagnon-turquoise) 0%, #3093a8 100%);
+  background: linear-gradient(135deg, var(--c-teal) 0%, var(--c-teal-dark) 100%);
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(72, 175, 196, 0.35);
+  box-shadow: var(--shadow-teal);
 }
 
 .review-modal__btn--submit:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(72, 175, 196, 0.45);
+  box-shadow: 0 6px 20px var(--c-teal-shadow);
+}
+
+.review-modal__btn--submit:focus-visible {
+  outline: 2px solid var(--c-navy);
+  outline-offset: 2px;
 }
 
 .review-modal__btn:disabled {
