@@ -81,4 +81,24 @@ class InvalidNotifyApiKeyError extends DomainError {
   }
 }
 
-export { AlreadyAccepted, AlreadyCancelled, AlreadyRejected, InvalidNotifyApiKeyError, JourneyIsNotOfThisUser, JourneyNotFound, MatchingAlgorithmNotConfigured, MatchingAlgorithmRequestFailed, UserHasNoRole };
+/**
+ * Throw when an invalid journey status transition is requested
+ */
+class InvalidJourneyStatusTransitionError extends DomainError {
+  constructor(message = "Invalid journey status transition") {
+    super(message, 400);
+  }
+}
+
+export {
+  AlreadyAccepted,
+  AlreadyCancelled,
+  AlreadyRejected,
+  InvalidJourneyStatusTransitionError,
+  InvalidNotifyApiKeyError,
+  JourneyIsNotOfThisUser,
+  JourneyNotFound,
+  MatchingAlgorithmNotConfigured,
+  MatchingAlgorithmRequestFailed,
+  UserHasNoRole,
+};

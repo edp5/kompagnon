@@ -95,5 +95,43 @@ async function updateFoundJourneyCompanionStatusByFoundJourneyId({ foundJourneyI
   await knexCon(TABLE_NAME).where({ id: foundJourneyId }).update({ companionStatus: status });
 }
 
+/**
+ * Finds all accepted found journeys linked to a journey ID.
+ * @param {object} params - The lookup parameters.
+ * @param {number} params.journeyId - The ID of the passenger or companion journey.
+ * @param {string} params.journeyType - The type of journey ("passenger" or "companion").
+ * @returns {Promise<object[]>} The list of accepted found journeys.
+ */
+async function findAcceptedFoundJourneysByJourneyId({ journeyId, journeyType }) {
+  const column = journeyType === "passenger" ? "passengerJourneyId" : "companionJourneyId";
+  return knex(TABLE_NAME)
+    .where({ [column]: journeyId })
+    .andWhere({ passengerStatus: "accepted", companionStatus: "accepted" });
+}
 
-export { findFoundJourneyByFoundJourneyId, findMatchesByCompanionJourneyId, findMatchesByPassengerJourneyId, updateFoundJourneyCompanionStatusByFoundJourneyId, updateFoundJourneyPassengerStatusByFoundJourneyId };
+/**
+ * Updates both passenger and companion statuses on a found journey.
+ * @param {object} params - The update parameters.
+ * @param {number} params.foundJourneyId - The found journey ID.
+ * @param {string} [params.passengerStatus] - The new passenger status.
+ * @param {string} [params.companionStatus] - The new companion status.
+ */
+async function updateFoundJourneyStatuses({ foundJourneyId, passengerStatus, companionStatus }) {
+  const knexCon = DomainTransaction.getConnection();
+  const updateData = {};
+  if (passengerStatus !== undefined) updateData.passengerStatus = passengerStatus;
+  if (companionStatus !== undefined) updateData.companionStatus = companionStatus;
+  if (Object.keys(updateData).length > 0) {
+    await knexCon(TABLE_NAME).where({ id: foundJourneyId }).update(updateData);
+  }
+}
+
+export {
+  findAcceptedFoundJourneysByJourneyId,
+  findFoundJourneyByFoundJourneyId,
+  findMatchesByCompanionJourneyId,
+  findMatchesByPassengerJourneyId,
+  updateFoundJourneyCompanionStatusByFoundJourneyId,
+  updateFoundJourneyPassengerStatusByFoundJourneyId,
+  updateFoundJourneyStatuses,
+};
