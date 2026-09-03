@@ -12,13 +12,6 @@ const stats = [];
 
 const communityStats = [];
 
-const actions = [
-  { icon: "map", label: "Déplacement", desc: "À pied, en transports", accent: "var(--c-teal-light)", color: "var(--c-teal)" },
-  { icon: "support", label: "Rendez-vous", desc: "Médical ou administratif", accent: "var(--c-warning-bg)", color: "var(--c-warning)" },
-  { icon: "connect", label: "Courses", desc: "Accompagnement shopping", accent: "var(--c-success-bg)", color: "var(--c-success)" },
-  { icon: "tracking", label: "Voir la carte", desc: "Volontaires à proximité", accent: "#ede3f8", color: "#7c4dcc" },
-];
-
 const recentActivity = [];
 
 const displayGreeting = computed(() => {
@@ -131,32 +124,43 @@ onMounted(async () => {
 
 
       <!-- Quick actions -->
-      <section class="home-section home-section--actions">
-        <h3 class="home-section__title">
+      <section
+        class="home-section home-section--actions"
+        aria-labelledby="home-quick-actions-title"
+      >
+        <h3
+          id="home-quick-actions-title"
+          class="home-section__title"
+        >
           Actions rapides
         </h3>
-        <div class="home-actions-grid">
-          <div
-            v-for="action in actions"
-            :key="action.label"
-            class="home-action-card"
-            role="button"
-            tabindex="0"
-            :aria-label="`Démarrer une demande : ${action.label}`"
+        <router-link
+          :to="{ name: 'record-journey' }"
+          class="home-cta"
+        >
+          <span
+            class="home-cta__icon"
+            aria-hidden="true"
           >
-            <div
-              class="home-action-card__icon"
-              :style="{ background: action.accent, color: action.color }"
-            >
-              <KIcon
-                :name="action.icon"
-                :size="22"
-              />
-            </div>
-            <span class="home-action-card__label">{{ action.label }}</span>
-            <span class="home-action-card__desc">{{ action.desc }}</span>
-          </div>
-        </div>
+            <KIcon
+              name="map"
+              :size="26"
+            />
+          </span>
+          <span class="home-cta__text">
+            <span class="home-cta__title">Enregistrer un trajet</span>
+            <span class="home-cta__desc">Indiquez où vous allez pour trouver un accompagnement adapté.</span>
+          </span>
+          <span
+            class="home-cta__go"
+            aria-hidden="true"
+          >
+            <KIcon
+              name="arrowRight"
+              :size="22"
+            />
+          </span>
+        </router-link>
       </section>
 
       <!-- Recent activity -->
@@ -507,56 +511,76 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 
-/* ── Quick actions ── */
-.home-actions-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.875rem;
-}
-
-.home-action-card {
-  background: var(--c-surface);
-  border-radius: var(--radius-lg);
-  padding: 1.35rem;
+/* ── Quick actions CTA ── */
+.home-cta {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.625rem;
-  cursor: pointer;
-  text-align: left;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: var(--radius-xl);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
   box-shadow: var(--shadow-card);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  min-height: 10.5rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.home-action-card:hover {
+.home-cta:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-card-hov);
+  border-color: var(--c-teal);
 }
 
-.home-action-card__icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+.home-cta__icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--c-teal-light);
+  color: var(--c-teal-dark);
+  flex-shrink: 0;
 }
 
-.home-action-card__label {
+.home-cta__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.home-cta__title {
   font-family: var(--font-display);
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
   font-weight: 800;
   color: var(--c-navy);
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
-.home-action-card__desc {
+.home-cta__desc {
   font-family: var(--font-body);
-  font-size: var(--text-xs);
-  color: var(--c-text-light);
-  line-height: 1.4;
+  font-size: var(--text-sm);
+  color: var(--c-text-medium);
+  line-height: 1.45;
+}
+
+.home-cta__go {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--c-teal-light);
+  color: var(--c-teal-dark);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.home-cta:hover .home-cta__go {
+  transform: translateX(3px);
 }
 
 /* ── Activity ── */
@@ -600,11 +624,6 @@ onMounted(async () => {
   .home-section--activity {
     grid-column: 1 / -1;
   }
-
-  .home-actions-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
-  }
 }
 
 @media (min-width: 1024px) and (max-width: 1179px) {
@@ -616,14 +635,6 @@ onMounted(async () => {
 
   .home-stats {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .home-actions-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .home-action-card {
-    min-height: 9.5rem;
   }
 }
 
@@ -708,10 +719,6 @@ onMounted(async () => {
   .home-stats {
     gap: 0.75rem;
   }
-
-  .home-actions-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 /* Tablette intermédiaire (≤ 768 px) */
@@ -776,11 +783,6 @@ onMounted(async () => {
 
   .home-community__value {
     font-size: 1rem;
-  }
-
-  /* Actions 1 colonne */
-  .home-actions-grid {
-    grid-template-columns: 1fr;
   }
 
   /* Appointment card : wrap + cacher avatar */
