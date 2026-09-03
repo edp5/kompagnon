@@ -334,4 +334,46 @@ describe("Unit | Router", () => {
       expect(router.currentRoute.value.name).toBe("privacy");
     });
   });
+
+  describe("document title on navigation", () => {
+    it("should set document.title using the route meta.title", async () => {
+      // when
+      await router.push({ name: "login" });
+
+      // then
+      expect(document.title).toBe("Connexion | Kompagnon");
+    });
+
+    it("should update document.title when navigating to another route with meta.title", async () => {
+      // given
+      const authStore = useAuthStore();
+      authStore.setAuth("jwt-token", 1);
+
+      // when
+      await router.push({ name: "home" });
+
+      // then
+      expect(document.title).toBe("Accueil | Kompagnon");
+    });
+
+    it("should fallback to 'Kompagnon' when the route has no meta.title", async () => {
+      // given
+      const testRoute = {
+        path: "/no-title",
+        name: "no-title",
+        component: { template: "<div>Test</div>" },
+        // pas de meta.title volontairement
+      };
+      router.addRoute(testRoute);
+
+      // when
+      await router.push({ name: "no-title" });
+
+      // then
+      expect(document.title).toBe("Kompagnon");
+
+      // cleanup
+      router.removeRoute("no-title");
+    });
+  });
 });
