@@ -1,7 +1,9 @@
 import AppLayout from "@/components/AppLayout.vue";
 import ActivateAccountView from "@/views/authentication/ActivateAccountView.vue";
+import ForgotPasswordView from "@/views/authentication/ForgotPasswordView.vue";
 import LoginView from "@/views/authentication/LoginView.vue";
 import RegisterView from "@/views/authentication/RegisterView.vue";
+import ResetPasswordView from "@/views/authentication/ResetPasswordView.vue";
 import HomeView from "@/views/HomeView.vue";
 import JourneysView from "@/views/JourneysView.vue";
 import JourneyView from "@/views/JourneyView.vue";
@@ -50,6 +52,18 @@ const routesList = [
     name: "register",
     component: RegisterView,
     meta: { title: "Inscription" },
+  },
+  {
+    path: "/forgot-password",
+    name: "forgot-password",
+    component: ForgotPasswordView,
+    meta: { title: "Mot de passe oublié" },
+  },
+  {
+    path: "/authentication/reset-password",
+    name: "reset-password",
+    component: ResetPasswordView,
+    meta: { title: "Nouveau mot de passe" },
   },
   {
     path: "/authentication/activate",

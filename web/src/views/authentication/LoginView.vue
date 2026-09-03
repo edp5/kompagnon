@@ -136,6 +136,15 @@ function togglePasswordVisibility() {
           </div>
         </label>
 
+        <div class="login-view__actions-row">
+          <router-link
+            :to="{ name: 'forgot-password' }"
+            class="login-view__forgot-link"
+          >
+            Mot de passe oublié ?
+          </router-link>
+        </div>
+
         <p class="login-view__hint">
           Besoin d’un accès ? Votre compte doit d’abord être activé via l’e-mail reçu après inscription.
         </p>
@@ -308,6 +317,23 @@ function togglePasswordVisibility() {
 .login-view__toggle:hover {
   background: rgba(72, 175, 196, 0.12);
   color: var(--c-teal-dark);
+}
+
+.login-view__actions-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -0.25rem;
+}
+
+.login-view__forgot-link {
+  color: var(--c-teal-dark);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-view__forgot-link:hover {
+  text-decoration: underline;
 }
 
 .login-view__hint {
