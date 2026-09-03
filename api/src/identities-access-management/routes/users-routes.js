@@ -59,6 +59,8 @@ usersRoutes.get("/api/users/profile", authMiddleware, getUserProfileController);
  *       - Users
  *     summary: Get public reviews and average rating score of a user
  *     description: Returns the average star rating, total review count, and list of reviews received by the user.
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -120,6 +122,7 @@ usersRoutes.get("/api/users/profile", authMiddleware, getUserProfileController);
  */
 usersRoutes.get(
   "/api/users/:userId/reviews",
+  authMiddleware,
   getUserReviewsSchema,
   getUserReviewsController,
 );

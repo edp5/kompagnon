@@ -29,13 +29,12 @@ async function getUserReviewsController(
 ) {
   try {
     const userId = Number(req.params.userId);
-    const limit = Number(req.query.limit) || 10;
-    const offset = Number(req.query.offset) || 0;
+    const { limit = 10, offset = 0 } = req.query;
 
     const result = await getUserReviews({
       userId,
-      limit,
-      offset,
+      limit: Number(limit),
+      offset: Number(offset),
     });
 
     return res.status(200).json({

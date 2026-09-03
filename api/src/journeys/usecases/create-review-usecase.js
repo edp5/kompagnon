@@ -43,11 +43,13 @@ async function createReviewUsecase({
     throw new FoundJourneyNotFound();
   }
 
-  const isCompleted =
+  const isCompletedOrConfirmed =
+    (journey.companionStatus === JOURNEY_STATUS.ACCEPTED &&
+      journey.passengerStatus === JOURNEY_STATUS.ACCEPTED) ||
     journey.companionStatus === JOURNEY_STATUS.COMPLETED ||
     journey.passengerStatus === JOURNEY_STATUS.COMPLETED;
 
-  if (!isCompleted) {
+  if (!isCompletedOrConfirmed) {
     throw new JourneyNotCompletedError();
   }
 
@@ -65,13 +67,20 @@ async function createReviewUsecase({
     throw new ReviewAlreadySubmittedError();
   }
 
-  return save({
-    foundJourneyId,
-    authorId,
-    targetUserId,
-    rating: numericRating,
-    comment,
-  });
+  try {
+    return await save({
+      foundJourneyId,
+      authorId,
+      targetUserId,
+      rating: numericRating,
+      comment,
+    });
+  } catch (error) {
+    if (error?.code === "23505" || error?.constraint === "reviews_found_journey_author_unique") {
+      throw new ReviewAlreadySubmittedError();
+    }
+    throw error;
+  }
 }
 
 export { createReviewUsecase };
