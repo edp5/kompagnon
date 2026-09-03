@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getJourney, getJourneyMatches, getJourneys, recordJourney, updateFoundJourneyStatus } from "@/adapters/journeys.js";
+import { getJourney, getJourneyMatches, getJourneys, getTrackingPoints, postTrackingPoint, recordJourney, updateFoundJourneyStatus, updateJourneyStatus } from "@/adapters/journeys.js";
 
 describe("Unit | Adapters | Journeys", () => {
   const payload = {
@@ -279,6 +279,13 @@ describe("Unit | Adapters | Journeys", () => {
       expect(result.success).toBe(false);
       expect(result.message).toBe("Impossible de récupérer les correspondances.");
     });
+
+    it("should handle network errors gracefully", async () => {
+      vi.spyOn(global, "fetch").mockRejectedValue(new Error("Network error"));
+      const result = await getJourneyMatches({ token: "jwt-token", journeyId: 42 });
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de joindre le serveur. Veuillez réessayer plus tard.");
+    });
   });
 
   describe("#updateFoundJourneyStatus", () => {
@@ -308,6 +315,101 @@ describe("Unit | Adapters | Journeys", () => {
       // then
       expect(result.success).toBe(false);
       expect(result.message).toBe("Impossible de mettre à jour le trajet. Veuillez réessayer.");
+    });
+
+    it("should handle network errors gracefully", async () => {
+      vi.spyOn(global, "fetch").mockRejectedValue(new Error("Network error"));
+      const result = await updateFoundJourneyStatus({ token: "jwt-token", foundJourneyId: 3, accept: false });
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de joindre le serveur. Veuillez réessayer plus tard.");
+    });
+  });
+
+  describe("#postTrackingPoint", () => {
+    it("should POST the tracking point and return it", async () => {
+      const point = { id: 1, lat: 48, lon: 2 };
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ data: point }),
+      });
+
+      const result = await postTrackingPoint({ token: "jwt", journeyId: 1, lat: 48, lon: 2 });
+
+      expect(fetchSpy).toHaveBeenCalledWith("/api/journeys/1/tracking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer jwt" },
+        body: JSON.stringify({ lat: 48, lon: 2 }),
+      });
+      expect(result).toEqual({ success: true, point });
+    });
+
+    it("should handle error", async () => {
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false });
+      const result = await postTrackingPoint({ token: "jwt", journeyId: 1, lat: 48, lon: 2 });
+      expect(result.success).toBe(false);
+    });
+
+    it("should handle exception", async () => {
+      vi.spyOn(global, "fetch").mockRejectedValue(new Error());
+      const result = await postTrackingPoint({ token: "jwt", journeyId: 1, lat: 48, lon: 2 });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe("#getTrackingPoints", () => {
+    it("should GET the tracking points", async () => {
+      const points = [{ id: 1, lat: 48, lon: 2 }];
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ data: points }),
+      });
+
+      const result = await getTrackingPoints({ token: "jwt", journeyId: 1 });
+
+      expect(fetchSpy).toHaveBeenCalledWith("/api/journeys/1/tracking", {
+        method: "GET",
+        headers: { Authorization: "Bearer jwt" },
+      });
+      expect(result).toEqual({ success: true, points });
+    });
+
+    it("should handle error", async () => {
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false });
+      const result = await getTrackingPoints({ token: "jwt", journeyId: 1 });
+      expect(result.success).toBe(false);
+    });
+
+    it("should handle exception", async () => {
+      vi.spyOn(global, "fetch").mockRejectedValue(new Error());
+      const result = await getTrackingPoints({ token: "jwt", journeyId: 1 });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe("#updateJourneyStatus", () => {
+    it("should PATCH the journey status", async () => {
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({ ok: true });
+
+      const result = await updateJourneyStatus({ token: "jwt", journeyId: 1, status: "in_progress" });
+
+      expect(fetchSpy).toHaveBeenCalledWith("/api/journeys/1/status", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer jwt" },
+        body: JSON.stringify({ status: "in_progress" }),
+      });
+      expect(result).toEqual({ success: true });
+    });
+
+    it("should handle error", async () => {
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false });
+      const result = await updateJourneyStatus({ token: "jwt", journeyId: 1, status: "completed" });
+      expect(result.success).toBe(false);
+    });
+
+    it("should handle exception", async () => {
+      vi.spyOn(global, "fetch").mockRejectedValue(new Error());
+      const result = await updateJourneyStatus({ token: "jwt", journeyId: 1, status: "completed" });
+      expect(result.success).toBe(false);
     });
   });
 });
