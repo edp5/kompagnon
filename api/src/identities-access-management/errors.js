@@ -36,4 +36,20 @@ class PhoneNumberAlreadyUsedError extends DomainError {
   }
 }
 
-export { InvalidCredentialsError, PhoneNumberAlreadyUsedError, UserIsAlreadyActive, UserNotFoundError };
+/**
+ * Throw when the password reset token is invalid or expired
+ */
+class InvalidOrExpiredPasswordResetTokenError extends DomainError {
+  constructor() {
+    super("Invalid or expired password reset token", 400);
+  }
+}
+
+export {
+  InvalidCredentialsError,
+  InvalidOrExpiredPasswordResetTokenError,
+  PhoneNumberAlreadyUsedError,
+  UserIsAlreadyActive,
+  UserNotFoundError,
+};
+
