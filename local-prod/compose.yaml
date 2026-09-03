@@ -1,0 +1,78 @@
+services:
+  db:
+    image: postgres:18.1-alpine
+    container_name: kompagnon-postgres-local-prod
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - kompagnon-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ..
+      dockerfile: local-prod/Dockerfile
+      args:
+        NODE_VERSION: ${NODE_VERSION}
+    container_name: kompagnon-api-local-prod
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:${PORT}/api/health || exit 1" ]
+      timeout: 5s
+      interval: 10s
+      retries: 5
+    networks:
+      kompagnon-network:
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: kompagnon-mailpit-local-prod
+    networks:
+      - kompagnon-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8025 || exit 1" ]
+
+  caddy:
+    container_name: caddy
+    image: caddy:latest
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/udp
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - kompagnon-network
+    depends_on:
+      api:
+        condition: service_healthy
+
+networks:
+  kompagnon-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  caddy_data:
+    external: false
+  caddy_config:
+    external: false
