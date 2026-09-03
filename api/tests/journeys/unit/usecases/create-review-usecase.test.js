@@ -41,14 +41,14 @@ describe("Unit | Journeys | Usecases | Create review usecase", () => {
     ).rejects.toThrow(FoundJourneyNotFound);
   });
 
-  it("should throw JourneyNotCompletedError when journey is not in COMPLETED status", async () => {
+  it("should throw JourneyNotCompletedError when journey is not confirmed (both accepted) or completed", async () => {
     // given
     const findJourneyMock = vi.fn().mockResolvedValue({
       id: 1,
       companionUserId: 10,
       passengerUserId: 20,
-      companionStatus: JOURNEY_STATUS.ACCEPTED,
-      passengerStatus: JOURNEY_STATUS.ACCEPTED,
+      companionStatus: JOURNEY_STATUS.WAITING,
+      passengerStatus: JOURNEY_STATUS.WAITING,
     });
 
     // when & then
@@ -60,6 +60,66 @@ describe("Unit | Journeys | Usecases | Create review usecase", () => {
         findJourney: findJourneyMock,
       }),
     ).rejects.toThrow(JourneyNotCompletedError);
+  });
+
+  it("should allow review when both companion and passenger have accepted the journey", async () => {
+    // given
+    const findJourneyMock = vi.fn().mockResolvedValue({
+      id: 1,
+      companionUserId: 10,
+      passengerUserId: 20,
+      companionStatus: JOURNEY_STATUS.ACCEPTED,
+      passengerStatus: JOURNEY_STATUS.ACCEPTED,
+    });
+    const hasReviewedMock = vi.fn().mockResolvedValue(false);
+    const saveMock = vi.fn().mockResolvedValue({
+      id: 100,
+      foundJourneyId: 1,
+      authorId: 10,
+      targetUserId: 20,
+      rating: 5,
+      comment: null,
+    });
+
+    // when
+    const result = await createReviewUsecase({
+      foundJourneyId: 1,
+      authorId: 10,
+      rating: 5,
+      findJourney: findJourneyMock,
+      hasReviewed: hasReviewedMock,
+      save: saveMock,
+    });
+
+    // then
+    expect(result.id).toBe(100);
+  });
+
+  it("should catch database unique constraint violation (23505) and throw ReviewAlreadySubmittedError", async () => {
+    // given
+    const findJourneyMock = vi.fn().mockResolvedValue({
+      id: 1,
+      companionUserId: 10,
+      passengerUserId: 20,
+      companionStatus: JOURNEY_STATUS.COMPLETED,
+      passengerStatus: JOURNEY_STATUS.COMPLETED,
+    });
+    const hasReviewedMock = vi.fn().mockResolvedValue(false);
+    const dbError = new Error("duplicate key value violates unique constraint");
+    dbError.code = "23505";
+    const saveMock = vi.fn().mockRejectedValue(dbError);
+
+    // when & then
+    await expect(
+      createReviewUsecase({
+        foundJourneyId: 1,
+        authorId: 10,
+        rating: 5,
+        findJourney: findJourneyMock,
+        hasReviewed: hasReviewedMock,
+        save: saveMock,
+      }),
+    ).rejects.toThrow(ReviewAlreadySubmittedError);
   });
 
   it("should throw UserNotParticipantError when author is neither companion nor passenger", async () => {

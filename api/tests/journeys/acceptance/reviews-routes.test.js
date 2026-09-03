@@ -50,7 +50,31 @@ describe("Acceptance | Journeys | Reviews routes", () => {
       expect(response.status).toBe(404);
     });
 
-    it("should return 400 when found journey is not in completed status", async () => {
+    it("should return 400 when found journey is still waiting and not confirmed or completed", async () => {
+      // given
+      const companion = await databaseBuilder.factory.buildUser();
+      const passenger = await databaseBuilder.factory.buildUser();
+      const cj = await databaseBuilder.factory.buildCompanionJourney({ userId: companion.id });
+      const pj = await databaseBuilder.factory.buildPassengerJourney({ userId: passenger.id });
+      const fj = await databaseBuilder.factory.buildFoundJourney({
+        companionJourneyId: cj.id,
+        passengerJourneyId: pj.id,
+        companionStatus: JOURNEY_STATUS.WAITING,
+        passengerStatus: JOURNEY_STATUS.WAITING,
+      });
+      const auth = generateAuthenticatedUser(companion.id, companion.userType);
+
+      // when
+      const response = await request(server)
+        .post(`/api/journeys/found/${fj.id}/reviews`)
+        .set("Authorization", auth)
+        .send({ rating: 5 });
+
+      // then
+      expect(response.status).toBe(400);
+    });
+
+    it("should return 201 when found journey is confirmed (both accepted)", async () => {
       // given
       const companion = await databaseBuilder.factory.buildUser();
       const passenger = await databaseBuilder.factory.buildUser();
@@ -68,10 +92,17 @@ describe("Acceptance | Journeys | Reviews routes", () => {
       const response = await request(server)
         .post(`/api/journeys/found/${fj.id}/reviews`)
         .set("Authorization", auth)
-        .send({ rating: 5 });
+        .send({ rating: 5, comment: "Superbe expérience !" });
 
       // then
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(201);
+      expect(response.body.data).toMatchObject({
+        foundJourneyId: Number(fj.id),
+        authorId: Number(companion.id),
+        targetUserId: Number(passenger.id),
+        rating: 5,
+        comment: "Superbe expérience !",
+      });
     });
 
     it("should return 403 when authenticated user is not a participant of the journey", async () => {
@@ -166,7 +197,15 @@ describe("Acceptance | Journeys | Reviews routes", () => {
   });
 
   describe("GET /api/users/:userId/reviews", () => {
-    it("should return 200 with review stats and reviews list", async () => {
+    it("should return 401 when token is missing", async () => {
+      // when
+      const response = await request(server).get("/api/users/1/reviews");
+
+      // then
+      expect(response.status).toBe(401);
+    });
+
+    it("should return 200 with review stats and reviews list when authenticated", async () => {
       // given
       const targetUser = await databaseBuilder.factory.buildUser({ firstname: "Target", lastname: "User" });
       const author = await databaseBuilder.factory.buildUser({ firstname: "Claire", lastname: "Dufour" });
@@ -178,6 +217,7 @@ describe("Acceptance | Journeys | Reviews routes", () => {
         companionStatus: JOURNEY_STATUS.COMPLETED,
         passengerStatus: JOURNEY_STATUS.COMPLETED,
       });
+      const auth = generateAuthenticatedUser(targetUser.id, targetUser.userType);
 
       await knex("reviews").insert({
         foundJourneyId: fj.id,
@@ -188,7 +228,9 @@ describe("Acceptance | Journeys | Reviews routes", () => {
       });
 
       // when
-      const response = await request(server).get(`/api/users/${targetUser.id}/reviews`);
+      const response = await request(server)
+        .get(`/api/users/${targetUser.id}/reviews`)
+        .set("Authorization", auth);
 
       // then
       expect(response.status).toBe(200);
@@ -206,9 +248,12 @@ describe("Acceptance | Journeys | Reviews routes", () => {
     it("should return 200 with empty list and 0 rating when user has no reviews", async () => {
       // given
       const user = await databaseBuilder.factory.buildUser();
+      const auth = generateAuthenticatedUser(user.id, user.userType);
 
       // when
-      const response = await request(server).get(`/api/users/${user.id}/reviews`);
+      const response = await request(server)
+        .get(`/api/users/${user.id}/reviews`)
+        .set("Authorization", auth);
 
       // then
       expect(response.status).toBe(200);
