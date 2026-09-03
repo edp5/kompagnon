@@ -19,7 +19,7 @@ RUN npm --prefix web run build
 RUN npm --prefix api install
 
 # Copy and set permissions for entrypoint script
-COPY prod/docker-entrypoint.sh /usr/local/bin/
+COPY scripts/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Expose the API port
