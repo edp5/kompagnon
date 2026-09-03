@@ -55,7 +55,7 @@ const configuration = (function() {
       enabled: toBoolean(process.env.MAILING_MAILPIT_ENABLED),
       port: _getNumber(process.env.MAILING_MAILPIT_PORT, 1025),
       secure: false,
-      host: "localhost",
+      host: process.env.MAILING_MAILPIT_HOST || "localhost",
     },
     allowedOrigins: process.env.ALLOWED_ORIGINS
       ? process.env.ALLOWED_ORIGINS.split(",").filter(Boolean)

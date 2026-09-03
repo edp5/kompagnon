@@ -119,6 +119,32 @@ Your commit must respect conventional commit with "feat" or "fix" or "refactor" 
 "feat(api): add the db configuration".
 Pull requests must respect similar rules.
 
+## Production server
+Kompagnon has a local production server. This server is used to test production build, with hostname. Some commands are defined to run it.
+1. Install hosts:
+You must install hosts to run the production server. You can run the following command:
+```bash
+sudo npm run local-prod:install
+```
+Note: You must have sudo rights to run this command.
+2. Run production server:
+You can run the production server with the following command:
+```bash
+npm run local-prod:start
+```
+3. Trust the self-signed certificate:
+The production server uses a self-signed certificate. You must trust it to avoid browser warnings. Run the following command to trust the certificate:
+```bash
+npm run local-prod:trust-self-signed-certificate:mac
+```
+Note: This command is for macOS. For Windows, you must manually trust the certificate in your browser.
+4. Goto https://app.dev.kompagnon.fr to access to server. Goto https://mail.dev.kompagnon.fr to access to mailhog.
+5. Stop production server:
+You can stop the production server with the following command:
+```bash
+npm run local-prod:stop
+```
+
 ## EditorConfig (Editing Rules and Conventions)
 
 The repository contains a `.editorconfig` file at its root that centralizes editing conventions (encoding, line endings, indentation, etc.). The key settings are:
