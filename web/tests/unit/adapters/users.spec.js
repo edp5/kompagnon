@@ -71,7 +71,7 @@ describe("Unit | Adapters | Users", () => {
       });
 
       // when
-      const result = await getUserReviews({ userId: 15, limit: 5, offset: 0 });
+      const result = await getUserReviews({ token: "auth-token", userId: 15, limit: 5, offset: 0 });
 
       // then
       expect(result).toEqual({
@@ -82,6 +82,9 @@ describe("Unit | Adapters | Users", () => {
       });
       expect(fetchSpy).toHaveBeenCalledWith("/api/users/15/reviews?limit=5&offset=0", {
         method: "GET",
+        headers: {
+          Authorization: "Bearer auth-token",
+        },
       });
     });
 

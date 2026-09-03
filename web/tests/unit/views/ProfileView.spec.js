@@ -69,7 +69,7 @@ describe("Unit | Views | ProfileView", () => {
 
     // then
     expect(getUserProfile).toHaveBeenCalledWith({ token: "valid-token" });
-    expect(getUserReviews).toHaveBeenCalledWith({ userId: 1 });
+    expect(getUserReviews).toHaveBeenCalledWith({ token: "valid-token", userId: 1 });
     expect(wrapper.text()).toContain("Jane");
     expect(wrapper.text()).toContain("Doe");
     expect(wrapper.text()).toContain("jane.doe@example.com");

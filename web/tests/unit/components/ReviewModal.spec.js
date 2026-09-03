@@ -162,6 +162,38 @@ describe("Unit | Components | ReviewModal", () => {
     expect(wrapper.emitted("close")).toBeFalsy();
   });
 
+  it("should emit close when Escape key is pressed", async () => {
+    // given
+    const wrapper = mountReviewModal();
+
+    // when
+    await wrapper.find(".review-modal-backdrop").trigger("keydown", { key: "Escape" });
+
+    // then
+    expect(wrapper.emitted("close")).toBeTruthy();
+  });
+
+  it("should change star rating on ArrowLeft and ArrowRight keys", async () => {
+    // given
+    const wrapper = mountReviewModal();
+    const starButtons = wrapper.findAll(".review-modal__star-btn");
+
+    // initial rating is 5 (index 4)
+    expect(wrapper.text()).toContain("Parfait !");
+
+    // press ArrowLeft on 5th star -> rating becomes 4
+    await starButtons[4].trigger("keydown", { key: "ArrowLeft" });
+    expect(wrapper.text()).toContain("Très bien");
+
+    // press ArrowLeft on 4th star -> rating becomes 3
+    await starButtons[3].trigger("keydown", { key: "ArrowLeft" });
+    expect(wrapper.text()).toContain("Correct");
+
+    // press ArrowRight on 3rd star -> rating becomes 4
+    await starButtons[2].trigger("keydown", { key: "ArrowRight" });
+    expect(wrapper.text()).toContain("Très bien");
+  });
+
   it("should display default error message when failure message is missing", async () => {
     // given
     submitJourneyReview.mockResolvedValue({
