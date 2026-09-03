@@ -1,6 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { activateAccount, loginUser, registerNewUser } from "@/adapters/authentication.js";
+import {
+  activateAccount,
+  loginUser,
+  registerNewUser,
+  requestPasswordReset,
+  submitPasswordReset,
+} from "@/adapters/authentication.js";
 
 describe("Unit | Adapters | Authentication", () => {
   describe("#registerNewUser", () => {
@@ -222,4 +228,125 @@ describe("Unit | Adapters | Authentication", () => {
       expect(result.message).toBe("Impossible de joindre le serveur. Veuillez réessayer plus tard.");
     });
   });
+
+  describe("#requestPasswordReset", () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("should call forgot-password endpoint and return success with message", async () => {
+      // given
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: { message: "Email sent" } }),
+      });
+
+      // when
+      const result = await requestPasswordReset({ email: "john@example.com" });
+
+      // then
+      expect(result).toEqual({ success: true, message: "Email sent" });
+      expect(fetchSpy).toHaveBeenCalledWith("/api/authentication/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: "john@example.com" }),
+      });
+    });
+
+    it("should return failure when response is not ok", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({ ok: false });
+
+      // when
+      const result = await requestPasswordReset({ email: "bad-request" });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Échec de la demande de réinitialisation. Veuillez réessayer.");
+    });
+
+    it("should handle network error", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockRejectedValue(new Error("Network error"));
+
+      // when
+      const result = await requestPasswordReset({ email: "john@example.com" });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de joindre le serveur. Veuillez réessayer plus tard.");
+    });
+  });
+
+  describe("#submitPasswordReset", () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("should call reset-password endpoint with token and new password", async () => {
+      // given
+      const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: { message: "Password updated" } }),
+      });
+
+      // when
+      const result = await submitPasswordReset({ token: "token-123", password: "newPassword" });
+
+      // then
+      expect(result).toEqual({ success: true, message: "Password updated" });
+      expect(fetchSpy).toHaveBeenCalledWith("/api/authentication/reset-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: "token-123", password: "newPassword" }),
+      });
+    });
+
+    it("should return specific message when status is 400 (invalid or expired token)", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({
+        ok: false,
+        status: 400,
+      });
+
+      // when
+      const result = await submitPasswordReset({ token: "expired-token", password: "newPassword" });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Le lien de réinitialisation est invalide ou a expiré.");
+    });
+
+    it("should return general error message for other error statuses", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockResolvedValue({
+        ok: false,
+        status: 500,
+      });
+
+      // when
+      const result = await submitPasswordReset({ token: "token-123", password: "newPassword" });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Échec de la réinitialisation du mot de passe. Veuillez réessayer.");
+    });
+
+    it("should handle network error", async () => {
+      // given
+      vi.spyOn(global, "fetch").mockRejectedValue(new Error("Network error"));
+
+      // when
+      const result = await submitPasswordReset({ token: "token-123", password: "newPassword" });
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Impossible de joindre le serveur. Veuillez réessayer plus tard.");
+    });
+  });
 });
+
