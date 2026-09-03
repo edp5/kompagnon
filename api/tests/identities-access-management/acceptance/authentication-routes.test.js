@@ -176,4 +176,156 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       expect(response.status).toBe(409);
     });
   });
+
+  describe("POST /api/authentication/forgot-password", () => {
+    it("should return 200 and generate reset token for existing user", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({
+        email: "forgot-test@example.com",
+        isActive: true,
+      });
+      const body = { email: "forgot-test@example.com" };
+
+      // when
+      const response = await request(server).post("/api/authentication/forgot-password").send(body);
+
+      // then
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("data");
+      expect(response.body.data).toHaveProperty("message");
+
+      const tokenRecord = await knex("password_reset_tokens").where({ userId: user.id }).first();
+      expect(tokenRecord).toBeDefined();
+      expect(tokenRecord.token).toBeDefined();
+      expect(tokenRecord.usedAt).toBeNull();
+    });
+
+    it("should return 200 even if user does not exist (anti-enumeration)", async () => {
+      // given
+      const body = { email: "nonexistent@example.com" };
+
+      // when
+      const response = await request(server).post("/api/authentication/forgot-password").send(body);
+
+      // then
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("data");
+      expect(response.body.data).toHaveProperty("message");
+    });
+
+    it("should return 400 when email is invalid or missing", async () => {
+      // given
+      const body = { email: "not-an-email" };
+
+      // when
+      const response = await request(server).post("/api/authentication/forgot-password").send(body);
+
+      // then
+      expect(response.status).toBe(400);
+    });
+  });
+
+  describe("POST /api/authentication/reset-password", () => {
+    it("should reset password and allow logging in with new password", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({
+        email: "reset-test@example.com",
+        password: "oldPassword123",
+        isActive: true,
+      });
+      const resetTokenValue = "valid-reset-token-acceptance";
+      await databaseBuilder.factory.buildPasswordReset({
+        userId: user.id,
+        token: resetTokenValue,
+        expiresAt: new Date(Date.now() + 3600 * 1000),
+      });
+
+      const body = {
+        token: resetTokenValue,
+        password: "newSecurePassword456",
+      };
+
+      // when
+      const response = await request(server).post("/api/authentication/reset-password").send(body);
+
+      // then
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveProperty("message");
+
+      const consumedToken = await knex("password_reset_tokens").where({ token: resetTokenValue }).first();
+      expect(consumedToken.usedAt).not.toBeNull();
+
+      // verify login works with new password
+      const loginResponse = await request(server).post("/api/authentication/authenticate").send({
+        email: "reset-test@example.com",
+        password: "newSecurePassword456",
+      });
+      expect(loginResponse.status).toBe(200);
+      expect(loginResponse.body.data).toHaveProperty("token");
+
+      // verify login fails with old password
+      const oldLoginResponse = await request(server).post("/api/authentication/authenticate").send({
+        email: "reset-test@example.com",
+        password: "oldPassword123",
+      });
+      expect(oldLoginResponse.status).toBe(401);
+    });
+
+    it("should return 400 when token is expired", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser();
+      const expiredTokenValue = "expired-reset-token-acceptance";
+      await databaseBuilder.factory.buildPasswordReset({
+        userId: user.id,
+        token: expiredTokenValue,
+        expiresAt: new Date(Date.now() - 3600 * 1000), // expired
+      });
+
+      const body = {
+        token: expiredTokenValue,
+        password: "newPassword123",
+      };
+
+      // when
+      const response = await request(server).post("/api/authentication/reset-password").send(body);
+
+      // then
+      expect(response.status).toBe(400);
+    });
+
+    it("should return 400 when token has already been used", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser();
+      const usedTokenValue = "used-reset-token-acceptance";
+      await databaseBuilder.factory.buildPasswordReset({
+        userId: user.id,
+        token: usedTokenValue,
+        expiresAt: new Date(Date.now() + 3600 * 1000),
+        usedAt: new Date(),
+      });
+
+      const body = {
+        token: usedTokenValue,
+        password: "newPassword123",
+      };
+
+      // when
+      const response = await request(server).post("/api/authentication/reset-password").send(body);
+
+      // then
+      expect(response.status).toBe(400);
+    });
+
+    it("should return 400 when request body is invalid", async () => {
+      // given
+      const body = { token: "token-only" };
+
+      // when
+      const response = await request(server).post("/api/authentication/reset-password").send(body);
+
+      // then
+      expect(response.status).toBe(400);
+    });
+  });
 });
+
