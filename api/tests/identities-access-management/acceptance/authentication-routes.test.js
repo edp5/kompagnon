@@ -101,7 +101,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
         isActive: false,
       });
       const token = encodedToken({ userId: user.id });
-      const body = { phoneNumber: "0601020304" };
+      const body = { phoneNumber: "0601020304", role: "companion" };
 
       // when
       const response = await request(server).post("/api/authentication/activate").set("authorization", `Bearer ${token}`).send(body);
@@ -111,6 +111,63 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       const updatedUser = await knex("users").where({ id: user.id }).first();
       expect(updatedUser.isActive).toBeTruthy();
       expect(updatedUser.phoneNumber).toBe("0601020304");
+      expect(updatedUser.role).toBe("companion");
+    });
+
+    it("should return 400 when role is missing", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({
+        email: "activate-no-role@example.com",
+        isActive: false,
+      });
+      const token = encodedToken({ userId: user.id });
+      const body = { phoneNumber: "0601020304" };
+
+      // when
+      const response = await request(server).post("/api/authentication/activate").set("authorization", `Bearer ${token}`).send(body);
+
+      // then
+      expect(response.status).toBe(400);
+    });
+
+    it("should activate user with passenger role and set visual disability", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({
+        email: "activate-passenger-test@example.com",
+        isActive: false,
+      });
+      const token = encodedToken({ userId: user.id });
+      const body = { phoneNumber: "0601020304", role: "passenger" };
+
+      // when
+      const response = await request(server).post("/api/authentication/activate").set("authorization", `Bearer ${token}`).send(body);
+
+      // then:
+      expect(response.status).toBe(201);
+      const updatedUser = await knex("users").where({ id: user.id }).first();
+      expect(updatedUser.isActive).toBeTruthy();
+      expect(updatedUser.role).toBe("passenger");
+      expect(updatedUser.disabilities).toEqual(["visually"]);
+    });
+
+    it("should activate user with companion role without disabilities", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({
+        email: "activate-companion-test@example.com",
+        isActive: false,
+      });
+      const token = encodedToken({ userId: user.id });
+      const body = { phoneNumber: "0601020304", role: "companion" };
+
+      // when
+      const response = await request(server).post("/api/authentication/activate").set("authorization", `Bearer ${token}`).send(body);
+
+      // then:
+      expect(response.status).toBe(201);
+      const updatedUser = await knex("users").where({ id: user.id }).first();
+      expect(updatedUser.isActive).toBeTruthy();
+      expect(updatedUser.role).toBe("companion");
+      expect(updatedUser.disabilities).toBeNull();
     });
 
     it("should return 400 when token is missing", async () => {
@@ -148,7 +205,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
         isActive: true,
       });
       const token = generateAuthenticatedUser(user.id, user.userType);
-      const body = { phoneNumber: "0601020304" };
+      const body = { phoneNumber: "0601020304", role: "companion" };
 
       // when
       const response = await request(server).post("/api/authentication/activate").set("authorization", token).send(body);
@@ -168,7 +225,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
         isActive: false,
       });
       const token = generateAuthenticatedUser(user.id, user.userType);
-      const body = { phoneNumber: "0601020304" };
+      const body = { phoneNumber: "0601020304", role: "companion" };
 
       // when
       const response = await request(server).post("/api/authentication/activate").set("authorization", token).send(body);

@@ -25,6 +25,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
       // given
       req.headers.authorization = "Bearer valid-token";
       req.body.phoneNumber = "phonenumber";
+      req.body.role = "companion";
       const decodedData = { userId: 123 };
 
       decodedTokenService.mockReturnValue(decodedData);
@@ -34,7 +35,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
 
       // then
       expect(decodedTokenService).toHaveBeenCalledWith("valid-token");
-      expect(activateUserUsecase).toHaveBeenCalledWith({ userId: 123, phoneNumber: "phonenumber" });
+      expect(activateUserUsecase).toHaveBeenCalledWith({ userId: 123, phoneNumber: "phonenumber", role: "companion" });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.send).toHaveBeenCalled();
     });
@@ -45,6 +46,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
       // given
       req.headers.authorization = "Bearer valid-token";
       req.body.phoneNumber = "test";
+      req.body.role = "passenger";
       const decodedData = { userId: 999 };
 
       decodedTokenService.mockReturnValue(decodedData);
@@ -55,7 +57,7 @@ describe("Unit | Identities Access Management | Controller | Activate User", () 
 
       // then
       expect(decodedTokenService).toHaveBeenCalledWith("valid-token");
-      expect(activateUserUsecase).toHaveBeenCalledWith({ userId: 999, phoneNumber: "test" });
+      expect(activateUserUsecase).toHaveBeenCalledWith({ userId: 999, phoneNumber: "test", role: "passenger" });
       expect(next).toHaveBeenCalledWith("some error");
     });
   });

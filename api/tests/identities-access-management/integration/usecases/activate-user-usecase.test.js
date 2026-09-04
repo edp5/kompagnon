@@ -8,10 +8,11 @@ import {
   UserNotFoundError,
 } from "../../../../src/identities-access-management/errors.js";
 import usecases from "../../../../src/identities-access-management/usecases/index.js";
+import { USER_DISABILITIES, USER_ROLE } from "../../../../src/shared/constants.js";
 
 describe("Integration | Usecases | Activate user usecase", () => {
   describe("success case", () => {
-    it("should Activate user", async () => {
+    it("should Activate user and set phone number", async () => {
       // given
       const user = await databaseBuilder.factory.buildUser({ isActive: false });
 
@@ -22,6 +23,34 @@ describe("Integration | Usecases | Activate user usecase", () => {
       const updatedUser = await knex("users").where({ id: user.id }).first();
       expect(updatedUser.isActive).toBeTruthy();
       expect(updatedUser.phoneNumber).toBe("0601020304");
+    });
+
+    it("should Activate user as companion without setting disabilities", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({ isActive: false });
+
+      // when
+      await usecases.activateUserUsecase({ userId: user.id, phoneNumber: "0601020304", role: USER_ROLE.COMPANION });
+
+      // then
+      const updatedUser = await knex("users").where({ id: user.id }).first();
+      expect(updatedUser.isActive).toBeTruthy();
+      expect(updatedUser.role).toBe(USER_ROLE.COMPANION);
+      expect(updatedUser.disabilities).toBeNull();
+    });
+
+    it("should Activate user as passenger and automatically assign visual disability", async () => {
+      // given
+      const user = await databaseBuilder.factory.buildUser({ isActive: false });
+
+      // when
+      await usecases.activateUserUsecase({ userId: user.id, phoneNumber: "0601020304", role: USER_ROLE.PASSENGER });
+
+      // then
+      const updatedUser = await knex("users").where({ id: user.id }).first();
+      expect(updatedUser.isActive).toBeTruthy();
+      expect(updatedUser.role).toBe(USER_ROLE.PASSENGER);
+      expect(updatedUser.disabilities).toEqual([USER_DISABILITIES.VISUAL_DIFFICULTIES]);
     });
   });
 
