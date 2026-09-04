@@ -1,3 +1,9 @@
+## [1.5.1](https://github.com/edp5/kompagnon/compare/v1.5.0...v1.5.1) (2026-09-04)
+
+### 🐛 Bug Fixes
+
+* Revert the deletion of start command ([#950](https://github.com/edp5/kompagnon/issues/950)) ([a437935](https://github.com/edp5/kompagnon/commit/a437935b2fe3a698131a0b9297bfbaf99657e045))
+
 ## [1.5.0](https://github.com/edp5/kompagnon/compare/v1.4.0...v1.5.0) (2026-09-04)
 
 ### 🚀 New features
