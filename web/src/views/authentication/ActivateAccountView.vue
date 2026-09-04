@@ -1,5 +1,5 @@
 <script setup>
-import { ArrowRight, CircleAlert, Phone } from "lucide-vue-next";
+import { Accessibility, ArrowRight, CircleAlert, HeartHandshake, Phone } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 
@@ -14,24 +14,30 @@ const FRENCH_PHONE_PATTERN = /^(?:(?:\+|00)33[\s.-]?|0)[1-9](?:[\s.-]?\d{2}){4}$
 const route = useRoute();
 const token = route.query.token;
 
+const role = ref("");
 const phoneNumber = ref("");
 const isSubmitting = ref(false);
 const message = ref("");
 const success = ref(false);
 const submitted = ref(false);
 
+const isRoleValid = computed(() => role.value === "companion" || role.value === "passenger");
 const isPhoneValid = computed(() => FRENCH_PHONE_PATTERN.test(phoneNumber.value.trim()));
 
 async function handleSubmit() {
   submitted.value = true;
   message.value = "";
 
-  if (!isPhoneValid.value) {
+  if (!isRoleValid.value || !isPhoneValid.value) {
     return;
   }
 
   isSubmitting.value = true;
-  const result = await activateAccount({ token, phoneNumber: phoneNumber.value.trim() });
+  const result = await activateAccount({
+    token,
+    phoneNumber: phoneNumber.value.trim(),
+    role: role.value,
+  });
   message.value = result.message;
   success.value = result.success;
   isSubmitting.value = false;
@@ -89,7 +95,74 @@ async function handleSubmit() {
           @submit.prevent="handleSubmit"
         >
           <p class="activate-intro">
-            Renseignez votre numéro de téléphone pour terminer l'activation de votre compte.
+            Choisissez votre rôle et renseignez votre numéro de téléphone pour terminer l'activation de votre compte.
+          </p>
+
+          <fieldset class="activate-fieldset">
+            <legend class="activate-label">
+              Votre rôle sur Kompagnon
+            </legend>
+            <div class="role-options">
+              <label
+                for="role-companion"
+                class="role-card"
+                :class="{ 'role-card--active': role === 'companion' }"
+              >
+                <div class="role-card-top">
+                  <div class="role-card-header">
+                    <HeartHandshake class="role-icon" />
+                    <span class="role-title">Accompagnateur</span>
+                  </div>
+                  <input
+                    id="role-companion"
+                    v-model="role"
+                    type="radio"
+                    name="role"
+                    value="companion"
+                    class="role-radio"
+                    required
+                  >
+                </div>
+                <p class="role-description">
+                  Je souhaite accompagner des personnes lors de leurs trajets.
+                </p>
+              </label>
+
+              <label
+                for="role-passenger"
+                class="role-card"
+                :class="{ 'role-card--active': role === 'passenger' }"
+              >
+                <div class="role-card-top">
+                  <div class="role-card-header">
+                    <Accessibility class="role-icon" />
+                    <span class="role-title">Passager</span>
+                  </div>
+                  <input
+                    id="role-passenger"
+                    v-model="role"
+                    type="radio"
+                    name="role"
+                    value="passenger"
+                    class="role-radio"
+                    required
+                  >
+                </div>
+                <p class="role-description">
+                  Je souhaite être accompagné lors de mes trajets.
+                </p>
+              </label>
+            </div>
+          </fieldset>
+
+          <p
+            v-if="submitted && !isRoleValid"
+            class="feedback error feedback--error activate-feedback"
+            role="alert"
+            aria-live="assertive"
+          >
+            <CircleAlert class="activate-feedback-icon" />
+            <span>Veuillez choisir un rôle (Accompagnateur ou Passager).</span>
           </p>
 
           <label class="activate-field">
@@ -110,7 +183,7 @@ async function handleSubmit() {
           </label>
 
           <p
-            v-if="submitted && !isPhoneValid"
+            v-if="submitted && isRoleValid && !isPhoneValid"
             class="feedback error feedback--error activate-feedback"
             role="alert"
             aria-live="assertive"
@@ -175,6 +248,105 @@ async function handleSubmit() {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
+}
+
+.activate-fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.role-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+@media (max-width: 540px) {
+  .role-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1.1rem;
+  background: rgba(255, 255, 255, 0.86);
+  border: 2px solid rgba(30, 44, 56, 0.08);
+  box-shadow: 0 8px 24px rgba(30, 44, 56, 0.04);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.role-card:hover {
+  border-color: rgba(72, 175, 196, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(72, 175, 196, 0.12);
+}
+
+.role-card--active {
+  border-color: var(--c-teal);
+  background: rgba(72, 175, 196, 0.08);
+  box-shadow: 0 0 0 1px var(--c-teal), 0 12px 28px rgba(72, 175, 196, 0.16);
+}
+
+.role-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.role-radio {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--c-teal);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.role-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.role-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--c-teal);
+  flex-shrink: 0;
+}
+
+.role-title {
+  color: var(--c-navy);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.role-description {
+  margin: 0;
+  color: var(--c-text-medium);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 .activate-label {

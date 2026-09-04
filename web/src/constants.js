@@ -1,4 +1,6 @@
 export const USER_ROLES = {
+  companion: "Accompagnateur",
+  passenger: "Passager",
   valid: "Accompagnateur",
   invalid: "Personne handicapé",
 };

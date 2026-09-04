@@ -113,10 +113,17 @@ authenticationRoutes.post("/api/authentication/authenticate", authenticateUserSc
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - phoneNumber
+ *               - role
  *             properties:
  *               phoneNumber:
  *                 type: string
  *                 example: "0601020304"
+ *               role:
+ *                 type: string
+ *                 enum: [companion, passenger]
+ *                 example: "passenger"
  *     responses:
  *       201:
  *         description: User activated successfully
