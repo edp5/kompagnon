@@ -24,7 +24,7 @@ describe("Integration | Identities Access Management | Repositories | Password r
       const saved = await knex("password_reset_tokens").where({ id: tokenId }).first();
       expect(saved).toBeDefined();
       expect(saved.userId).toBe(user.id);
-      expect(saved.token).toBe(token);
+      expect(saved.token).toBe(resetTokenRepository.hashResetToken(token));
       expect(saved.usedAt).toBeNull();
     });
   });
@@ -47,7 +47,7 @@ describe("Integration | Identities Access Management | Repositories | Password r
       // then
       expect(found).toBeDefined();
       expect(found.userId).toBe(user.id);
-      expect(found.token).toBe(token);
+      expect(found.token).toBe(resetTokenRepository.hashResetToken(token));
     });
 
     it("should return null when the token has already been used", async () => {

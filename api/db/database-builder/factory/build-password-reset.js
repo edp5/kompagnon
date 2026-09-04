@@ -1,3 +1,4 @@
+import { hashResetToken } from "../../../src/identities-access-management/repositories/password-reset-token-repository.js";
 import { knex } from "../../knex-database-connection.js";
 
 const TABLE_NAME = "password_reset_tokens";
@@ -14,7 +15,7 @@ async function buildPasswordReset({
   }
   const [values] = await knex(TABLE_NAME).insert({
     userId,
-    token,
+    token: hashResetToken(token),
     expiresAt,
     usedAt,
     created_at: createdAt,

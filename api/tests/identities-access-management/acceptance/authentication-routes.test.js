@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import databaseBuilder from "../../../db/database-builder/index.js";
 import { knex } from "../../../db/knex-database-connection.js";
 import server from "../../../server.js";
+import { hashResetToken } from "../../../src/identities-access-management/repositories/password-reset-token-repository.js";
 import { encodedToken } from "../../../src/identities-access-management/services/token-service.js";
 import { generateAuthenticatedUser } from "../../helpers/generate-authenticated-user.js";
 
@@ -252,7 +253,7 @@ describe("Acceptance | Identities Access Management | Routes | Authentication ro
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveProperty("message");
 
-      const consumedToken = await knex("password_reset_tokens").where({ token: resetTokenValue }).first();
+      const consumedToken = await knex("password_reset_tokens").where({ token: hashResetToken(resetTokenValue) }).first();
       expect(consumedToken.usedAt).not.toBeNull();
 
       // verify login works with new password
