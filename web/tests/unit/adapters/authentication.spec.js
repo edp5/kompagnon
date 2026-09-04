@@ -140,13 +140,13 @@ describe("Unit | Adapters | Authentication", () => {
   });
 
   describe("#activateAccount", () => {
-    it("should call the activation endpoint with the token and phone number", async () => {
+    it("should call the activation endpoint with the token, phone number and role", async () => {
       // given
       const token = "test-activation-token";
       const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({ status: 201 });
 
       // when
-      const result = await activateAccount({ token, phoneNumber: "0612345678" });
+      const result = await activateAccount({ token, phoneNumber: "0612345678", role: "passenger" });
 
       // then
       expect(result).toEqual({ success: true, message: "Compte activé avec succès !" });
@@ -156,7 +156,7 @@ describe("Unit | Adapters | Authentication", () => {
           "Content-Type": "application/json",
           authorization: "Bearer test-activation-token",
         },
-        body: JSON.stringify({ phoneNumber: "0612345678" }),
+        body: JSON.stringify({ phoneNumber: "0612345678", role: "passenger" }),
       });
     });
 

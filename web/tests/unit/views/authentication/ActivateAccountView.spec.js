@@ -43,7 +43,7 @@ describe("Unit | Views | Authentication | ActivateAccountView", () => {
   });
 
   describe("when token is provided", () => {
-    it("should show the phone number form and not activate on mount", async () => {
+    it("should show the role options and phone number form and not activate on mount", async () => {
       // given
       mockRoute.query = { token: "valid-token" };
 
@@ -52,7 +52,24 @@ describe("Unit | Views | Authentication | ActivateAccountView", () => {
       await flushPromises();
 
       // then
+      expect(wrapper.find("input#role-companion").exists()).toBe(true);
+      expect(wrapper.find("input#role-passenger").exists()).toBe(true);
       expect(wrapper.find("input#phoneNumber").exists()).toBe(true);
+      expect(activateAccount).not.toHaveBeenCalled();
+    });
+
+    it("should show a validation error and not call the adapter when no role is selected", async () => {
+      // given
+      mockRoute.query = { token: "valid-token" };
+      const wrapper = mount(ActivateAccountView);
+
+      // when
+      await wrapper.find("input#phoneNumber").setValue("0612345678");
+      await wrapper.find("form").trigger("submit.prevent");
+      await flushPromises();
+
+      // then
+      expect(wrapper.text()).toContain("Veuillez choisir un rôle (Accompagnateur ou Passager).");
       expect(activateAccount).not.toHaveBeenCalled();
     });
 
@@ -62,6 +79,7 @@ describe("Unit | Views | Authentication | ActivateAccountView", () => {
       const wrapper = mount(ActivateAccountView);
 
       // when
+      await wrapper.find("input#role-companion").setValue(true);
       await wrapper.find("input#phoneNumber").setValue("not-a-phone");
       await wrapper.find("form").trigger("submit.prevent");
       await flushPromises();
@@ -71,19 +89,46 @@ describe("Unit | Views | Authentication | ActivateAccountView", () => {
       expect(activateAccount).not.toHaveBeenCalled();
     });
 
-    it("should activate with the token and phone number, then show the login link on success", async () => {
+    it("should activate with token, phone number and selected role, then show the login link on success", async () => {
       // given
       mockRoute.query = { token: "valid-token" };
       activateAccount.mockResolvedValue({ success: true, message: "Compte activé avec succès !" });
       const wrapper = mount(ActivateAccountView);
 
       // when
+      await wrapper.find("input#role-passenger").setValue(true);
       await wrapper.find("input#phoneNumber").setValue("0612345678");
       await wrapper.find("form").trigger("submit.prevent");
       await flushPromises();
 
       // then
-      expect(activateAccount).toHaveBeenCalledWith({ token: "valid-token", phoneNumber: "0612345678" });
+      expect(activateAccount).toHaveBeenCalledWith({
+        token: "valid-token",
+        phoneNumber: "0612345678",
+        role: "passenger",
+      });
+      expect(wrapper.text()).toContain("Compte activé avec succès !");
+      expect(wrapper.text()).toContain("Aller à la connexion");
+    });
+
+    it("should activate with token, phone number and companion role when companion is selected", async () => {
+      // given
+      mockRoute.query = { token: "valid-token" };
+      activateAccount.mockResolvedValue({ success: true, message: "Compte activé avec succès !" });
+      const wrapper = mount(ActivateAccountView);
+
+      // when
+      await wrapper.find("input#role-companion").setValue(true);
+      await wrapper.find("input#phoneNumber").setValue("0612345678");
+      await wrapper.find("form").trigger("submit.prevent");
+      await flushPromises();
+
+      // then
+      expect(activateAccount).toHaveBeenCalledWith({
+        token: "valid-token",
+        phoneNumber: "0612345678",
+        role: "companion",
+      });
       expect(wrapper.text()).toContain("Compte activé avec succès !");
       expect(wrapper.text()).toContain("Aller à la connexion");
     });
@@ -95,6 +140,7 @@ describe("Unit | Views | Authentication | ActivateAccountView", () => {
       const wrapper = mount(ActivateAccountView);
 
       // when
+      await wrapper.find("input#role-companion").setValue(true);
       await wrapper.find("input#phoneNumber").setValue("0612345678");
       await wrapper.find("form").trigger("submit.prevent");
       await flushPromises();
