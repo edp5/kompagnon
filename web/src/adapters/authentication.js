@@ -68,7 +68,7 @@ async function loginUser({ email, password }) {
   }
 }
 
-async function activateAccount({ token, phoneNumber }) {
+async function activateAccount({ token, phoneNumber, role }) {
   try {
     const response = await fetch(`${AUTHENTICATION_URL}activate`, {
       method: "POST",
@@ -76,7 +76,7 @@ async function activateAccount({ token, phoneNumber }) {
         "Content-Type": "application/json",
         authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ phoneNumber }),
+      body: JSON.stringify({ phoneNumber, role }),
     });
 
     switch (response.status) {
