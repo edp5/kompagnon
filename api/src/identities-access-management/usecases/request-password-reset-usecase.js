@@ -11,31 +11,25 @@ const TOKEN_EXPIRATION_MS = 60 * 60 * 1000; // 1 hour
  * Always resolves without throwing user existence errors to prevent account enumeration.
  * @param {object} params - Parameters
  * @param {string} params.email - User email address
- * @param {Function} [params.findUser] - Repository function to find user by email
- * @param {Function} [params.createToken] - Repository function to create reset token
- * @param {Function} [params.sendMail] - Service function to send reset email
  * @returns {Promise<{ message: string }>} Resolves with status message
  */
 async function requestPasswordResetUsecase({
   email,
-  findUser = findUserByEmail,
-  createToken = createPasswordResetToken,
-  sendMail = sendMailToResetPasswordService,
 }) {
   const normalizedEmail = email.trim().toLowerCase();
-  const user = await findUser(normalizedEmail);
+  const user = await findUserByEmail(normalizedEmail);
 
   if (user) {
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + TOKEN_EXPIRATION_MS);
 
-    await createToken({
+    await createPasswordResetToken({
       userId: user.id,
       token,
       expiresAt,
     });
 
-    await sendMail({
+    await sendMailToResetPasswordService({
       firstname: user.firstname,
       lastname: user.lastname,
       email: user.email,
