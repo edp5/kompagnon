@@ -4,8 +4,13 @@ import { useRouter } from "vue-router";
 
 import { getUserProfile } from "@/adapters/users.js";
 import KIcon from "@/components/KIcon.vue";
-import { USER_GENRE, USER_ROLES } from "@/constants.js";
+import { USER_GENRE } from "@/constants.js";
 import { useAuthStore } from "@/stores/auth.js";
+
+const ROLE_LABELS = {
+  companion: "Accompagnateur",
+  passenger: "Bénéficiaire",
+};
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -59,7 +64,7 @@ const initials = computed(() => {
 });
 
 const displayGenre = computed(() => USER_GENRE[profile.value?.genre] ?? "-");
-const displayRole = computed(() => USER_ROLES[profile.value?.role] ?? "-");
+const displayRole = computed(() => ROLE_LABELS[profile.value?.role] ?? "-");
 
 const stats = computed(() => [
   { value: displayGenre.value, label: "Civilité", accent: "var(--kompagnon-turquoise)" },

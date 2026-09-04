@@ -54,6 +54,40 @@ describe("Unit | Views | ProfileView", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
+  it("should display 'Accompagnateur' as the role for a companion", async () => {
+    // given
+    const authStore = useAuthStore();
+    authStore.setAuth("valid-token", 1);
+    getUserProfile.mockResolvedValue({
+      success: true,
+      profile: { firstname: "Jane", lastname: "Doe", role: "companion" },
+    });
+
+    // when
+    const wrapper = mount(ProfileView);
+    await flushPromises();
+
+    // then
+    expect(wrapper.text()).toContain("Accompagnateur");
+  });
+
+  it("should display 'Bénéficiaire' as the role for a passenger", async () => {
+    // given
+    const authStore = useAuthStore();
+    authStore.setAuth("valid-token", 1);
+    getUserProfile.mockResolvedValue({
+      success: true,
+      profile: { firstname: "Jane", lastname: "Doe", role: "passenger" },
+    });
+
+    // when
+    const wrapper = mount(ProfileView);
+    await flushPromises();
+
+    // then
+    expect(wrapper.text()).toContain("Bénéficiaire");
+  });
+
   it("should clear token and redirect to login when session is expired", async () => {
     // given
     const authStore = useAuthStore();
