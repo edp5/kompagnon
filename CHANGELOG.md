@@ -1,3 +1,30 @@
+## [1.5.0](https://github.com/edp5/kompagnon/compare/v1.4.0...v1.5.0) (2026-09-04)
+
+### 🚀 New features
+
+* define user role on account activation ([#934](https://github.com/edp5/kompagnon/issues/934)) ([#942](https://github.com/edp5/kompagnon/issues/942)) ([6670bc0](https://github.com/edp5/kompagnon/commit/6670bc040384729012e717294bcbc7610c3d500c))
+* implement forgot password and reset password flow via email ([#912](https://github.com/edp5/kompagnon/issues/912)) ([#931](https://github.com/edp5/kompagnon/issues/931)) ([9ed5455](https://github.com/edp5/kompagnon/commit/9ed5455e210b5207d48c17051ae25d2b46ca9d9b))
+* replace mock home quick actions with a single record-journey CTA ([#937](https://github.com/edp5/kompagnon/issues/937)) ([2e1f625](https://github.com/edp5/kompagnon/commit/2e1f6253a8692f402fcd24e74ba31047cb1ad027))
+* Update the page title during navigation ([#938](https://github.com/edp5/kompagnon/issues/938)) ([a8b4fbd](https://github.com/edp5/kompagnon/commit/a8b4fbda2103491c3c922d576430919879fdf45d))
+
+### 🐛 Bug Fixes
+
+* **web:** show the correct role label in the desktop sidebar ([#948](https://github.com/edp5/kompagnon/issues/948)) ([35ab2c3](https://github.com/edp5/kompagnon/commit/35ab2c38f7cddee7b4d3054a01b9e96163281e84))
+* **web:** show the correct role on the profile page ([#949](https://github.com/edp5/kompagnon/issues/949)) ([d5417fd](https://github.com/edp5/kompagnon/commit/d5417fd377f36104dda7c4d83a46a5467ee92ccc))
+
+### 🛠️ Technical
+
+* Create a local server ([#944](https://github.com/edp5/kompagnon/issues/944)) ([c9f519f](https://github.com/edp5/kompagnon/commit/c9f519f0d740f59d0addab187095b36145416990))
+
+### 🔖 Version Bumps
+
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.2.1 to 64.3.2 ([#940](https://github.com/edp5/kompagnon/issues/940)) ([586311a](https://github.com/edp5/kompagnon/commit/586311a7d50bcb910331b794f5987d7db9a5bc03))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.2.1 to 64.3.2 in /api ([#941](https://github.com/edp5/kompagnon/issues/941)) ([0502ad9](https://github.com/edp5/kompagnon/commit/0502ad99ed42eaa35fe286b40c3c1e240989b77e))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.3.2 to 64.3.3 ([#945](https://github.com/edp5/kompagnon/issues/945)) ([da7affa](https://github.com/edp5/kompagnon/commit/da7affa1a8dfe7eed48f2161ff5bf8a9dca6c2f5))
+* **deps-dev:** bump eslint-plugin-jsdoc from 64.3.2 to 64.3.3 in /api ([#947](https://github.com/edp5/kompagnon/issues/947)) ([5c20f95](https://github.com/edp5/kompagnon/commit/5c20f9589c4a737d4bc5295aad9e613148c566d2))
+* **deps:** bump edp5/edp5-actions from 1.8.1 to 1.9.0 ([#939](https://github.com/edp5/kompagnon/issues/939)) ([729bbda](https://github.com/edp5/kompagnon/commit/729bbdac0678bddfa6d13704115e9411a10f120f))
+* **deps:** bump nodemailer from 9.0.6 to 9.1.0 in /api ([#946](https://github.com/edp5/kompagnon/issues/946)) ([042c3d3](https://github.com/edp5/kompagnon/commit/042c3d3b96cb24ec2353d06cd3f637b90e496e69))
+
 ## [1.4.0](https://github.com/edp5/kompagnon/compare/v1.3.0...v1.4.0) (2026-09-02)
 
 ### 🚀 New features
