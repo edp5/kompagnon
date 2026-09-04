@@ -5,7 +5,7 @@ import { useRoute, useRouter } from "vue-router";
 import { getJourney, getJourneyMatches, updateFoundJourneyStatus } from "@/adapters/journeys.js";
 import { useAuthStore } from "@/stores/auth.js";
 
-const STATUS = { WAITING: "waiting", ACCEPTED: "accepted", REJECTED: "rejected", CANCELLED: "cancelled", COMPLETED: "completed" };
+const STATUS = { WAITING: "waiting", ACCEPTED: "accepted", CANCELLED: "cancelled", COMPLETED: "completed" };
 
 const authStore = useAuthStore();
 const route = useRoute();
@@ -26,9 +26,7 @@ function matchState(match) {
   if (match.myStatus === STATUS.CANCELLED || match.otherStatus === STATUS.CANCELLED) {
     return { actionable: false, variant: "cancelled", message: "Ce trajet a été annulé." };
   }
-  if (match.myStatus === STATUS.REJECTED || match.otherStatus === STATUS.REJECTED) {
-    return { actionable: false, variant: "cancelled", message: "Ce trajet a été refusé." };
-  }
+
   if (match.myStatus === STATUS.COMPLETED || match.otherStatus === STATUS.COMPLETED) {
     return { actionable: false, variant: "completed", message: "Ce trajet est terminé." };
   }
@@ -680,12 +678,12 @@ onMounted(async () => {
 }
 
 .journey-view__match-status--cancelled {
-  background: rgba(211, 47, 47, 0.08);
-  color: #b3261e;
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
 }
 
 .journey-view__match-status--completed {
-  background: rgba(46, 125, 50, 0.08);
-  color: #2e7d32;
+  background: var(--c-success-bg);
+  color: var(--c-success-text, #1a6b3e);
 }
 </style>

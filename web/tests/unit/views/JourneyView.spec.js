@@ -324,40 +324,6 @@ describe("Unit | Views | JourneyView", () => {
     expect(wrapper.text()).toContain("Ce trajet a été annulé.");
   });
 
-  it("should show a rejected message and no actions when the match is rejected", async () => {
-    // given
-    getJourney.mockResolvedValue({ success: true, journey });
-    getJourneyMatches.mockResolvedValue({
-      success: true,
-      matches: [{ ...waitingMatch, myStatus: "rejected", otherStatus: "accepted" }],
-    });
-
-    // when
-    const wrapper = mountView();
-    await flushPromises();
-
-    // then
-    expect(wrapper.find(".journey-view__match-btn--accept").exists()).toBe(false);
-    expect(wrapper.text()).toContain("Ce trajet a été refusé.");
-    expect(wrapper.find(".journey-view__match-status--cancelled").exists()).toBe(true);
-  });
-
-  it("should show a rejected message when the other side rejected", async () => {
-    // given
-    getJourney.mockResolvedValue({ success: true, journey });
-    getJourneyMatches.mockResolvedValue({
-      success: true,
-      matches: [{ ...waitingMatch, myStatus: "accepted", otherStatus: "rejected" }],
-    });
-
-    // when
-    const wrapper = mountView();
-    await flushPromises();
-
-    // then
-    expect(wrapper.text()).toContain("Ce trajet a été refusé.");
-  });
-
   it("should show a completed message and no actions when the match is completed", async () => {
     // given
     getJourney.mockResolvedValue({ success: true, journey });
