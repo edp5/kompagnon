@@ -272,4 +272,73 @@ describe("Unit | Views | JourneyView", () => {
     expect(wrapper.find(".journey-view__match-btn--accept").exists()).toBe(false);
     expect(wrapper.text()).toContain("En attente de la réponse");
   });
+
+  it("should show a confirmation message once both sides accepted", async () => {
+    // given
+    getJourney.mockResolvedValue({ success: true, journey });
+    getJourneyMatches.mockResolvedValue({
+      success: true,
+      matches: [{ ...waitingMatch, myStatus: "accepted", otherStatus: "accepted" }],
+    });
+
+    // when
+    const wrapper = mountView();
+    await flushPromises();
+
+    // then
+    expect(wrapper.find(".journey-view__match-btn--accept").exists()).toBe(false);
+    expect(wrapper.text()).toContain("Trajet confirmé, vous êtes bien en binôme.");
+  });
+
+  it("should show a cancelled message and no actions when the match is cancelled", async () => {
+    // given
+    getJourney.mockResolvedValue({ success: true, journey });
+    getJourneyMatches.mockResolvedValue({
+      success: true,
+      matches: [{ ...waitingMatch, myStatus: "cancelled", otherStatus: "accepted" }],
+    });
+
+    // when
+    const wrapper = mountView();
+    await flushPromises();
+
+    // then
+    expect(wrapper.find(".journey-view__match-btn--accept").exists()).toBe(false);
+    expect(wrapper.text()).toContain("Ce trajet a été annulé.");
+    expect(wrapper.find(".journey-view__match-status--cancelled").exists()).toBe(true);
+  });
+
+  it("should show a cancelled message when the other side cancelled", async () => {
+    // given
+    getJourney.mockResolvedValue({ success: true, journey });
+    getJourneyMatches.mockResolvedValue({
+      success: true,
+      matches: [{ ...waitingMatch, myStatus: "accepted", otherStatus: "cancelled" }],
+    });
+
+    // when
+    const wrapper = mountView();
+    await flushPromises();
+
+    // then
+    expect(wrapper.text()).toContain("Ce trajet a été annulé.");
+  });
+
+  it("should show a completed message and no actions when the match is completed", async () => {
+    // given
+    getJourney.mockResolvedValue({ success: true, journey });
+    getJourneyMatches.mockResolvedValue({
+      success: true,
+      matches: [{ ...waitingMatch, myStatus: "completed", otherStatus: "completed" }],
+    });
+
+    // when
+    const wrapper = mountView();
+    await flushPromises();
+
+    // then
+    expect(wrapper.find(".journey-view__match-btn--accept").exists()).toBe(false);
+    expect(wrapper.text()).toContain("Ce trajet est terminé.");
+    expect(wrapper.find(".journey-view__match-status--completed").exists()).toBe(true);
+  });
 });
