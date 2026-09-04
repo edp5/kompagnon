@@ -81,4 +81,65 @@ class InvalidNotifyApiKeyError extends DomainError {
   }
 }
 
-export { AlreadyAccepted, AlreadyCancelled, AlreadyRejected, InvalidNotifyApiKeyError, JourneyIsNotOfThisUser, JourneyNotFound, MatchingAlgorithmNotConfigured, MatchingAlgorithmRequestFailed, UserHasNoRole };
+/**
+ * Throw when a found journey is not found
+ */
+class FoundJourneyNotFound extends DomainError {
+  constructor() {
+    super("Found journey not found", 404);
+  }
+}
+
+/**
+ * Throw when trying to review a journey that is not completed
+ */
+class JourneyNotCompletedError extends DomainError {
+  constructor() {
+    super("Journey is not completed", 400);
+  }
+}
+
+/**
+ * Throw when a user attempts an action on a journey they did not participate in
+ */
+class UserNotParticipantError extends DomainError {
+  constructor() {
+    super("User is not a participant of this journey", 403);
+  }
+}
+
+/**
+ * Throw when a review has already been submitted for a journey by the user
+ */
+class ReviewAlreadySubmittedError extends DomainError {
+  constructor() {
+    super("Review already submitted for this journey", 409);
+  }
+}
+
+/**
+ * Throw when rating is invalid
+ */
+class InvalidRatingError extends DomainError {
+  constructor() {
+    super("Rating must be an integer between 1 and 5", 400);
+  }
+}
+
+export {
+  AlreadyAccepted,
+  AlreadyCancelled,
+  AlreadyRejected,
+  FoundJourneyNotFound,
+  InvalidNotifyApiKeyError,
+  InvalidRatingError,
+  JourneyIsNotOfThisUser,
+  JourneyNotCompletedError,
+  JourneyNotFound,
+  MatchingAlgorithmNotConfigured,
+  MatchingAlgorithmRequestFailed,
+  ReviewAlreadySubmittedError,
+  UserHasNoRole,
+  UserNotParticipantError,
+};
+

@@ -209,4 +209,67 @@ async function updateFoundJourneyStatus({ token, foundJourneyId, accept }) {
   }
 }
 
-export { getJourney, getJourneyMatches, getJourneys, recordJourney, updateFoundJourneyStatus };
+/**
+ * Submit a rating and review for a completed found journey.
+ * @param {object} params - Review parameters.
+ * @param {string} params.token - The authenticated user's bearer token.
+ * @param {number|string} params.foundJourneyId - The found journey ID.
+ * @param {number} params.rating - The star rating (1-5).
+ * @param {string} [params.comment] - Optional review comment text.
+ * @returns {Promise<{success: boolean, review?: object, message?: string}>}
+ */
+async function submitJourneyReview({ token, foundJourneyId, rating, comment }) {
+  try {
+    const response = await fetch(`${JOURNEYS_URL}/found/${foundJourneyId}/reviews`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ rating, comment }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        return {
+          success: false,
+          message: "Session expirée. Merci de vous reconnecter.",
+        };
+      }
+      if (response.status === 409) {
+        return {
+          success: false,
+          message: "Vous avez déjà laissé un avis pour ce trajet.",
+        };
+      }
+      if (response.status === 400) {
+        return {
+          success: false,
+          message: "Impossible de déposer un avis : le trajet n'est pas encore terminé.",
+        };
+      }
+      return {
+        success: false,
+        message: "Impossible de déposer l'avis. Veuillez réessayer.",
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, review: data?.data };
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de joindre le serveur. Veuillez réessayer plus tard.",
+    };
+  }
+}
+
+export {
+  getJourney,
+  getJourneyMatches,
+  getJourneys,
+  recordJourney,
+  submitJourneyReview,
+  updateFoundJourneyStatus,
+};
+

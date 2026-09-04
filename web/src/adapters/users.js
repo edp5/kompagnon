@@ -37,4 +37,48 @@ async function getUserProfile({ token }) {
   }
 }
 
-export { getUserProfile };
+/**
+ * Retrieve public reviews and statistics for a given user.
+ * @param {object} params - Parameters.
+ * @param {string} [params.token] - Auth token.
+ * @param {number|string} params.userId - Target user ID.
+ * @param {number} [params.limit=10] - Number of reviews.
+ * @param {number} [params.offset=0] - Pagination offset.
+ * @returns {Promise<{success: boolean, averageRating?: number, reviewCount?: number, reviews?: Array, message?: string}>}
+ */
+async function getUserReviews({ token, userId, limit = 10, offset = 0 }) {
+  try {
+    const query = new URLSearchParams({ limit, offset }).toString();
+    const headers = {};
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    const response = await fetch(`${USERS_URL}${userId}/reviews?${query}`, {
+      method: "GET",
+      headers,
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: "Impossible de charger les avis utilisateur.",
+      };
+    }
+
+    const data = await response.json();
+    return {
+      success: true,
+      averageRating: data?.data?.averageRating ?? 0,
+      reviewCount: data?.data?.reviewCount ?? 0,
+      reviews: data?.data?.reviews ?? [],
+    };
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de joindre le serveur. Veuillez réessayer plus tard.",
+    };
+  }
+}
+
+export { getUserProfile, getUserReviews };
+
