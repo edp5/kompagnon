@@ -1,6 +1,7 @@
 import { celebrate, Joi, Segments } from "celebrate";
 
 import { logger } from "../../../logger.js";
+import { USER_ROLE } from "../../shared/constants.js";
 import { decodedToken } from "../services/token-service.js";
 import usecases from "../usecases/index.js";
 
@@ -9,7 +10,8 @@ const activateUserSchema = celebrate({
     authorization: Joi.string().pattern(/^Bearer .+$/).required(),
   }).unknown(),
   [Segments.BODY]: Joi.object({
-    phoneNumber: Joi.string().pattern(/^0[67]\d{8}$/),
+    phoneNumber: Joi.string().pattern(/^0[67]\d{8}$/).required(),
+    role: Joi.string().valid(USER_ROLE.COMPANION, USER_ROLE.PASSENGER).required(),
   }),
 });
 
@@ -34,9 +36,9 @@ async function activateUserController(
 
     const decodedData = decodedTokenService(token);
     const userId = decodedData.userId;
-    const { phoneNumber } = req.body;
+    const { phoneNumber, role } = req.body;
 
-    await activateUserUsecase({ userId, phoneNumber });
+    await activateUserUsecase({ userId, phoneNumber, role });
 
     return res.status(201).send();
   } catch (error) {
