@@ -34,6 +34,7 @@
     "test:web": "cd web && npm test",
     "test:admin": "cd admin && npm test",
     "test": "run-p --print-label test:api test:web test:admin",
+    "start": "npm --prefix api start",
     "local-prod:install": "./local-prod/install",
     "local-prod:start": "docker compose -f local-prod/compose.yaml up -d",
     "local-prod:stop": "docker compose -f local-prod/compose.yaml down -v",
