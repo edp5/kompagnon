@@ -1,9 +1,14 @@
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getUserProfile } from "@/adapters/users.js";
 import DesktopSidebar from "@/components/DesktopSidebar.vue";
 import { useAuthStore } from "@/stores/auth.js";
+
+vi.mock("@/adapters/users.js", () => ({
+  getUserProfile: vi.fn().mockResolvedValue({ success: false }),
+}));
 
 const pushMock = vi.fn();
 
@@ -171,6 +176,43 @@ describe("Unit | Components | DesktopSidebar", () => {
     expect(wrapper.find(".sidebar__nav").exists()).toBe(true);
     expect(wrapper.find(".sidebar__user").exists()).toBe(true);
     expect(wrapper.find(".sidebar__brand").exists()).toBe(true);
+  });
+
+  describe("role label", () => {
+    async function mountWithRole(role) {
+      const authStore = useAuthStore();
+      authStore.setAuth("jwt-token", 1);
+      getUserProfile.mockResolvedValue({ success: true, profile: { role } });
+      const wrapper = mount(DesktopSidebar, {
+        global: { stubs: { RouterLink: true } },
+      });
+      await flushPromises();
+      return wrapper;
+    }
+
+    it("should display 'Volontaire' for a companion", async () => {
+      // when
+      const wrapper = await mountWithRole("companion");
+
+      // then
+      expect(wrapper.find(".sidebar__role-label").text()).toContain("Volontaire");
+    });
+
+    it("should display 'Bénéficiaire' for a passenger", async () => {
+      // when
+      const wrapper = await mountWithRole("passenger");
+
+      // then
+      expect(wrapper.find(".sidebar__role-label").text()).toContain("Bénéficiaire");
+    });
+
+    it("should fall back to 'Bénéficiaire' when the user has no role", async () => {
+      // when
+      const wrapper = await mountWithRole(null);
+
+      // then
+      expect(wrapper.find(".sidebar__role-label").text()).toContain("Bénéficiaire");
+    });
   });
 
   describe("drawer behaviour", () => {

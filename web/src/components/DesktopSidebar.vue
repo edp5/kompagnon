@@ -171,7 +171,7 @@ function isActive(routeName) {
       class="sidebar__role-display"
     >
       <p class="sidebar__role-label">
-        {{ userRole === "valid" ? "💚 Volontaire" : "🤝 Bénéficiaire" }}
+        {{ userRole === "companion" ? "💚 Volontaire" : "🤝 Bénéficiaire" }}
       </p>
     </div>
 
