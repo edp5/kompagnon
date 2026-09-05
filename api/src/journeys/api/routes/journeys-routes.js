@@ -13,6 +13,12 @@ import {
   recordJourneyPositionSchema,
 } from "../controllers/journey-positions-controller.js";
 import {
+  getMyJourneyReviewController,
+  getMyJourneyReviewSchema,
+  reviewJourneyController,
+  reviewJourneySchema,
+} from "../controllers/journey-review-controller.js";
+import {
   createJourneyShareController,
   createJourneyShareSchema,
   getSharedJourneyController,
@@ -325,6 +331,17 @@ journeysRoutes.put(
  *                           lastname:
  *                             type: string
  *                             example: Le Guen
+ *                           reputation:
+ *                             type: object
+ *                             description: How this user has been rated on the journeys they travelled. Carried on the match so it can be weighed before accepting.
+ *                             properties:
+ *                               average:
+ *                                 type: number
+ *                                 nullable: true
+ *                                 example: 4.6
+ *                               count:
+ *                                 type: integer
+ *                                 example: 12
  *                       journey:
  *                         type: object
  *                         properties:
@@ -691,6 +708,96 @@ journeysRoutes.get(
   "/api/share/:token",
   getSharedJourneySchema,
   getSharedJourneyController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/found/{foundJourneyId}/review:
+ *   post:
+ *     tags:
+ *       - Journeys
+ *     summary: Review a journey once it is over
+ *     description: |
+ *       Records what one participant thought of the other. Only the two users of
+ *       the journey may review it, only once the pair both accepted, and only
+ *       once the arrival time has passed — a reputation must not be built out of
+ *       journeys nobody made. Reviewing again replaces what the author wrote
+ *       rather than adding a second opinion of the same trip.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: foundJourneyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [rating]
+ *             properties:
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *               comment:
+ *                 type: string
+ *                 nullable: true
+ *     responses:
+ *       201:
+ *         description: The review
+ *       400:
+ *         description: Malformed rating
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: The journey is not the user's
+ *       404:
+ *         description: Unknown journey
+ *       409:
+ *         description: The journey was not confirmed, or has not been travelled yet
+ */
+journeysRoutes.post(
+  "/api/journeys/found/:foundJourneyId/review",
+  authMiddleware,
+  reviewJourneySchema,
+  reviewJourneyController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/found/{foundJourneyId}/review:
+ *   get:
+ *     tags:
+ *       - Journeys
+ *     summary: Read the review the user left on a journey
+ *     description: Returns the review the authenticated user wrote about this journey, or null when they have not written one, so the app can offer to change it rather than asking again.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: foundJourneyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: The review, or null
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: The journey is not the user's
+ *       404:
+ *         description: Unknown journey
+ */
+journeysRoutes.get(
+  "/api/journeys/found/:foundJourneyId/review",
+  authMiddleware,
+  getMyJourneyReviewSchema,
+  getMyJourneyReviewController,
 );
 
 export default journeysRoutes;

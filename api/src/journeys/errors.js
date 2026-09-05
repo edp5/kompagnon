@@ -90,4 +90,22 @@ class ShareLinkInvalid extends DomainError {
   }
 }
 
-export { AlreadyAccepted, AlreadyCancelled, AlreadyRejected, InvalidNotifyApiKeyError, JourneyIsNotOfThisUser, JourneyNotFound, MatchingAlgorithmNotConfigured, MatchingAlgorithmRequestFailed, ShareLinkInvalid, UserHasNoRole };
+/**
+ * Throw when someone reviews a journey that has not happened yet
+ */
+class JourneyNotTravelledYet extends DomainError {
+  constructor() {
+    super("The journey has not been travelled yet", 409);
+  }
+}
+
+/**
+ * Throw when someone reviews a journey the pair never confirmed
+ */
+class JourneyWasNotConfirmed extends DomainError {
+  constructor() {
+    super("The journey was not confirmed by both users", 409);
+  }
+}
+
+export { AlreadyAccepted, AlreadyCancelled, AlreadyRejected, InvalidNotifyApiKeyError, JourneyIsNotOfThisUser, JourneyNotFound, JourneyNotTravelledYet, JourneyWasNotConfirmed, MatchingAlgorithmNotConfigured, MatchingAlgorithmRequestFailed, ShareLinkInvalid, UserHasNoRole };
