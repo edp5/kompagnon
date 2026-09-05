@@ -6,12 +6,14 @@ import { cancelFoundJourneyPassengerStatusUsecase } from "./cancel-found-journey
 import { getCompanionJourneyUsecase } from "./get-companion-journey-usecase.js";
 import { getCompanionJourneysUsecase } from "./get-companion-journeys-usecase.js";
 import { getJourneyMatchesUsecase } from "./get-journey-matches-usecase.js";
+import { getJourneyMessagesUsecase } from "./get-journey-messages-usecase.js";
 import { getPassengerJourneyUsecase } from "./get-passenger-journey-usecase.js";
 import { getPassengerJourneysUsecase } from "./get-passenger-journeys-usecase.js";
 import { recordCompanionJourneyUsecase } from "./record-companion-journey-usecase.js";
 import { recordPassengerJourneyUsecase } from "./record-passenger-journey-usecase.js";
 import { rejectFoundJourneyCompanionStatusUsecase } from "./reject-found-journey-companion-status-usecase.js";
 import { rejectFoundJourneyPassengerStatusUsecase } from "./reject-found-journey-passenger-status-usecase.js";
+import { sendJourneyMessageUsecase } from "./send-journey-message-usecase.js";
 
 const usecases = {
   acceptFoundJourneyCompanionStatusUsecase,
@@ -22,12 +24,14 @@ const usecases = {
   getCompanionJourneyUsecase,
   getCompanionJourneysUsecase,
   getJourneyMatchesUsecase,
+  getJourneyMessagesUsecase,
   getPassengerJourneyUsecase,
   getPassengerJourneysUsecase,
   recordCompanionJourneyUsecase,
   recordPassengerJourneyUsecase,
   rejectFoundJourneyCompanionStatusUsecase,
   rejectFoundJourneyPassengerStatusUsecase,
+  sendJourneyMessageUsecase,
 };
 
 export default usecases;
