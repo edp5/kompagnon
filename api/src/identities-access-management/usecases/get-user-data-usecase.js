@@ -15,6 +15,11 @@ async function getUserDataUsecase(userId) {
     genre: user.genre,
     role: user.role,
     disabilities: user.disabilities,
+    // Null rather than an object with empty fields, so the client can ask
+    // "is there one?" without inspecting the inside of it.
+    trustedContact: user.trustedContactPhone
+      ? { name: user.trustedContactName, phoneNumber: user.trustedContactPhone }
+      : null,
   };
 }
 
