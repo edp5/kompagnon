@@ -81,4 +81,13 @@ class InvalidNotifyApiKeyError extends DomainError {
   }
 }
 
-export { AlreadyAccepted, AlreadyCancelled, AlreadyRejected, InvalidNotifyApiKeyError, JourneyIsNotOfThisUser, JourneyNotFound, MatchingAlgorithmNotConfigured, MatchingAlgorithmRequestFailed, UserHasNoRole };
+/**
+ * Throw when a share link is unknown, expired or revoked
+ */
+class ShareLinkInvalid extends DomainError {
+  constructor() {
+    super("Share link is invalid or expired", 404);
+  }
+}
+
+export { AlreadyAccepted, AlreadyCancelled, AlreadyRejected, InvalidNotifyApiKeyError, JourneyIsNotOfThisUser, JourneyNotFound, MatchingAlgorithmNotConfigured, MatchingAlgorithmRequestFailed, ShareLinkInvalid, UserHasNoRole };
