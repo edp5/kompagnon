@@ -7,6 +7,18 @@ import { getJourneyMatchesController, getJourneyMatchesControllerSchema } from "
 import { getJourneyMessagesController, getJourneyMessagesSchema } from "../controllers/get-journey-messages-controller.js";
 import { getJourneysController, getJourneysControllerSchema } from "../controllers/get-journeys-controller.js";
 import {
+  getJourneyPositionsController,
+  getJourneyPositionsSchema,
+  recordJourneyPositionController,
+  recordJourneyPositionSchema,
+} from "../controllers/journey-positions-controller.js";
+import {
+  createJourneyShareController,
+  createJourneyShareSchema,
+  getSharedJourneyController,
+  getSharedJourneySchema,
+} from "../controllers/journey-share-controller.js";
+import {
   notifyNewMatchController,
   notifyNewMatchControllerSchema,
 } from "../controllers/notify-new-match-controller.js";
@@ -495,6 +507,185 @@ journeysRoutes.post(
   authMiddleware,
   sendJourneyMessageSchema,
   sendJourneyMessageController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/found/{foundJourneyId}/positions:
+ *   post:
+ *     tags:
+ *       - Journeys
+ *     summary: Report where you are during a journey
+ *     description: Records the position of the authenticated user so the other participant, and anyone holding a share link, can follow the journey. Only the two users of the journey may report.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: foundJourneyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [lat, lon]
+ *             properties:
+ *               lat:
+ *                 type: number
+ *                 example: 48.8566
+ *               lon:
+ *                 type: number
+ *                 example: 2.3522
+ *     responses:
+ *       201:
+ *         description: Position recorded
+ *       400:
+ *         description: Validation failed
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: The user is not part of this journey
+ *       404:
+ *         description: Found journey not found
+ */
+journeysRoutes.post(
+  "/api/journeys/found/:foundJourneyId/positions",
+  authMiddleware,
+  recordJourneyPositionSchema,
+  recordJourneyPositionController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/found/{foundJourneyId}/positions:
+ *   get:
+ *     tags:
+ *       - Journeys
+ *     summary: Where each participant currently is
+ *     description: Returns the latest position of each user of the journey. Only the latest one is kept in the answer, never a trail.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: foundJourneyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: The latest position of each participant
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       lat:
+ *                         type: number
+ *                       lon:
+ *                         type: number
+ *                       recordedAt:
+ *                         type: string
+ *                         format: date-time
+ *                       mine:
+ *                         type: boolean
+ *                       firstname:
+ *                         type: string
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: The user is not part of this journey
+ */
+journeysRoutes.get(
+  "/api/journeys/found/:foundJourneyId/positions",
+  authMiddleware,
+  getJourneyPositionsSchema,
+  getJourneyPositionsController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/found/{foundJourneyId}/share:
+ *   post:
+ *     tags:
+ *       - Journeys
+ *     summary: Create a link to let someone follow the journey
+ *     description: Returns a secret link a participant can send to a relative so they can follow the trip. The link expires after 24 hours.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: foundJourneyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       201:
+ *         description: The share link
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                     url:
+ *                       type: string
+ *                     expiresAt:
+ *                       type: string
+ *                       format: date-time
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: The user is not part of this journey
+ */
+journeysRoutes.post(
+  "/api/journeys/found/:foundJourneyId/share",
+  authMiddleware,
+  createJourneyShareSchema,
+  createJourneyShareController,
+);
+
+/**
+ * @swagger
+ * /api/share/{token}:
+ *   get:
+ *     tags:
+ *       - Journeys
+ *     summary: Follow a journey from a share link
+ *     description: |
+ *       Public on purpose: whoever receives the link has no account. It exposes
+ *       the least it can — the route, the schedule, the first names of the pair
+ *       and where they are now. No email, phone number or account is reachable
+ *       through it, and the link stops working after 24 hours.
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The shared journey
+ *       400:
+ *         description: Malformed token
+ *       404:
+ *         description: Unknown, revoked or expired link
+ */
+journeysRoutes.get(
+  "/api/share/:token",
+  getSharedJourneySchema,
+  getSharedJourneyController,
 );
 
 export default journeysRoutes;
