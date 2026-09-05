@@ -1,4 +1,5 @@
 import { JOURNEY_STATUS } from "../../shared/constants.js";
+import { findReputationOfUser } from "../repositories/journey-reviews-repository.js";
 import { getJourneyUsecase } from "./get-journey-usecase.js";
 
 /**
@@ -23,9 +24,16 @@ async function getJourneyMatchesForSideUsecase({ findJourneyById, findMatches, m
 
   const matches = await findMatches(journeyId);
 
-  return matches
-    .filter((match) => match[myStatusKey] !== JOURNEY_STATUS.REJECTED && match[otherStatusKey] !== JOURNEY_STATUS.REJECTED)
-    .map((match) => {
+  const live = matches.filter(
+    (match) => match[myStatusKey] !== JOURNEY_STATUS.REJECTED && match[otherStatusKey] !== JOURNEY_STATUS.REJECTED,
+  );
+
+  // Reputation is what the user weighs before accepting, so it travels with the
+  // match rather than behind a second call they would have to know to make.
+  const reputations = await Promise.all(live.map((match) => findReputationOfUser(match.otherUserId)));
+
+  return live
+    .map((match, index) => {
       const confirmed = match[myStatusKey] === JOURNEY_STATUS.ACCEPTED && match[otherStatusKey] === JOURNEY_STATUS.ACCEPTED;
 
       return {
@@ -34,6 +42,7 @@ async function getJourneyMatchesForSideUsecase({ findJourneyById, findMatches, m
           firstname: match.firstname,
           lastname: match.lastname,
           phoneNumber: confirmed ? match.phoneNumber : null,
+          reputation: reputations[index],
         },
         journey: {
           departureAddress: match.departureAddress,

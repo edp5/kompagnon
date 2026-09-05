@@ -441,7 +441,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
       // then
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveLength(1);
-      expect(response.body.data[0].user).toEqual({ firstname: "Adrien", lastname: "Le Guen", phoneNumber: null });
+      expect(response.body.data[0].user).toEqual({ firstname: "Adrien", lastname: "Le Guen", phoneNumber: null, reputation: { average: null, count: 0 } });
       expect(response.body.data[0].myStatus).toBe(JOURNEY_STATUS.WAITING);
       expect(response.body.data[0].otherStatus).toBe(JOURNEY_STATUS.ACCEPTED);
     });
@@ -466,7 +466,7 @@ describe("Acceptance | Journeys | Journey routes", () => {
       // then
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveLength(1);
-      expect(response.body.data[0].user).toEqual({ firstname: "Adrien", lastname: "Le Guen", phoneNumber: companion.phoneNumber });
+      expect(response.body.data[0].user).toEqual({ firstname: "Adrien", lastname: "Le Guen", phoneNumber: companion.phoneNumber, reputation: { average: null, count: 0 } });
       expect(response.body.data[0].myStatus).toBe(JOURNEY_STATUS.ACCEPTED);
       expect(response.body.data[0].otherStatus).toBe(JOURNEY_STATUS.ACCEPTED);
     });
