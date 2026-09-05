@@ -290,7 +290,7 @@ journeysRoutes.put(
  *     tags:
  *       - Journeys
  *     summary: Get the matches of a journey
- *     description: Returns the matches of a journey owned by the authenticated user, with the other user's name, their journey and both statuses. Matches declined by either side are excluded.
+ *     description: Returns the matches of a journey owned by the authenticated user, with the other user's name, their journey and both statuses. Matches declined by either side are excluded. The phone number and the meeting code are only filled in once both sides have accepted.
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -350,6 +350,11 @@ journeysRoutes.put(
  *                           arrivalLon:
  *                             type: number
  *                             example: 2.2945
+ *                       meetingCode:
+ *                         type: string
+ *                         nullable: true
+ *                         description: Four digits both users read to check they found each other. Null until both sides accepted.
+ *                         example: "4821"
  *                       myStatus:
  *                         type: string
  *                         example: waiting
