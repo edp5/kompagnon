@@ -4,12 +4,14 @@ import { authMiddleware } from "../../../shared/infrastructure/middlewares/auth-
 import { checkMatchApiKey } from "../../infrastructure/middlewares/check-match-api-key.js";
 import { getJourneyController, getJourneyControllerSchema } from "../controllers/get-journey-controller.js";
 import { getJourneyMatchesController, getJourneyMatchesControllerSchema } from "../controllers/get-journey-matches-controller.js";
+import { getJourneyMessagesController, getJourneyMessagesSchema } from "../controllers/get-journey-messages-controller.js";
 import { getJourneysController, getJourneysControllerSchema } from "../controllers/get-journeys-controller.js";
 import {
   notifyNewMatchController,
   notifyNewMatchControllerSchema,
 } from "../controllers/notify-new-match-controller.js";
 import { recordJourneyController, recordJourneyControllerSchema } from "../controllers/record-journey-controller.js";
+import { sendJourneyMessageController, sendJourneyMessageSchema } from "../controllers/send-journey-message-controller.js";
 import {
   updateFoundJourneyStatusController,
   updateFoundJourneyStatusSchema,
@@ -387,5 +389,112 @@ journeysRoutes.get(
  *         description: Api key is invalid.
  */
 journeysRoutes.post("/api/journeys/match", checkMatchApiKey, notifyNewMatchControllerSchema, notifyNewMatchController);
+
+/**
+ * @swagger
+ * /api/journeys/found/{foundJourneyId}/messages:
+ *   get:
+ *     tags:
+ *       - Journeys
+ *     summary: Read the conversation of a match
+ *     description: Returns the messages exchanged by the two users of a found journey, oldest first. Only those two users may read it.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: foundJourneyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: The conversation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       body:
+ *                         type: string
+ *                       sentAt:
+ *                         type: string
+ *                         format: date-time
+ *                       mine:
+ *                         type: boolean
+ *                         description: True when the message was written by the authenticated user.
+ *                       author:
+ *                         type: object
+ *                         properties:
+ *                           firstname:
+ *                             type: string
+ *                           lastname:
+ *                             type: string
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: The user is not part of this journey
+ *       404:
+ *         description: Found journey not found
+ */
+journeysRoutes.get(
+  "/api/journeys/found/:foundJourneyId/messages",
+  authMiddleware,
+  getJourneyMessagesSchema,
+  getJourneyMessagesController,
+);
+
+/**
+ * @swagger
+ * /api/journeys/found/{foundJourneyId}/messages:
+ *   post:
+ *     tags:
+ *       - Journeys
+ *     summary: Send a message to the other user of a match
+ *     description: Adds a message to the conversation of a found journey. Only its two users may write in it.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: foundJourneyId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - body
+ *             properties:
+ *               body:
+ *                 type: string
+ *                 example: Bonjour, je vous attends devant l'entrée principale.
+ *     responses:
+ *       201:
+ *         description: Message sent
+ *       400:
+ *         description: Validation failed
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: The user is not part of this journey
+ *       404:
+ *         description: Found journey not found
+ */
+journeysRoutes.post(
+  "/api/journeys/found/:foundJourneyId/messages",
+  authMiddleware,
+  sendJourneyMessageSchema,
+  sendJourneyMessageController,
+);
 
 export default journeysRoutes;
