@@ -19,16 +19,8 @@ export default defineConfig({
           name: "Integration tests",
           setupFiles: ["./tests/setup.js"],
           include: ["tests/**/integration/**/*.test.js"],
-          poolOptions: {
-            forks: {
-              execArgv: ["--expose-gc"],
-              isolate: true,
-              singleFork: true,
-            },
-            threads: {
-              memoryLimit: 300,
-            },
-          },
+          execArgv: ["--expose-gc"],
+          isolate: true,
           maxWorkers: 1,
         },
       },
@@ -37,13 +29,9 @@ export default defineConfig({
           name: "Acceptance tests",
           setupFiles: ["./tests/setup.js"],
           include: ["tests/**/acceptance/**/*.test.js"],
-          poolOptions: {
-            forks: {
-              execArgv: ["--expose-gc"],
-              isolate: true,
-              singleFork: true,
-            },
-          },
+          execArgv: ["--expose-gc"],
+          isolate: true,
+          maxWorkers: 1,
         },
       },
     ],
