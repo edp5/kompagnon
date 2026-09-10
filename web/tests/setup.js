@@ -3,7 +3,11 @@ import { afterEach, vi } from "vitest";
 
 import localStorage from "./localStorage.js";
 
-global.localStorage = localStorage;
+Object.defineProperty(global, "localStorage", {
+  value: localStorage,
+  writable: true,
+  configurable: true,
+});
 
 // Stub global components
 config.global.stubs = {

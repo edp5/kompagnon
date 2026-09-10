@@ -2,7 +2,7 @@ import { fileURLToPath } from "node:url";
 
 import { configDefaults, defineConfig, mergeConfig } from "vitest/config";
 
-import baseViteConfig from "./vite.config";
+import baseViteConfig from "./vite.config.js";
 
 const viteConfig = typeof baseViteConfig === "function"
   ? baseViteConfig({ mode: "test" })
@@ -14,6 +14,7 @@ export default mergeConfig(
     test: {
       globals: true,
       environment: "jsdom",
+      pool: "vmThreads",
       setupFiles: "tests/setup.js",
       exclude: [...configDefaults.exclude, "e2e/**"],
       root: fileURLToPath(new URL("./", import.meta.url)),
