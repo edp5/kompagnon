@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code, setup node and install dependencies
-        uses: edp5/edp5-actions/checkout-node@v1.9.0
+        uses: edp5/edp5-actions/checkout-node@v1.10.0
         with:
           file-version: .nvmrc
           installCommand: npm ci
@@ -34,7 +34,7 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - name: Checkout code, setup node and install dependencies
-        uses: edp5/edp5-actions/checkout-node@v1.9.0
+        uses: edp5/edp5-actions/checkout-node@v1.10.0
         with:
           file-version: .nvmrc
           installCommand: npm ci
@@ -49,7 +49,7 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - name: Checkout code, setup node and install dependencies
-        uses: edp5/edp5-actions/checkout-node@v1.9.0
+        uses: edp5/edp5-actions/checkout-node@v1.10.0
         with:
           file-version: .nvmrc
           installCommand: |
@@ -58,7 +58,7 @@ jobs:
           workingDirectory: ./api
 
       - name: Setup docker compose
-        uses: edp5/edp5-actions/setup-docker-compose@v1.9.0
+        uses: edp5/edp5-actions/setup-docker-compose@v1.10.0
         with:
           waitTime: '2'
           path: ./api
@@ -81,7 +81,7 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - name: Checkout code, setup node and install dependencies
-        uses: edp5/edp5-actions/checkout-node@v1.9.0
+        uses: edp5/edp5-actions/checkout-node@v1.10.0
         with:
           file-version: .nvmrc
           installCommand: npm ci
@@ -96,7 +96,7 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - name: Checkout code, setup node and install dependencies
-        uses: edp5/edp5-actions/checkout-node@v1.9.0
+        uses: edp5/edp5-actions/checkout-node@v1.10.0
         with:
           file-version: .nvmrc
           installCommand: npm ci
@@ -120,7 +120,7 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - name: Checkout code, setup node and install dependencies
-        uses: edp5/edp5-actions/checkout-node@v1.9.0
+        uses: edp5/edp5-actions/checkout-node@v1.10.0
         with:
           file-version: .nvmrc
           installCommand: npm ci
@@ -135,7 +135,7 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - name: Checkout code, setup node and install dependencies
-        uses: edp5/edp5-actions/checkout-node@v1.9.0
+        uses: edp5/edp5-actions/checkout-node@v1.10.0
         with:
           file-version: .nvmrc
           installCommand: npm ci
